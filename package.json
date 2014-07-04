@@ -3,7 +3,6 @@
   "main": "./lib/dart-tools",
   "version": "0.0.0",
   "description": "Various tools for Dart in Atom",
-  "activationEvents": ["dart-tools:toggle"],
   "repository": "https://github.com/atom/dart-tools",
   "license": "MIT",
   "engines": {
