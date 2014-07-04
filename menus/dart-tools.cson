@@ -1,0 +1,16 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  '.overlayer':
+      'Enable dart-tools': 'dart-tools:toggle'
+
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'dart-tools'
+      'submenu': [
+        { 'label': 'Toggle', 'command': 'dart-tools:toggle' }
+      ]
+    ]
+  }
+]
