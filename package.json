@@ -9,6 +9,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "chokidar": "~0.8.2"
+    "chokidar": "~0.8.2",
+    "theorist": "~1.0.1"
   }
 }
