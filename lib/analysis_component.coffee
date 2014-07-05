@@ -1,4 +1,6 @@
 AnalysisServer = require './analysis_server'
+AnalysisView = require './views/analysis_view'
+
 chokidar = require 'chokidar'
 spawn = require('child_process').spawn
 extname = require('path').extname
@@ -7,11 +9,13 @@ module.exports =
 class AnalysisComponent
   subscriptions: []
   analysisStatusView: null
+  analysisView: null
 
   enable: =>
     @subscriptions.push atom.project.on 'path-changed', @watchDartProject
     @watchDartProject()
     @createAnalysisStatusView()
+    @createAnalysisView()
 
   disable: =>
     @cleanup()
@@ -49,3 +53,9 @@ class AnalysisComponent
         AnalysisStatusView = require './views/analysis_status_view'
         @analysisStatusView = new AnalysisStatusView(statusBar)
         @analysisStatusView.attach()
+
+  createAnalysisView: =>
+    @analysisView = new AnalysisView()
+
+  showProblems: =>
+    console.log 'showing problems'

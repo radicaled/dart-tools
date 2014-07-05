@@ -33,6 +33,7 @@ module.exports =
             class: css
 
           @analysisComponent.analysisStatusView.addFailure()
+          @analysisComponent.analysisView.addProblem(result.desc)
 
           # atom.workspaceView.appendToBottom new AnalysisView
           # ev.appendToBottom new AnalysisView
