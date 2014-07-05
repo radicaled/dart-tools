@@ -11,8 +11,8 @@ class AnalysisResult
     result.subtype  = segments[1]
     result.detail   = segments[2]
     result.fullpath = segments[3]
-    result.line     = segments[4]
-    result.column   = segments[5]
-    result.length   = segments[6]
+    result.line     = parseInt segments[4]
+    result.column   = parseInt segments[5]
+    result.length   = parseInt segments[6]
     result.desc     = segments[7]
     return result

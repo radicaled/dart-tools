@@ -12,6 +12,13 @@ module.exports =
     @analysisComponent.enable()
     @analysisComponent.analysisServer.on 'analysis', (result) =>
       console.log 'Analyzed!', result
+      for ev in atom.workspaceView.getEditorViews()
+        editor = ev.getEditor()
+
+        if editor.getPath() == result.fullpath
+          category = result.category.toLowerCase()          
+          ev.gutter.addClassToLine result.line - 1, "dart-analysis-#{category}"
+
 
 
   deactivate: ->
