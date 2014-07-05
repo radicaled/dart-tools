@@ -1,11 +1,10 @@
-DartToolsView = require './dart-tools-view'
 AnalysisComponent = require './analysis_component'
+AnalysisView = require './views/analysis_view'
 
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
-  dartToolsView: null
-  watcher: null
   analysisComponent: null
+  analysisStatusView: null
 
   activate: (state) ->
     @analysisComponent = new AnalysisComponent()
@@ -32,6 +31,11 @@ module.exports =
           editor.addDecorationForMarker marker,
             type: 'highlight',
             class: css
+
+          @analysisComponent.analysisStatusView.addFailure()
+
+          # atom.workspaceView.appendToBottom new AnalysisView
+          # ev.appendToBottom new AnalysisView
 
   deactivate: ->
     @analysisComponent.disable()

@@ -6,9 +6,12 @@ extname = require('path').extname
 module.exports =
 class AnalysisComponent
   subscriptions: []
+  analysisStatusView: null
+
   enable: =>
     @subscriptions.push atom.project.on 'path-changed', @watchDartProject
     @watchDartProject()
+    @createAnalysisStatusView()
 
   disable: =>
     @cleanup()
@@ -36,3 +39,13 @@ class AnalysisComponent
     @subscriptions = []
     @watcher?.close()
     @analysisServer?.stop()
+    @analysisStatusView?.detach()
+
+  createAnalysisStatusView: =>
+    return unless @isDartProject()
+    atom.packages.once 'activated', =>
+      {statusBar} = atom.workspaceView
+      if statusBar?
+        AnalysisStatusView = require './views/analysis_status_view'
+        @analysisStatusView = new AnalysisStatusView(statusBar)
+        @analysisStatusView.attach()
