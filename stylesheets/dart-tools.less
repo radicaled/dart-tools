@@ -7,6 +7,18 @@
 .dart-tools {
 }
 
+.line-number {
+  &.dart-analysis-info {
+    color: @text-color-warning;
+  }
+}
+
+
 .dart-analysis-info {
-  color: @text-color-warning;
+  .region {
+    border-bottom: 1px dotted fadeout(@text-color-warning, 30%);
+  }
+  // border-bottom-style: dotted;
+  // border-bottom-width: 1px;
+  // border-bottom-color: fadeout(@text-color-warning, 30%);
 }
