@@ -20,12 +20,13 @@ class AnalysisServer extends Model
     @process?.close()
 
   check: (fullPath) =>
+    @emit 'refresh', fullPath
     @process.stdin.write(fullPath + "\n")
 
   processAnalysis: (data) =>
     line = data.toString()
     @buffer ||= ''
-    @buffer += line    
+    @buffer += line
     if @isDone(@buffer)
       @emit 'analysis', AnalysisResult.fromDartAnalyzer @cleanOutput(@buffer)
       @buffer = ''

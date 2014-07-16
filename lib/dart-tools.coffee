@@ -9,6 +9,8 @@ module.exports =
   activate: (state) ->
     @analysisComponent = new AnalysisComponent()
     @analysisComponent.enable()
+    @analysisComponent.analysisServer.on 'refresh', (fullPath) =>
+      atom.workspace.emit 'dart-tools:refresh', fullPath
     @analysisComponent.analysisServer.on 'analysis', (result) =>
       atom.workspace.emit 'dart-tools:analysis', result
 

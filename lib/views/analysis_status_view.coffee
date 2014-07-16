@@ -1,39 +1,48 @@
 {View} = require 'atom'
+React = require 'react-atom-fork'
+{_} = require 'lodash'
+
+{a, div, span} = require 'reactionary-atom-fork'
 
 module.exports =
 class AnalysisStatusView extends View
-  failCount: 0
+  Object.defineProperty @::, 'analysisCount', get: -> @items.length
+  items: []
 
   @content: ->
-    @a class: 'inline-block', =>
-      @span class: 'status icon icon-check'
-      @span class: 'status-text'
+    @div class: 'inline-block'
 
   initialize: (@statusBar) =>
-    @subscribe this, 'click', =>
-      atom.workspaceView.trigger('dart-tools:problems:show')
-      false
-
     @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
-      @addFailure()
+      @items.push(result)
+      @updateState()
+      return null
+
+    @subscribe atom.workspace, 'dart-tools:refresh', (fullPath) =>
+      _.remove @items, (item) => item.fullpath == fullPath
+      @updateState()
+      return null
 
   attach: ->
     @statusBar.appendLeft(this)
 
   afterAttach: ->
-    @updateStatus()
+    @component = React.renderComponent (StatusBar {items: @items }), @element
 
-  addFailure: ->
-    @failCount += 1
-    @updateStatus()
+  updateState: ->
+    @component.setState({ items: @items })
 
+StatusBar = React.createClass
+  showAnalysis: (e) ->
+    atom.workspaceView.trigger('dart-tools:problems:show')
+    e.preventDefault()
+    return false
 
-  updateStatus: =>
-    className = if @failCount > 0 then 'icon-x' else 'icon-check'
-    statusText = if @failCount > 0 then "#{@failCount} problems" else 'No problems'
-
-    this.find('.status')
-      .removeClass('icon-check icon-x')
-      .addClass(className)
-
-    this.find('.status-text').text(statusText)
+  render: ->
+    length = @props.items.length
+    className = if length > 0 then 'icon icon-x' else 'icon icon-check'
+    statusText = if length > 0 then "#{length} problems" else 'No problems'
+    div {},
+      a { href: '#', onClick: @showAnalysis },
+        span className: className
+        span className: 'status-text', @props.items.length, " problems"
