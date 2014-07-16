@@ -20,10 +20,12 @@ class AnalysisView extends View
 
     @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
       @items.push(result)
+      @updateState()
       return null
 
     @subscribe atom.workspace, 'dart-tools:refresh', (fullPath) =>
       _.remove @items, (item) => item.fullpath == fullPath
+      @updateState()
       return null
     this
 
