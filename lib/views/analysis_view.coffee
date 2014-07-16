@@ -14,7 +14,7 @@ class AnalysisView extends View
       @attach()
 
     @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
-      @addProblem(result.desc)
+      @addProblem(result)
 
     @subscribe this.find("a[rel='dismiss']"), 'click', =>
       @detach()
@@ -28,10 +28,11 @@ class AnalysisView extends View
   detach: ->
     @hide()
 
-  addProblem: (text) ->
+  addProblem: (result) ->
     this.find('.lenny').hide()
 
     row = new ErrorRow()
+    text = "#{result.fullpath}:#{result.line}: #{result.desc}"
     row.text(text)
     this.append(row)
 
