@@ -1,13 +1,16 @@
 {
   "name": "dart-tools",
   "main": "./lib/dart-tools",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Various tools for Dart in Atom",
-  "repository": "https://github.com/atom/dart-tools",
+  "repository": "https://github.com/radicaled/dart-tools",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">0.106.0"
   },
+  "constributors": [
+    "Arron Washington <arron@theradicaledwards.com>"
+  ],
   "dependencies": {
     "chokidar": "~0.8.2",
     "theorist": "~1.0.1",
