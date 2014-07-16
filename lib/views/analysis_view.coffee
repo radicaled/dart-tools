@@ -56,7 +56,6 @@ AnalysisPanel = React.createClass
 
 AnalysisResultRow = React.createClass
   render: ->
-    console.log 'rendering this: #{item}'
     item = @props.analysisResult
     text = "#{item.fullpath}:#{item.line}: #{item.desc}"
     div { className: 'text-warning' }, text
