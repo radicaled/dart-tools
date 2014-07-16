@@ -46,8 +46,11 @@ AnalysisPanel = React.createClass
     return false
 
   render: ->
-    unless @props.items
-      return div className: 'lenny', "( ͡° ͜ʖ ͡°) doesn't see any problems. Relax, man."
+    if @props.items.length == 0
+      return div className: 'tool-panel panel-bottom padded',
+        div className: 'pull-right',
+          a href: '#', className: 'icon icon-x', rel: 'dismiss', onClick: @dismiss
+        div className: 'lenny', "( ͡° ͜ʖ ͡°) doesn't see any problems. Relax, man."
 
     div className: 'tool-panel panel-bottom padded',
       div className: 'pull-right',
