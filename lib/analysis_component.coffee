@@ -55,7 +55,9 @@ class AnalysisComponent
         @analysisStatusView.attach()
 
   createAnalysisView: =>
-    @analysisView = new AnalysisView()
+    atom.packages.once 'activated', =>
+      @analysisView = new AnalysisView()
+      @analysisView.attach()
 
   showProblems: =>
     console.log 'showing problems'
