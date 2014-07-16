@@ -13,6 +13,9 @@ class AnalysisView extends View
     @subscribe atom.workspaceView, 'dart-tools:problems:show', =>
       @attach()
 
+    @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
+      @addProblem(result.desc)
+
     @subscribe this.find("a[rel='dismiss']"), 'click', =>
       @detach()
       false

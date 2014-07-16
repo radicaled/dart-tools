@@ -10,6 +10,8 @@ module.exports =
     @analysisComponent = new AnalysisComponent()
     @analysisComponent.enable()
     @analysisComponent.analysisServer.on 'analysis', (result) =>
+      atom.workspace.emit 'dart-tools:analysis', result
+
       console.log 'Analyzed!', result
       for ev in atom.workspaceView.getEditorViews()
         editor = ev.getEditor()
@@ -31,12 +33,6 @@ module.exports =
           editor.addDecorationForMarker marker,
             type: 'highlight',
             class: css
-
-          @analysisComponent.analysisStatusView.addFailure()
-          @analysisComponent.analysisView.addProblem(result.desc)
-
-          # atom.workspaceView.appendToBottom new AnalysisView
-          # ev.appendToBottom new AnalysisView
 
   deactivate: ->
     @analysisComponent.disable()

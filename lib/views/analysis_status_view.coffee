@@ -14,6 +14,9 @@ class AnalysisStatusView extends View
       atom.workspaceView.trigger('dart-tools:problems:show')
       false
 
+    @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
+      @addFailure()
+
   attach: ->
     @statusBar.appendLeft(this)
 
