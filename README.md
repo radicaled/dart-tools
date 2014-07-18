@@ -2,4 +2,13 @@
 
 Various tools for Dart support in Atom.
 
-![A screenshot of your spankin' package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+Features
+========
+
+Lints the current .dart file, on change, when a pubspec.yaml file exists
+at project root.
+
+Notes
+=====
+
+Requires your dart-sdk to be available in your path.
