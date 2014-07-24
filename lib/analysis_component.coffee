@@ -1,21 +1,26 @@
 AnalysisServer = require './analysis_server'
 AnalysisView = require './views/analysis_view'
+AnalysisDecorator = require './analysis_decorator'
 
+{Model} = require 'theorist'
 spawn = require('child_process').spawn
 extname = require('path').extname
 
 module.exports =
-class AnalysisComponent
+class AnalysisComponent extends Model
   subscriptions: []
   analysisStatusView: null
   analysisView: null
   analysisServer: null
+  analysisDecorator: null
 
   enable: =>
     @subscriptions.push atom.project.on 'path-changed', @watchDartProject
     @watchDartProject()
     @createAnalysisStatusView()
     @createAnalysisView()
+    @analysisDecorator = new AnalysisDecorator(this)
+
 
   disable: =>
     @cleanup()
@@ -34,6 +39,11 @@ class AnalysisComponent
     rootPath = atom.project.getPath()
     @analysisServer = new AnalysisServer(rootPath)
     @analysisServer.start atom.project.getPath()
+
+    @analysisServer.on 'analysis', (result) =>
+      @emit 'dart-tools:analysis', result
+    @analysisServer.on 'refresh', (fullPath) =>
+      @emit 'dart-tools:refresh', fullPath
 
     @watcher = chokidar.watch rootPath, ignored: /packages/, ignoreInitial: true
     @watcher.on 'all', (event, pathname) =>
