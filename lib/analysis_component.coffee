@@ -1,7 +1,6 @@
 AnalysisServer = require './analysis_server'
 AnalysisView = require './views/analysis_view'
 
-chokidar = require 'chokidar'
 spawn = require('child_process').spawn
 extname = require('path').extname
 
@@ -10,6 +9,7 @@ class AnalysisComponent
   subscriptions: []
   analysisStatusView: null
   analysisView: null
+  analysisServer: null
 
   enable: =>
     @subscriptions.push atom.project.on 'path-changed', @watchDartProject
@@ -28,6 +28,8 @@ class AnalysisComponent
     @cleanup()
 
     return unless @isDartProject()
+
+    chokidar = require 'chokidar'
 
     rootPath = atom.project.getPath()
     @analysisServer = new AnalysisServer(rootPath)
