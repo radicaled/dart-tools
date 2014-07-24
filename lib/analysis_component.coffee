@@ -42,6 +42,7 @@ class AnalysisComponent extends Model
 
     @analysisServer.on 'analysis', (result) =>
       @emit 'dart-tools:analysis', result
+
     @analysisServer.on 'refresh', (fullPath) =>
       @emit 'dart-tools:refresh', fullPath
 

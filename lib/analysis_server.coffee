@@ -4,6 +4,8 @@ spawn = require('child_process').spawn
 
 module.exports =
 class AnalysisServer extends Model
+  MSG_END_TOKEN: ">>> EOF STDERR\n"
+
   start: (packageRoot) =>
     args = [
       "-b",
@@ -25,12 +27,9 @@ class AnalysisServer extends Model
 
   processAnalysis: (data) =>
     line = data.toString()
-    @buffer ||= ''
-    @buffer += line
-    if @isDone(@buffer)
+    @recordToBuffer(line)
+    @eachMessage (msg) =>
       @emit 'analysis', AnalysisResult.fromDartAnalyzer @cleanOutput(@buffer)
-      @buffer = ''
-
 
   processError: (data) =>
     line = data.toString()
@@ -40,9 +39,18 @@ class AnalysisServer extends Model
     line?.indexOf('>>>') == 0
 
   isDone: (line) =>
-    line?.indexOf(">>> EOF STDERR\n") != -1
+    line?.indexOf(@MSG_END_TOKEN) != -1
+
+  recordToBuffer: (line) =>
+    @buffer ||= ''
+    @buffer += line
+
+  eachMessage: (cb) ->
+    if @isDone(@buffer)
+      sanitized = @cleanOutput(@buffer)
+      cb(sanitized) if sanitized
+      @buffer = ''
 
   cleanOutput: (line) =>
-    token = "\n>>> EOF STDERR\n"
-    idx = line.indexOf("\n>>> EOF STDERR\n")
+    idx = line.indexOf(@MSG_END_TOKEN)
     line.slice(0, idx)
