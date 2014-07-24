@@ -9,6 +9,9 @@ module.exports =
   activate: (state) ->
     @analysisComponent = new AnalysisComponent()
     @analysisComponent.enable()
+
+    return unless @analysisComponent.isDartProject()
+
     @analysisComponent.analysisServer.on 'refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
     @analysisComponent.analysisServer.on 'analysis', (result) =>
