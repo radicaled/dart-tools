@@ -15,6 +15,11 @@ module.exports =
     @analysisComponent.on 'dart-tools:analysis', (result) =>
       atom.workspace.emit 'dart-tools:analysis', result
 
+    atom.workspaceView.command 'dart-tools:analyze-file', =>
+      editor = atom.workspace.getActiveEditor()
+      if editor
+        @analysisComponent.checkFile(editor.getPath())
+
   deactivate: ->
     @analysisComponent.disable()
 

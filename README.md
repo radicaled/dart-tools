@@ -2,6 +2,8 @@
 
 Various tools for Dart support in Atom.
 
+**NOTE**: very alpha quality
+
 Features
 ========
 

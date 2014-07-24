@@ -23,7 +23,7 @@ class AnalysisServer extends Model
 
   check: (fullPath) =>
     @emit 'refresh', fullPath
-    @process.stdin.write(fullPath + "\n")
+    @process?.stdin?.write(fullPath + "\n")
 
   processAnalysis: (data) =>
     line = data.toString()

@@ -47,9 +47,12 @@ class AnalysisComponent extends Model
       @emit 'dart-tools:refresh', fullPath
 
     @watcher = chokidar.watch rootPath, ignored: /packages/, ignoreInitial: true
-    @watcher.on 'all', (event, pathname) =>
-      if extname(pathname) == '.dart'
-        @analysisServer.check(pathname)
+    @watcher.on 'add', (pathname) => @checkFile(pathname)
+    @watcher.on 'change', (pathname) => @checkFile(pathname)
+
+  checkFile: (fullPath) =>
+    if extname(fullPath) == '.dart'
+      @analysisServer.check(fullPath)
 
   cleanup: =>
     subscription.off() for subscription in @subscriptions
