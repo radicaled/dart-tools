@@ -31,11 +31,11 @@ module.exports =
             [line, col + result.length]
           ]
 
-          editor.addDecorationForMarker marker,
+          editor.decorateMarker marker,
             type: 'gutter',
             class: css
 
-          editor.addDecorationForMarker marker,
+          editor.decorateMarker marker,
             type: 'highlight',
             class: css
 
