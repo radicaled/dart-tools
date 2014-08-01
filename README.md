@@ -7,10 +7,16 @@ Various tools for Dart support in Atom.
 Features
 ========
 
-Lints the current .dart file, on change, when a pubspec.yaml file exists
+* Lints the current Dart file, on change, when a pubspec.yaml file exists
 at project root.
+* Lints the current Dart file via command palette.
+* Formats the current Dart file via command palette, supporting both whitespace-only
+and code transformation.
 
 Notes
 =====
 
-Requires your dart-sdk to be available in your path.
+Linting and formatting will save the current editor buffer first.
+
+
+Requires your dart-sdk to be available in your path. Will fail silently otherwise.
