@@ -39,4 +39,5 @@ class AnalysisDecorator
   refreshDecoratorsForPath: (fullPath) ->
     decorators = @decoratorMap[fullPath] || []
     for dec in decorators
-      dec.destroy()
+      dec.destroy()      
+    @decoratorMap[fullPath] = []
