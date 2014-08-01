@@ -9,16 +9,34 @@
 
 .line-number {
   &.dart-analysis-info {
+    color: @text-color-info;
+  }
+  &.dart-analysis-warning {
     color: @text-color-warning;
   }
-}
+  &.dart-analysis-error {
+    color: @text-color-error
+  }
 
+}
 
 .dart-analysis-info {
   .region {
-    border-bottom: 1px dotted fadeout(@text-color-warning, 30%);
+    border-bottom: 1px dotted fadeout(@text-color-info, 30%);
   }
   // border-bottom-style: dotted;
   // border-bottom-width: 1px;
   // border-bottom-color: fadeout(@text-color-warning, 30%);
+}
+.dart-analysis-warning {
+  .region {
+    border-bottom: 1px dotted fadeout(@text-color-warning, 30%);
+  }
+}
+
+
+.dart-analysis-error {
+  .region {
+    border-bottom: 1px dotted fadeout(@text-color-error, 30%);
+  }
 }
