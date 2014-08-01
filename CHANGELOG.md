@@ -1,4 +1,5 @@
 ## 0.5.0
+* Better dealing with output from `dartanalyzer`
 * Can now format code via command palette, keyword "Format"
 * Free internal decorator array
 * More colorization options for Dart analyzer categories
