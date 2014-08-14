@@ -11,6 +11,12 @@ module.exports =
 
   pubComponent: null
 
+
+  # Wizardry
+  configDefaults:
+    automaticPubGet: true
+
+  # TODO: becoming massive, refactor.
   activate: (state) ->
     @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
     @analysisComponent = new AnalysisComponent()
