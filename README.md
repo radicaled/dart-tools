@@ -12,6 +12,7 @@ at project root.
 * Lints the current Dart file via command palette.
 * Formats the current Dart file via command palette, supporting both whitespace-only
 and code transformation.
+* Automatic and manual "pub get."
 
 Notes
 =====

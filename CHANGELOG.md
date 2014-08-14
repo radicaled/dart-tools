@@ -1,3 +1,7 @@
+## 0.6.0
+* Added "Pub Get" to command palette
+* Added setting to automatically run Pub Get on pubspec.yaml change.
+
 ## 0.5.0
 * Better dealing with output from `dartanalyzer`
 * Can now format code via command palette, keyword "Format"
