@@ -2,13 +2,17 @@ AnalysisComponent = require './analysis_component'
 AnalysisView = require './views/analysis_view'
 Utils = require './utils'
 Formatter = require './formatter'
+PubComponent = require './pub_component'
 
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
   analysisComponent: null
   analysisStatusView: null
 
+  pubComponent: null
+
   activate: (state) ->
+    @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
     @analysisComponent = new AnalysisComponent()
     @analysisComponent.enable()
 
@@ -29,6 +33,10 @@ module.exports =
       Utils.whenEditor (editor) ->
         editor.save()
         Formatter.formatCode(editor.getPath())
+
+    atom.workspaceView.command 'dart-tools:pub-get', =>
+      @pubComponent.get()
+
 
   deactivate: ->
     @analysisComponent.disable()
