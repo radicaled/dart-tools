@@ -11,8 +11,13 @@ class PubComponent
     args = Array(args)
     @process = spawn cmd, args,
       cwd: @rootPath
+    @process.stdout.on 'data', (data) =>
+      atom.workspace.emit('dart-tools:pub-update', data.toString())
+    @process.stderr.on 'data', (data) =>
+      atom.workspace.emit('dart-tools:pub-error', data.toString())
 
   get: =>
+    atom.workspace.emit('dart-tools:pub-start', 'Pub Get')
     @run 'get'
 
   observePubspec: =>

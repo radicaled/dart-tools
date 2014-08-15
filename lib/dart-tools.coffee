@@ -3,6 +3,7 @@ AnalysisView = require './views/analysis_view'
 Utils = require './utils'
 Formatter = require './formatter'
 PubComponent = require './pub_component'
+PubStatusView = require('./views/pub_status_view')
 
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
@@ -10,6 +11,7 @@ module.exports =
   analysisStatusView: null
 
   pubComponent: null
+  pubStatusView: null
 
 
   # Wizardry
@@ -19,6 +21,8 @@ module.exports =
   # TODO: becoming massive, refactor.
   activate: (state) ->
     @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
+    @pubStatusView = new PubStatusView()
+    
     @analysisComponent = new AnalysisComponent()
     @analysisComponent.enable()
 
