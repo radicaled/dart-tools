@@ -6,17 +6,18 @@
   "repository": "https://github.com/radicaled/dart-tools",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.116.0"
+    "atom": ">=0.123.0"
   },
   "constributors": [
     "Arron Washington <arron@theradicaledwards.com>"
   ],
   "dependencies": {
-    "chokidar": "~0.8.2",
     "theorist": "~1.0.1",
     "lodash": "~2.4.1",
     "envify": "~1.2.1",
     "react-atom-fork": "~0.10.0",
-    "reactionary-atom-fork": "~0.9.0"
+    "reactionary-atom-fork": "~0.9.0",
+    "stream-splitter": "~0.3.0",
+    "pathwatcher": "~2.0.7"
   }
 }

@@ -17,12 +17,13 @@ module.exports =
   # Wizardry
   configDefaults:
     automaticPubGet: true
+    dartSdkLocation: ''
 
   # TODO: becoming massive, refactor.
   activate: (state) ->
     @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
     @pubStatusView = new PubStatusView()
-    
+
     @analysisComponent = new AnalysisComponent()
     @analysisComponent.enable()
 

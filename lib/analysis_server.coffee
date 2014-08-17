@@ -1,65 +1,66 @@
 {Model} = require 'theorist'
 {_} = require 'lodash'
 AnalysisResult = require './analysis_result'
+Utils = require './utils'
 spawn = require('child_process').spawn
+path  = require 'path'
+StreamSplitter = require 'stream-splitter'
 
 module.exports =
 class AnalysisServer extends Model
-  MSG_END_TOKEN: '\n'
-  FILE_END_TOKEN: ">>> EOF STDERR"
   analysisResults: []
+  id: 1
 
   start: (packageRoot) =>
+    @listenForEvents()
+    sdkPath = Utils.dartSdkPath()
+    atomConfigRoot = atom.getConfigDirPath()
     args = [
-      "-b",
-      "-p",
-      packageRoot,
-      "--format=machine"
+      path.join(atomConfigRoot,
+        'packages',
+        'dart-tools/dart/analysis_server.dart'),
+      "--sdk=#{sdkPath}"
     ]
-    cmd = "dartanalyzer"
+    cmd = path.join(sdkPath, "bin", "dart")
     @process = spawn cmd, args
-    @process.stderr.on 'data', @processAnalysis
-    #@process.stderr.on 'data', @processError
+    @process.stdout.pipe(StreamSplitter("\n")).on 'token', @processMessage
+
+
+    # Set analysis root.
+    @sendMessage
+      method: "analysis.setAnalysisRoots"
+      params:
+        included: [packageRoot]
+        excluded: []
 
   stop: =>
     @process?.close()
 
+  # Not sure this method is needed, but adding for
+  # compatibility
   check: (fullPath) =>
     @emit 'refresh', fullPath
-    @process?.stdin?.write(fullPath + "\n")
+    @sendMessage
+      method: "analysis.reanalyze"
+      params:
+        file: fullPath
 
-  processAnalysis: (data) =>
-    line = data.toString()
-    @recordToBuffer(line)
-    # Waiting for the entire analysis to complete (for a file at least)
-    # isn't ideal. However, the analyzer API makes it difficult to deal with
-    # at the moment
-    if @isDone(@buffer)
-      @eachMessage (msg) =>
-        @emit 'analysis', AnalysisResult.fromDartAnalyzer msg
-      @buffer = ''
 
-  processError: (data) =>
-    line = data.toString()
-    console.log '*** An error occurred!', line
+  sendMessage: (obj) =>
+    obj.id ||= (@id++).toString();
+    msg = JSON.stringify(obj)
+    console.log 'sending this', msg
+    @process?.stdin?.write(msg + "\n")
 
-  isCommand: (line) =>
-    line?.indexOf('>>>') == 0
+  processMessage: (message) =>
+    obj = JSON.parse(message.toString())
+    if obj.event
+      @emit "analysis-server:#{obj.event}", obj
+    console.log('Received:', message.toString())
 
-  isDone: (line) =>
-    line?.indexOf(@FILE_END_TOKEN) != -1
-
-  recordToBuffer: (line) =>
-    @buffer ||= ''
-    @buffer += line
-
-  eachMessage: (cb) ->
-    @analysisResults.push.apply @analysisResults, @buffer.split(@MSG_END_TOKEN)
-    _.remove @analysisResults, (msg) => msg.length == 0 || @isCommand(msg)
-    while @analysisResults.length > 0
-      result = @analysisResults.pop()
-      cb(result)
-
-  cleanOutput: (line) =>
-    idx = line.indexOf(@MSG_END_TOKEN)
-    line.slice(0, idx)
+  listenForEvents: =>
+    @subscribe this, 'analysis-server:analysis.errors', (obj) =>
+      @emit 'refresh', obj.file
+      for error in obj.params.errors
+        @emit 'analysis', error
+      console.log 'Received', obj

@@ -1,5 +1,7 @@
 path  = require 'path'
 spawn = require('child_process').spawn
+PathWatcher = require('pathwatcher')
+Utils = require './utils'
 
 module.exports =
 class PubComponent
@@ -7,7 +9,8 @@ class PubComponent
     @observePubspec()
 
   run: (args) =>
-    cmd  = 'pub'
+    sdkPath = Utils.dartSdkPath()
+    cmd  = if sdkPath then path.join(sdkPath, 'bin', 'pub') else 'pub'
     args = Array(args)
     @process = spawn cmd, args,
       cwd: @rootPath
@@ -21,8 +24,6 @@ class PubComponent
     @run 'get'
 
   observePubspec: =>
-    chokidar = require 'chokidar'
-    @watcher = chokidar.watch path.join(@rootPath, 'pubspec.yaml'), ignoreInitial: true
-    @watcher.on 'change', (pathname) =>
+    @watcher = PathWatcher.watch path.join(@rootPath, 'pubspec.yaml'), ->
       if atom.config.get 'dart-tools.automaticPubGet'
         @get()

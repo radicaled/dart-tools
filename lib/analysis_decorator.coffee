@@ -8,14 +8,16 @@ class AnalysisDecorator
       @refreshDecoratorsForPath fullPath
 
   addDecoratorForAnalysis: (result) ->
-    decorators = @decoratorMap[result.fullpath] ||= []
+    loc = result.location
+    fullpath = loc.file
+    decorators = @decoratorMap[fullpath] ||= []
     for ev in atom.workspaceView.getEditorViews()
       editor = ev.getEditor()
 
-      if editor.getPath() == result.fullpath
-        category = result.category.toLowerCase()
-        line = result.line - 1;
-        col  = result.column - 1
+      if editor.getPath() == fullpath
+        category = result.severity.toLowerCase()
+        line = loc.startLine   - 1;
+        col  = loc.startColumn - 1
         css = "dart-analysis-#{category}"
         marker = editor.markBufferRange [
           [line, col],
@@ -39,5 +41,5 @@ class AnalysisDecorator
   refreshDecoratorsForPath: (fullPath) ->
     decorators = @decoratorMap[fullPath] || []
     for dec in decorators
-      dec.destroy()      
+      dec.destroy()
     @decoratorMap[fullPath] = []

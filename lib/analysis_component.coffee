@@ -34,8 +34,6 @@ class AnalysisComponent extends Model
 
     return unless @isDartProject()
 
-    chokidar = require 'chokidar'
-
     rootPath = atom.project.getPath()
     @analysisServer = new AnalysisServer(rootPath)
     @analysisServer.start atom.project.getPath()
@@ -45,10 +43,6 @@ class AnalysisComponent extends Model
 
     @analysisServer.on 'refresh', (fullPath) =>
       @emit 'dart-tools:refresh', fullPath
-
-    @watcher = chokidar.watch rootPath, ignored: /packages/, ignoreInitial: true
-    @watcher.on 'add', (pathname) => @checkFile(pathname)
-    @watcher.on 'change', (pathname) => @checkFile(pathname)
 
   checkFile: (fullPath) =>
     if extname(fullPath) == '.dart'

@@ -65,5 +65,6 @@ AnalysisPanel = React.createClass
 AnalysisResultRow = React.createClass
   render: ->
     item = @props.analysisResult
-    text = "#{item.fullpath}:#{item.line}: #{item.desc}"
+    loc = item.location
+    text = "#{loc.file}:#{loc.startLine}: #{item.message}"
     div { className: 'text-warning' }, text
