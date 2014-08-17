@@ -1,3 +1,13 @@
+## 0.7.0
+BREAKING CHANGE
+---------------
+In order to analyze your project, you must specify your Dart SDK
+location by setting the 'dart-tools.dartSdkLocation' configuration variable
+(Settings View: Open -> Filter Packages -> Dart Tools) or by setting a
+DART_SDK environment variable.
+
+* Analysis feature now powered by Dart analysis server.
+
 ## 0.6.0
 * Added "Pub Get" to command palette
 * Added setting to automatically run Pub Get on pubspec.yaml change.
