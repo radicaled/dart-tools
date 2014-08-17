@@ -49,18 +49,15 @@ class AnalysisServer extends Model
   sendMessage: (obj) =>
     obj.id ||= (@id++).toString();
     msg = JSON.stringify(obj)
-    console.log 'sending this', msg
     @process?.stdin?.write(msg + "\n")
 
   processMessage: (message) =>
     obj = JSON.parse(message.toString())
     if obj.event
       @emit "analysis-server:#{obj.event}", obj
-    console.log('Received:', message.toString())
 
   listenForEvents: =>
     @subscribe this, 'analysis-server:analysis.errors', (obj) =>
       @emit 'refresh', obj.file
       for error in obj.params.errors
         @emit 'analysis', error
-      console.log 'Received', obj
