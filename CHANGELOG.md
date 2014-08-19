@@ -1,3 +1,8 @@
+## 0.7.1
+BUGFIX
+------
+* Now using correct lengths for decorators in the editor UI.
+
 ## 0.7.0
 BREAKING CHANGE
 ---------------
