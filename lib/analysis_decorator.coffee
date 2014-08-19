@@ -21,7 +21,7 @@ class AnalysisDecorator
         css = "dart-analysis-#{category}"
         marker = editor.markBufferRange [
           [line, col],
-          [line, col + result.length]
+          [line, col + loc.length]
         ]
 
         dec1 = editor.decorateMarker marker,
