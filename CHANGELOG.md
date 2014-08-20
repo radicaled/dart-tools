@@ -1,3 +1,10 @@
+## 0.7.2
+BUGFIX
+------
+* Fixed some bugs resolving bug counts.
+* Fixed some bugs resolving duplicate items in analysis view.
+* Changed terminology from "problems" to "issues"
+
 ## 0.7.1
 BUGFIX
 ------
