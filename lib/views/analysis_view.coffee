@@ -1,70 +1,60 @@
 {View} = require 'atom'
-React = require 'react-atom-fork'
 {_} = require 'lodash'
-{a, div, span} = require 'reactionary-atom-fork'
 
 module.exports =
 class AnalysisView extends View
   items: []
 
   @content: ->
-    @div class: 'inline-block'
+    @div class: 'inline-block', =>
+      @div class: 'tool-panel panel-bottom padded', =>
+        @div class: 'pull-right', =>
+          @a href: '#', class: 'icon icon-x', rel: 'dismiss', click: 'dismiss'
+        @div class: 'dart-tools-analysis-tool-panel'
+
 
   initialize: =>
     @subscribe atom.workspaceView, 'dart-tools:problems:show', =>
-      @component?.show()
-
-    @subscribe atom.workspaceView, 'dart-tools:problems:hide', =>
-      @component?.hide()
+      @show()
 
     @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
       @items.push(result)
       @updateState()
-      return null
 
     @subscribe atom.workspace, 'dart-tools:refresh', (fullPath) =>
-      _.remove @items, (item) => item.fullpath == fullPath
+      _.remove @items, (item) => item.location.file == fullPath
       @updateState()
-      return null
     this
 
   attach: ->
+    @updateState()
+    @hide()
     atom.workspaceView.appendToBottom(this)
 
-  afterAttach: ->
-    @component = React.renderComponent (AnalysisPanel {items: @items }), @element
-
   updateState: ->
-    @component.setState({ items: @items })
+    panel = @find('.dart-tools-analysis-tool-panel')
+    panel.html('')
+    if @items.length == 0
+      panel.append(new LennyRow())
+    else
+      panel.append(new AnalysisResultRow(analysisResult: item)) for item in @items
 
-AnalysisPanel = React.createClass
-  show: ->
-    @setProps(visible: true)
-  hide: ->
-    @setProps(visible: false)
 
   dismiss: (e) ->
-    atom.workspaceView.trigger 'dart-tools:problems:hide'
-    e.preventDefault()
-    return false
+    @hide()
 
-  render: ->
-    display = 'none' unless @props.visible
+class AnalysisResultRow extends View
+  @content: (params) ->
+    @analysisRow(params.analysisResult)
 
-    if @props.items.length == 0
-      return div className: 'tool-panel panel-bottom padded', style: {display},
-        div className: 'pull-right',
-          a href: '#', className: 'icon icon-x', rel: 'dismiss', onClick: @dismiss
-        div className: 'lenny', "( ͡° ͜ʖ ͡°) doesn't see any problems. Relax, man."
+  @analysisRow: (analysisResult) ->
+    className = 'text-' + analysisResult.severity.toLowerCase()
+    @div class: className, @analysisText(analysisResult)
 
-    div className: 'tool-panel panel-bottom padded', style: {display},
-      div className: 'pull-right',
-        a href: '#', className: 'icon icon-x', rel: 'dismiss', onClick: @dismiss
-      AnalysisResultRow({ analysisResult: item }) for item in @props.items
+  @analysisText: (analysisResult) ->
+     loc = analysisResult.location
+     "#{loc.file}:#{loc.startLine}: #{analysisResult.message}"
 
-AnalysisResultRow = React.createClass
-  render: ->
-    item = @props.analysisResult
-    loc = item.location
-    text = "#{loc.file}:#{loc.startLine}: #{item.message}"
-    div { className: 'text-warning' }, text
+class LennyRow extends View
+  @content: ->
+    @div class: 'lenny', "( ͡° ͜ʖ ͡°) doesn't see any problems. Relax, man."
