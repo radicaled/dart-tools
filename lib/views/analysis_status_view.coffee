@@ -1,8 +1,5 @@
 {View} = require 'atom'
-React = require 'react-atom-fork'
 {_} = require 'lodash'
-
-{a, div, span} = require 'reactionary-atom-fork'
 
 module.exports =
 class AnalysisStatusView extends View
@@ -10,39 +7,35 @@ class AnalysisStatusView extends View
   items: []
 
   @content: ->
-    @div class: 'inline-block'
+    @div class: 'inline-block', =>
+      @a href: '#', click: 'showAnalysis', =>
+        @span class: 'dart-tools-status icon'
+        @span class: 'dart-tools-status-text'
 
   initialize: (@statusBar) =>
     @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
       @items.push(result)
       @updateState()
-      return null
 
     @subscribe atom.workspace, 'dart-tools:refresh', (fullPath) =>
-      _.remove @items, (item) => item.fullpath == fullPath
+      _.remove @items, (item) => item.location.file == fullPath
       @updateState()
-      return null
 
   attach: ->
-    @statusBar.appendLeft(this)
-
-  afterAttach: ->
-    @component = React.renderComponent (StatusBar {items: @items }), @element
+    @updateState()
+    atom.workspaceView.statusBar?.appendLeft(this)
 
   updateState: ->
-    @component.setState({ items: @items })
+    length = @items.length
+    className = if length > 0 then 'icon-x' else 'icon-check'
+    statusText = if length > 0 then "#{length} issues" else 'No issues'
 
-StatusBar = React.createClass
+    @find('.dart-tools-status')
+      .removeClass('icon-x icon-check')
+      .addClass(className)
+    @find('.dart-tools-status-text').text(statusText)
+
+
   showAnalysis: (e) ->
     atom.workspaceView.trigger('dart-tools:problems:show')
     e.preventDefault()
-    return false
-
-  render: ->
-    length = @props.items.length
-    className = if length > 0 then 'icon icon-x' else 'icon icon-check'
-    statusText = if length > 0 then "#{length} problems" else 'No problems'
-    div {},
-      a { href: '#', onClick: @showAnalysis },
-        span className: className
-        span className: 'status-text', @props.items.length, " problems"
