@@ -58,6 +58,6 @@ class AnalysisServer extends Model
 
   listenForEvents: =>
     @subscribe this, 'analysis-server:analysis.errors', (obj) =>
-      @emit 'refresh', obj.file
+      @emit 'refresh', obj.params.file
       for error in obj.params.errors
         @emit 'analysis', error
