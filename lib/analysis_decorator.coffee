@@ -1,19 +1,18 @@
 module.exports =
 class AnalysisDecorator
-  decoratorMap: {}
   constructor: (@analysisComponent) ->
     @analysisComponent.on 'dart-tools:analysis', (result) =>
       @addDecoratorForAnalysis result
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       @refreshDecoratorsForPath fullPath
     that = this
+
     atom.workspace.eachEditor (editor) =>
       fullPath = editor.getPath()
-      if that.decoratorMap[fullPath]
-        results = that.analysisComponent.analysisResultsMap[fullPath] || []
-        for result in results
-          if fullPath == result.location.file
-            that.decorateEditor(result, editor)
+      results = that.analysisComponent.analysisResultsMap[fullPath] || []
+      for result in results
+        if fullPath == result.location.file
+          that.decorateEditor(result, editor)
 
   addDecoratorForAnalysis: (result) ->
     for editor in atom.workspace.getEditors()
@@ -34,21 +33,26 @@ class AnalysisDecorator
       [line, col + loc.length]
     ]
 
-    dec1 = editor.decorateMarker marker,
+    @noteMarker(marker)
+
+    editor.decorateMarker marker,
       type: 'gutter',
       class: css
 
-    dec2 = editor.decorateMarker marker,
+    editor.decorateMarker marker,
       type: 'highlight',
       class: css
 
-    decorators = @decoratorMap[fullpath] ||= []
-    decorators.push(dec1)
-    decorators.push(dec2)
-
-
   refreshDecoratorsForPath: (fullPath) ->
-    decorators = @decoratorMap[fullPath] || []
-    for dec in decorators
-      dec.destroy()
-    @decoratorMap[fullPath] = []
+    for editor in atom.workspace.getEditors()
+      if editor.getPath() == fullPath
+        for marker in editor.getMarkers()
+          marker.destroy() if @isDartMarker(marker)
+        return
+
+  noteMarker: (marker) ->
+    marker.setAttributes
+      isDartMarker: true
+
+  isDartMarker: (marker) ->
+    marker.getAttributes().isDartMarker == true
