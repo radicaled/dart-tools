@@ -1,3 +1,8 @@
+## 0.7.3
+BUGFIX
+------
+* Error and info decorations are now displayed for new editor windows.
+
 ## 0.7.2
 BUGFIX
 ------
