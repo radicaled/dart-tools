@@ -42,7 +42,7 @@ class AnalysisDecorator
       type: 'highlight',
       class: css
 
-    decorators = @decoratorMap[result.fullpath] ||= []
+    decorators = @decoratorMap[fullpath] ||= []
     decorators.push(dec1)
     decorators.push(dec2)
 

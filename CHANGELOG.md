@@ -1,3 +1,8 @@
+## 0.7.4
+BUGFIX
+------
+* Decorators are now refreshed properly when analysis results change.
+
 ## 0.7.3
 BUGFIX
 ------
