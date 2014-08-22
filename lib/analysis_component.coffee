@@ -14,6 +14,8 @@ class AnalysisComponent extends Model
   analysisServer: null
   analysisDecorator: null
 
+  analysisResultsMap: {}
+
   enable: =>
     @subscriptions.push atom.project.on 'path-changed', @watchDartProject
     @watchDartProject()
@@ -39,9 +41,12 @@ class AnalysisComponent extends Model
     @analysisServer.start atom.project.getPath()
 
     @analysisServer.on 'analysis', (result) =>
+      results = @analysisResultsMap[result.location.file] ||= []
+      results.push(result)
       @emit 'dart-tools:analysis', result
 
     @analysisServer.on 'refresh', (fullPath) =>
+      @analysisResultsMap[fullPath] = []
       @emit 'dart-tools:refresh', fullPath
 
   checkFile: (fullPath) =>
