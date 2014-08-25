@@ -24,6 +24,7 @@ class PubComponent
     @run 'get'
 
   observePubspec: =>
+    return unless Utils.isDartProject()
     @watcher = PathWatcher.watch path.join(@rootPath, 'pubspec.yaml'), =>
       if atom.config.get 'dart-tools.automaticPubGet'
         @get()

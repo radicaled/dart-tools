@@ -7,3 +7,10 @@ class Utils
     atom.config.get 'dart-tools.dartSdkLocation' ||
       process.env.DART_SDK ||
       ''
+
+  @whenDartProject: (fxn) =>
+    fxn() if @isDartProject
+
+  @isDartProject: =>
+    pubspec = atom.project.getRootDirectory().getFile('pubspec.yaml')
+    pubspec.exists()
