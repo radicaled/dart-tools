@@ -1,15 +1,16 @@
 {View} = require 'atom'
 
 module.exports =
-class IssuePanelView extends View
+class QuickIssueView extends View
   @content: ->
-    @div class: 'tool-panel panel-bottom padded', =>
-      @div 'Hello, World'
+    @div class: 'tool-panel panel-bottom', =>
+      @ul class: 'dart-tools-quick-issue-view', outlet: 'issues'
 
   monitorIt: ->
     atom.workspaceView.eachEditorView (ev) =>
       ev.on 'cursor:moved', =>
         @hide()
+        @issues.empty()
         editor = ev.getEditor()
         markers = editor.getMarkers()
         for marker in markers
@@ -19,4 +20,8 @@ class IssuePanelView extends View
             cursorPos = cursor.getBufferPosition()
 
             if range.containsPoint(cursorPos)
+              ar = marker.getAttributes().analysisResult
+              className = 'text-' + ar.severity.toLowerCase()
+              @issues.empty()
+              @issues.append("<li class='#{className}'>#{ar.message}</li>")
               @show()

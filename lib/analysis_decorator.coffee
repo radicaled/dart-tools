@@ -33,7 +33,7 @@ class AnalysisDecorator
       [line, col + loc.length]
     ]
 
-    @noteMarker(marker)
+    @annotateMarker(marker, result)
 
     editor.decorateMarker marker,
       type: 'gutter',
@@ -50,9 +50,11 @@ class AnalysisDecorator
           marker.destroy() if @isDartMarker(marker)
         return
 
-  noteMarker: (marker) ->
+  annotateMarker: (marker, analysisResult) ->
     marker.setAttributes
       isDartMarker: true
+      analysisResult: analysisResult
+
 
   isDartMarker: (marker) ->
     marker.getAttributes().isDartMarker == true
