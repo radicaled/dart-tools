@@ -54,6 +54,7 @@ module.exports =
 
     Ipv = require './views/issue_panel_view'
     ipv = new Ipv()
+    ipv.hide()
     ipv.monitorIt()
     atom.workspaceView.prependToBottom(ipv)
   deactivate: ->
