@@ -48,7 +48,14 @@ module.exports =
     atom.workspaceView.command 'dart-tools:pub-get', =>
       @pubComponent.get()
 
+    atom.workspaceView.command 'dart-tools:explorer', =>
+      ExplorerView = require('./views/explorer')
+      atom.workspaceView.prependToBottom(new ExplorerView())
 
+    Ipv = require './views/issue_panel_view'
+    ipv = new Ipv()
+    ipv.monitorIt()
+    atom.workspaceView.prependToBottom(ipv)
   deactivate: ->
     @analysisComponent.disable()
 
