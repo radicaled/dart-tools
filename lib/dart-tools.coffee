@@ -25,7 +25,9 @@ module.exports =
     @pubStatusView = new PubStatusView()
 
     @analysisComponent = new AnalysisComponent()
-    @analysisComponent.enable()
+
+    Utils.whenDartProject =>
+      @analysisComponent.enable()
 
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
