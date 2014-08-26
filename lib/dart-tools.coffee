@@ -54,11 +54,6 @@ module.exports =
       ExplorerView = require('./views/explorer')
       atom.workspaceView.prependToBottom(new ExplorerView())
 
-    QuickIssueView = require './views/quick_issue_view'
-    qiv = new QuickIssueView()
-    qiv.hide()
-    qiv.monitorIt()
-    atom.workspaceView.prependToBottom(qiv)
   deactivate: ->
     @analysisComponent.disable()
 

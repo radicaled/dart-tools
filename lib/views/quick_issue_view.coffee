@@ -6,7 +6,11 @@ class QuickIssueView extends View
     @div class: 'tool-panel panel-bottom', =>
       @ul class: 'dart-tools-quick-issue-view', outlet: 'issues'
 
-  monitorIt: ->
+  initialize: ->
+    @hide()
+    @monitorCursor()
+
+  monitorCursor: ->
     atom.workspaceView.eachEditorView (ev) =>
       ev.on 'cursor:moved', =>
         @hide()

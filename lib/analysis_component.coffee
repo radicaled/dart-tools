@@ -14,6 +14,8 @@ class AnalysisComponent extends Model
   analysisServer: null
   analysisDecorator: null
 
+  quickIssueView: null
+
   analysisResultsMap: {}
 
   enable: =>
@@ -22,6 +24,8 @@ class AnalysisComponent extends Model
     @createAnalysisStatusView()
     @createAnalysisView()
     @analysisDecorator = new AnalysisDecorator(this)
+
+    @createQuickIssueView()
 
 
   disable: =>
@@ -73,6 +77,10 @@ class AnalysisComponent extends Model
     atom.packages.once 'activated', =>
       @analysisView = new AnalysisView()
       @analysisView.attach()
+
+  createQuickIssueView: =>
+    QuickIssueView = require './views/quick_issue_view'
+    atom.workspaceView.prependToBottom(new QuickIssueView);
 
   showProblems: =>
     console.log 'showing problems'
