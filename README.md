@@ -13,6 +13,7 @@ at project root. (see note section)
 * Formats the current Dart file via command palette, supporting both whitespace-only
 and code transformation.
 * Automatic and manual "pub get."
+* Putting a cursor within an analysis error quickly shows the problem text
 
 Notes
 =====
