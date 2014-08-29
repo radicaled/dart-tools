@@ -1,3 +1,12 @@
+## 0.8.1
+
+* Added Quick Issue View: displays Dart warnings / errors underneath
+the current cursor position.
+
+## 0.8.0 -- THE VERSION TIME FORGOT
+
+Just me fat fingering `apm minor` instead of `apm publish`
+
 ## 0.7.5
 
 * Better handling of "absent" Dart SDKs
