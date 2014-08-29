@@ -12,6 +12,28 @@ class Utils
       process.env.DART_SDK ||
       ''
 
+  @dartSdkInfo: (fxn) =>
+    sdkInfo =
+      sdkPath: atom.config.get 'dart-tools.dartSdkLocation'
+      envPath: process.env.DART_SDK
+    if fxn
+      @dartVersion (dartVersion) =>
+        sdkInfo.version = dartVersion
+        fxn(sdkInfo)
+
+    sdkInfo
+
+  @dartVersion: (fxn) =>
+    buffer = ''
+    sdkPath = @dartSdkPath()
+    execPath = if sdkPath then path.join(sdkPath, 'bin', 'dart') else 'dart'
+    @whenDartSdkFound =>
+      process = spawn execPath, ['--version']
+      exitCode = -1;
+
+      process.stderr.on 'data', (data) => buffer += data.toString()
+      process.stderr.on 'end', => fxn(buffer)
+
   @whenDartProject: (fxn) =>
     fxn() if @isDartProject
 
@@ -33,4 +55,4 @@ class Utils
         if code == 0
           fxn()
         else
-          atom.workspace.emit 'dart-tools:cannot-find-sdk'
+          atom.workspace.emit 'dart-tools:cannot-find-sdk', @dartSdkInfo()

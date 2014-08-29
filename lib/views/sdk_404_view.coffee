@@ -2,9 +2,9 @@
 
 module.exports =
 class Sdk404View extends View
-  @content: ->
-    sdkPath = atom.config.get('dart-tools.dartSdkLocation') || '(null)'
-    envPath = process.env.DART_SDK || '(null)'
+  @content: (sdkInfo) ->
+    sdkPath = sdkInfo.sdkPath || '(null)'
+    envPath = sdkInfo.envPath || '(null)'
 
     @div class: 'overlay from-bottom', =>
       @h2 class: 'text-error', 'Could not find Dart SDK'
@@ -18,6 +18,6 @@ class Sdk404View extends View
         @br()
         @strong envPath
 
-  initialize: (params) ->
+  initialize: (sdkInfo) ->
     @subscribe atom.workspaceView, 'core:cancel', =>
       @remove()
