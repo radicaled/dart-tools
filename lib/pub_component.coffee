@@ -20,8 +20,9 @@ class PubComponent
       atom.workspace.emit('dart-tools:pub-error', data.toString())
 
   get: =>
-    atom.workspace.emit('dart-tools:pub-start', 'Pub Get')
-    @run 'get'
+    Utils.whenDartSdkFound =>
+      atom.workspace.emit('dart-tools:pub-start', 'Pub Get')
+      @run 'get'
 
   observePubspec: =>
     return unless Utils.isDartProject()

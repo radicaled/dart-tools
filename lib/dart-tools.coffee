@@ -50,9 +50,16 @@ module.exports =
     atom.workspaceView.command 'dart-tools:pub-get', =>
       @pubComponent.get()
 
-    atom.workspaceView.command 'dart-tools:explorer', =>
-      ExplorerView = require('./views/explorer')
-      atom.workspaceView.prependToBottom(new ExplorerView())
+    # Not Ready Yet
+    #atom.workspaceView.command 'dart-tools:explorer', =>
+      #ExplorerView = require('./views/explorer')
+      #atom.workspaceView.prependToBottom(new ExplorerView())
+
+
+    atom.workspace.on 'dart-tools:cannot-find-sdk', =>
+      console.log 'success'
+      Sdk404View = require('./views/sdk_404_view')
+      atom.workspaceView.prependToBottom(new Sdk404View())
 
   deactivate: ->
     @analysisComponent.disable()

@@ -1,4 +1,5 @@
 {_} = require 'lodash'
+Utils = require './utils'
 
 module.exports =
 class Formatter
@@ -10,12 +11,13 @@ class Formatter
     @format fullPath, ['-t']
 
   @format: (fullPath, options) =>
-    spawn = require('child_process').spawn
+    Utils.whenDartSdkFound =>
+      spawn = require('child_process').spawn
 
-    args = _.flatten([
-      '-w',
-      options || [],
-      fullPath
-    ])
+      args = _.flatten([
+        '-w',
+        options || [],
+        fullPath
+      ])
 
-    spawn "dartfmt", args
+      spawn "dartfmt", args

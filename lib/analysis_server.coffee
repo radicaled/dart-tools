@@ -22,16 +22,17 @@ class AnalysisServer extends Model
       "--sdk=#{sdkPath}"
     ]
     cmd = path.join(sdkPath, "bin", "dart")
-    @process = spawn cmd, args
-    @process.stdout.pipe(StreamSplitter("\n")).on 'token', @processMessage
+    Utils.whenDartSdkFound =>
+      @process = spawn cmd, args
+      @process.stdout.pipe(StreamSplitter("\n")).on 'token', @processMessage
 
 
-    # Set analysis root.
-    @sendMessage
-      method: "analysis.setAnalysisRoots"
-      params:
-        included: [packageRoot]
-        excluded: []
+      # Set analysis root.
+      @sendMessage
+        method: "analysis.setAnalysisRoots"
+        params:
+          included: [packageRoot]
+          excluded: []
 
   stop: =>
     @process?.close()
