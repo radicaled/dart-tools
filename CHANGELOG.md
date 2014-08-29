@@ -1,3 +1,9 @@
+## 0.7.5
+
+* Better handling of "absent" Dart SDKs
+* Added Dart Tools: Sdk Info command
+* Now show error message if dart-tools cannot locate `dart`
+
 ## 0.7.4
 BUGFIX
 ------
