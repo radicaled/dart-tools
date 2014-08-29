@@ -5,6 +5,8 @@ Formatter = require './formatter'
 PubComponent = require './pub_component'
 PubStatusView = require('./views/pub_status_view')
 
+AutocompleteComponent = require './autocomplete_component'
+
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
   analysisComponent: null
@@ -68,6 +70,10 @@ module.exports =
     atom.workspace.on 'dart-tools:show-sdk-info', (sdkInfo) =>
       SdkInfoView = require('./views/sdk_info_view')
       atom.workspaceView.prependToBottom(new SdkInfoView(sdkInfo))
+
+
+    @autocompleteComponent = new AutocompleteComponent()
+    @autocompleteComponent.enable()
 
   deactivate: ->
     @analysisComponent.disable()
