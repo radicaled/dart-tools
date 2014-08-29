@@ -80,7 +80,11 @@ class AnalysisComponent extends Model
 
   createQuickIssueView: =>
     QuickIssueView = require './views/quick_issue_view'
-    atom.workspaceView.prependToBottom(new QuickIssueView);
+    qv = new QuickIssueView()
+    atom.workspaceView.appendToBottom(qv)
+
+    atom.workspace.eachEditor (editor) ->      
+      qv.watchEditor(editor)
 
   showProblems: =>
     console.log 'showing problems'

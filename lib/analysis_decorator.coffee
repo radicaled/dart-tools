@@ -1,5 +1,7 @@
+{Model} = require 'theorist'
+
 module.exports =
-class AnalysisDecorator
+class AnalysisDecorator extends Model
   constructor: (@analysisComponent) ->
     @analysisComponent.on 'dart-tools:analysis', (result) =>
       @addDecoratorForAnalysis result
@@ -42,6 +44,10 @@ class AnalysisDecorator
     editor.decorateMarker marker,
       type: 'highlight',
       class: css
+
+    @emit 'marker-added',
+      marker: marker
+      editor: editor
 
   refreshDecoratorsForPath: (fullPath) ->
     for editor in atom.workspace.getEditors()
