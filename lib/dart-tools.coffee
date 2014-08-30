@@ -72,7 +72,7 @@ module.exports =
       atom.workspaceView.prependToBottom(new SdkInfoView(sdkInfo))
 
 
-    @autocompleteComponent = new AutocompleteComponent()
+    @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
     @autocompleteComponent.enable()
 
   deactivate: ->

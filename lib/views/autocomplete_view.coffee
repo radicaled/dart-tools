@@ -1,14 +1,22 @@
-{SelectListView} = require 'atom'
+{$$, SelectListView} = require 'atom'
 
 module.exports =
 class AutocompleteView extends SelectListView
-  initialize: (@editorView) ->
+  initialize: (@editorView, @autocompleter) ->
     super
     @editor = @editorView.editor
 
     @addClass('autocomplete popover-list')
     @subscribe editorView, 'dart-tools:autocomplete', =>
       @attach()
+      pos = @editor.getCursorBufferPosition()
+      path = @editor.getPath()
+
+      @autocompleter.autocomplete path, pos.row * pos.column
+
+    @subscribe @autocompleter, 'autocomplete', (autocompleteInfo) =>
+      results = autocompleteInfo.results
+      @setItems(results)
 
   # Copied from atom/autocomplete/lib/autocomplete-view.coffee
   attach: ->
@@ -36,3 +44,19 @@ class AutocompleteView extends SelectListView
       @css(left: left, top: top - height, bottom: 'inherit')
     else
       @css(left: left, top: potentialTop, bottom: 'inherit')
+
+  getFilterKey: ->
+    'completion'
+    
+  viewForItem: (item) ->
+    $$ ->
+      @li =>
+        @raw item.completion
+
+  selectNextItemView: ->
+    super
+    false
+
+  selectPreviousItemView: ->
+    super
+    false
