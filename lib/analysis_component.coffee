@@ -1,6 +1,8 @@
 AnalysisServer = require './analysis_server'
 AnalysisView = require './views/analysis_view'
 AnalysisDecorator = require './analysis_decorator'
+AnalysisAPI = require './analysis_api'
+BufferUpdateComponent = require './buffer_update_component'
 
 {Model} = require 'theorist'
 spawn = require('child_process').spawn
@@ -13,6 +15,7 @@ class AnalysisComponent extends Model
   analysisView: null
   analysisServer: null
   analysisDecorator: null
+  analysisAPI: new AnalysisAPI()
 
   quickIssueView: null
 
@@ -24,9 +27,11 @@ class AnalysisComponent extends Model
     @createAnalysisStatusView()
     @createAnalysisView()
     @analysisDecorator = new AnalysisDecorator(this)
-
     @createQuickIssueView()
 
+    atom.workspace.eachEditor (editor) =>
+      buc = new BufferUpdateComponent(editor, @analysisAPI)
+      @subscribe editor, 'destroyed', => buc.destroy()
 
   disable: =>
     @cleanup()
@@ -42,6 +47,8 @@ class AnalysisComponent extends Model
 
     rootPath = atom.project.getPath()
     @analysisServer = new AnalysisServer(rootPath)
+    @analysisAPI.analysisServer = @analysisServer
+
     @analysisServer.start atom.project.getPath()
 
     @analysisServer.on 'analysis', (result) =>
@@ -83,7 +90,7 @@ class AnalysisComponent extends Model
     qv = new QuickIssueView()
     atom.workspaceView.appendToBottom(qv)
 
-    atom.workspace.eachEditor (editor) ->      
+    atom.workspace.eachEditor (editor) ->
       qv.watchEditor(editor)
 
   showProblems: =>
