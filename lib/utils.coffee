@@ -35,7 +35,7 @@ class Utils
       process.stderr.on 'end', => fxn(buffer)
 
   @whenDartProject: (fxn) =>
-    fxn() if @isDartProject
+    fxn() if @isDartProject()
 
   @isDartProject: =>
     pubspec = atom.project.getRootDirectory().getFile('pubspec.yaml')
