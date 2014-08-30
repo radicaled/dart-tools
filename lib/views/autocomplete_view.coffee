@@ -9,10 +9,11 @@ class AutocompleteView extends SelectListView
     @addClass('autocomplete popover-list')
     @subscribe editorView, 'dart-tools:autocomplete', =>
       @attach()
-      pos = @editor.getCursorBufferPosition()
       path = @editor.getPath()
+      pos = @editor.getCursorBufferPosition()
+      offset = @editor.buffer.characterIndexForPosition(pos)
 
-      @autocompleter.autocomplete path, pos.row * pos.column
+      @autocompleter.autocomplete path, offset
 
     @subscribe @autocompleter, 'autocomplete', (autocompleteInfo) =>
       results = autocompleteInfo.results
@@ -47,7 +48,7 @@ class AutocompleteView extends SelectListView
 
   getFilterKey: ->
     'completion'
-    
+
   viewForItem: (item) ->
     $$ ->
       @li =>
