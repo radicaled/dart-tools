@@ -72,8 +72,9 @@ module.exports =
       atom.workspaceView.prependToBottom(new SdkInfoView(sdkInfo))
 
 
-    @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
-    @autocompleteComponent.enable()
+    Utils.whenDartProject =>
+      @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
+      @autocompleteComponent.enable()
 
   deactivate: ->
     @analysisComponent.disable()
