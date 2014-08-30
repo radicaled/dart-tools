@@ -4,7 +4,7 @@ module.exports =
 
     constructor: (@analysisServer) ->
 
-    sendMessage: (obj) => @analysisServer.sendMessage(obj)
+    sendMessage: (obj) => @analysisServer?.sendMessage(obj)
 
     perform: (methodName, params) =>
       @sendMessage
