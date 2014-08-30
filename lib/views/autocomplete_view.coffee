@@ -46,6 +46,9 @@ class AutocompleteView extends SelectListView
     else
       @css(left: left, top: potentialTop, bottom: 'inherit')
 
+  confirmed: (item) ->
+    console.log 'confirming', item
+
   getFilterKey: ->
     'completion'
 
