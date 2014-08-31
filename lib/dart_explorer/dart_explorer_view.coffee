@@ -31,11 +31,11 @@ class DartExplorerView extends ScrollView
 
     editor = @filterEditorView.getEditor()
     @subscribe editor, 'contents-modified', =>
-      @loadingSpinner.removeClass('off')
-
       text = editor.getText()
-      promise = promise.then => @api.search.findTopLevelDeclarations text
-      promise = promise.then (obj) => @setItems(obj.params.results)
+      if text
+        @loadingSpinner.removeClass('off')
+        promise = promise.then => @api.search.findTopLevelDeclarations text
+        promise = promise.then (obj) => @setItems(obj.params.results)
 
 
   setItems: (items) =>
