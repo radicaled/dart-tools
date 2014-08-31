@@ -8,6 +8,8 @@ class AutocompleteView extends SelectListView
     'DEFAULT': 0
     'HIGH': -1
 
+  maxItems: 20
+
   initialize: (@editorView, @autocompleter) ->
     super
     @editor = @editorView.editor
