@@ -21,6 +21,7 @@ class AutocompleteView extends SelectListView
       pos = @editor.getCursorBufferPosition()
       offset = @editor.buffer.characterIndexForPosition(pos)
 
+      @setLoading('Fetching results...')
       @autocompleter.autocomplete path, offset
 
     @subscribe @autocompleter, 'autocomplete', (@autocompleteInfo) =>
