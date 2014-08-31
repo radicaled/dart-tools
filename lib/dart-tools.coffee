@@ -4,6 +4,7 @@ Utils = require './utils'
 Formatter = require './formatter'
 PubComponent = require './pub_component'
 PubStatusView = require('./views/pub_status_view')
+url = require('url')
 
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
@@ -53,6 +54,24 @@ module.exports =
     atom.workspaceView.command 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
         atom.workspace.emit 'dart-tools:show-sdk-info', sdkInfo
+
+
+    uri = 'dart-tools://dart_explorer/'
+    atom.workspace.registerOpener (uriToOpen) =>
+      try
+        {protocol, host, pathname} = url.parse(uriToOpen)
+      catch error
+        return
+
+      return unless protocol == 'dart-tools:'
+      return unless host == 'dart_explorer'
+
+      DartExplorerView = require './dart_explorer/dart_explorer_view'
+      new DartExplorerView(atom.project, @analysisComponent.analysisAPI)
+
+    atom.workspaceView.command 'dart-tools:dart-explorer', =>
+      Utils.whenDartProject =>
+        atom.workspace.open(uri, split: 'right')
 
 
     # Not Ready Yet
