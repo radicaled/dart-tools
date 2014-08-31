@@ -14,7 +14,7 @@ class AutocompleteView extends SelectListView
     super
     @editor = @editorView.editor
 
-    @addClass('autocomplete popover-list')
+    @addClass('autocomplete popover-list dart-tools-autocomplete')
     @subscribe editorView, 'dart-tools:autocomplete', =>
       @attach()
       path = @editor.getPath()
