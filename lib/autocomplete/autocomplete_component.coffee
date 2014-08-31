@@ -1,4 +1,5 @@
 AutocompleteView = require './autocomplete_view'
+Utils = require '../utils'
 
 module.exports =
 class AutocompleteComponent
@@ -6,4 +7,5 @@ class AutocompleteComponent
 
   enable: =>
     atom.workspaceView.eachEditorView (ev) =>
-      new AutocompleteView(ev, @analysisComponent.analysisAPI)
+      if Utils.isDartFile(ev.getEditor().getPath())
+        new AutocompleteView(ev, @analysisComponent.analysisAPI)

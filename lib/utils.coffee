@@ -41,6 +41,9 @@ class Utils
     pubspec = atom.project.getRootDirectory().getFile('pubspec.yaml')
     pubspec.exists()
 
+  @isDartFile: (filename = '') =>
+    path.extname(filename) == '.dart'
+
   @whenDartSdkFound: (fxn) =>
     # Why is process null??
     process = window.process unless process
