@@ -37,8 +37,8 @@ class DartExplorerView extends ScrollView
       for path in item.path # ???
 
         @list.append "
-        <li>
+        <li class='text-highlight'>
           <h2>#{path.name} - #{path.kind}</h2>
-          <p>#{path.location.file}</p>
+          <p class='text-info'>#{path.location.file}</p>
         </li>
         "
