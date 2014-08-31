@@ -70,8 +70,9 @@ class AutocompleteView extends SelectListView
 
   viewForItem: (item) ->
     $$ ->
-      @li =>
-        @raw item.completion
+      @li class: 'two-lines', =>
+        @div class: 'primary-line', item.completion
+        @div class: 'secondary-line', item.docSummary        
 
   selectNextItemView: ->
     super
