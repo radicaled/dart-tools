@@ -21,7 +21,7 @@ class AutocompleteView extends SelectListView
       pos = @editor.getCursorBufferPosition()
       offset = @editor.buffer.characterIndexForPosition(pos)
 
-      @setLoading('Fetching results...')
+      @showFetchingResults()
       @api.updateFile @editor.getPath(), @editor.getText()
       @api.completion.getSuggestions(path, offset)
         .progress(@handleAutocompleteResult)
@@ -85,7 +85,10 @@ class AutocompleteView extends SelectListView
     results = @autocompleteInfo.params.results
     sortedResults = _.sortBy results, (res) => @SORT_MAP[res.relevance]
     @setItems(sortedResults)
+    @showFetchingResults() if @autocompleteInfo.params.isLast == false
 
+  showFetchingResults: =>
+    @setLoading('Fetching results...')
 
   selectNextItemView: ->
     super
