@@ -19,8 +19,8 @@ class DartExplorerView extends ScrollView
   initialize: (@project, @api) =>
     @handleEvents()
 
-  getTitle: ->
-    'Hello, World'
+  getTitle: =>
+    'Dart Explorer'
 
   handleEvents: ->
     @subscribe this, 'core:move-up', => @scrollUp()
@@ -31,7 +31,7 @@ class DartExplorerView extends ScrollView
     editor = @filterEditorView.getEditor()
     @subscribe editor, 'contents-modified', =>
       @loadingSpinner.removeClass('off')
-      
+
       text = editor.getText()
       promise = promise.then => @api.search.findTopLevelDeclarations 'String'
       promise = promise.then (obj) => @setItems(obj.params.results)
