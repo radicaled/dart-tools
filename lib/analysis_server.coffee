@@ -51,7 +51,7 @@ class AnalysisServer extends Model
 
 
   sendMessage: (obj) =>
-    obj.id ||= (@id++).toString();
+    obj.id ||= "dart-tools-#{(@id++)}"
     msg = JSON.stringify(obj)
     @process?.stdin?.write(msg + "\n")
 
