@@ -1,3 +1,8 @@
+## 0.8.2
+
+* Added autocomplete based on analysis_server package.
+  NOTE: the results usually hit the barn wall.
+
 ## 0.8.1
 
 * Added Quick Issue View: displays Dart warnings / errors underneath
