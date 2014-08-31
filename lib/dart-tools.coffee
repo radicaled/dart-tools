@@ -29,10 +29,12 @@ module.exports =
 
     @analysisComponent = new AnalysisComponent()
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
+    @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
 
     Utils.whenDartProject =>
       @analysisComponent.enable()
       # @dartExplorerComponent.enable()
+      @autocompleteComponent.enable()
 
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
@@ -66,11 +68,6 @@ module.exports =
     atom.workspace.on 'dart-tools:show-sdk-info', (sdkInfo) =>
       SdkInfoView = require('./views/sdk_info_view')
       atom.workspaceView.prependToBottom(new SdkInfoView(sdkInfo))
-
-
-    Utils.whenDartProject =>
-      @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
-      @autocompleteComponent.enable()
 
   deactivate: ->
     @analysisComponent.disable()
