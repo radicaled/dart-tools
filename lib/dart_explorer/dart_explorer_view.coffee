@@ -1,18 +1,19 @@
-{ScrollView} = require 'atom'
+{ScrollView, EditorView} = require 'atom'
+
+Q = require 'q'
+_ = require 'lodash'
 
 module.exports =
 class DartExplorerView extends ScrollView
   @content: ->
     @div class: 'native-key-bindings dart-explorer', tabindex: -1, =>
-      @h2 'Hello, World!'
+      @h2 class: 'text-highlight', =>
+        @text 'Dart Explorer'
+      @subview 'filterEditorView', new EditorView(mini: true)
       @ol outlet: 'list'
 
   initialize: (@project, @api) =>
     @handleEvents()
-    promise = @api.search.findTopLevelDeclarations 'String'
-    promise.then (obj) =>
-      console.log 'I got this:', obj
-      @setItems(obj.params.results)
 
   getTitle: ->
     'Hello, World'
@@ -20,6 +21,15 @@ class DartExplorerView extends ScrollView
   handleEvents: ->
     @subscribe this, 'core:move-up', => @scrollUp()
     @subscribe this, 'core:move-down', => @scrollDown()
+
+    promise = Q.fcall -> true
+
+    editor = @filterEditorView.getEditor()
+    @subscribe editor, 'contents-modified', =>
+      text = editor.getText()
+      promise = promise.then => @api.search.findTopLevelDeclarations 'String'
+      promise = promise.then (obj) => @setItems(obj.params.results)
+
 
   setItems: (items) =>
     @list.empty()
