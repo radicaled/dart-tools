@@ -42,11 +42,10 @@ class DartExplorerView extends ScrollView
     @loadingSpinner.addClass('off')
     @list.empty()
     for item in items
-      for path in item.path # ???
-
-        @list.append "
+      path = item.path[0]
+      @list.append "
         <li class='text-highlight'>
           <h2>#{path.name} - #{path.kind}</h2>
           <p class='text-info'>#{path.location.file}</p>
         </li>
-        "
+      "
