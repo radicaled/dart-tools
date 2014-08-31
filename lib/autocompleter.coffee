@@ -1,11 +1,11 @@
 {Model} = require 'theorist'
 
+# TODO: migrate to AnalysisAPI
 module.exports =
 class Autocompleter extends Model
   constructor: (@analysisComponent) ->
     {@analysisServer} = @analysisComponent
     @subscribe @analysisServer, "analysis-server:completion.results", (obj) =>
-      console.log 'Received completion: ', obj
       @emit 'autocomplete', obj.params
 
 

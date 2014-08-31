@@ -1,4 +1,5 @@
-{$$, SelectListView} = require 'atom'
+{$$, SelectListView, Range} = require 'atom'
+_ = require 'lodash'
 
 module.exports =
 class AutocompleteView extends SelectListView
@@ -15,8 +16,8 @@ class AutocompleteView extends SelectListView
 
       @autocompleter.autocomplete path, offset
 
-    @subscribe @autocompleter, 'autocomplete', (autocompleteInfo) =>
-      results = autocompleteInfo.results
+    @subscribe @autocompleter, 'autocomplete', (@autocompleteInfo) =>
+      results = @autocompleteInfo.results
       @setItems(results)
 
   # Copied from atom/autocomplete/lib/autocomplete-view.coffee
@@ -47,7 +48,22 @@ class AutocompleteView extends SelectListView
       @css(left: left, top: potentialTop, bottom: 'inherit')
 
   confirmed: (item) ->
-    console.log 'confirming', item
+    {replacementOffset} = @autocompleteInfo
+    {buffer} = @editor
+    {selectionOffset} = item
+
+    startPos = buffer.positionForCharacterIndex(replacementOffset)
+    endPos   = buffer.positionForCharacterIndex(replacementOffset + selectionOffset)
+    range    = new Range(startPos, endPos)
+
+    # TODO: replace when analysis_server is fixed (?)
+    # Or I might be using it wrong. Whatever.
+    # if replacementOffset were accurate, we'd use the following:
+    # @editor.setTextInBufferRange range, item.completion
+    # instead, we make a gamble that all completions are word-based:
+    selection = _.first @editor.selectWord()
+    selection?.insertText(item.completion)
+    @cancel()
 
   getFilterKey: ->
     'completion'
