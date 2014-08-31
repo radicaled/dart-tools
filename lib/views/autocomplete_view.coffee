@@ -22,7 +22,7 @@ class AutocompleteView extends SelectListView
       offset = @editor.buffer.characterIndexForPosition(pos)
 
       @setLoading('Fetching results...')
-      @autocompleter.autocomplete path, offset
+      @autocompleter.autocomplete @editor, path, offset
 
     @subscribe @autocompleter, 'autocomplete', (@autocompleteInfo) =>
       results = @autocompleteInfo.results

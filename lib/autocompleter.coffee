@@ -4,12 +4,15 @@
 module.exports =
 class Autocompleter extends Model
   constructor: (@analysisComponent) ->
-    {@analysisServer} = @analysisComponent
+    {@analysisServer, @analysisAPI} = @analysisComponent
     @subscribe @analysisServer, "analysis-server:completion.results", (obj) =>
       @emit 'autocomplete', obj.params
 
 
-  autocomplete: (fullPath, offset)->
+  autocomplete: (editor, fullPath, offset)->
+    # HACK: update buffer in analysis server before querying
+    @analysisAPI.updateFile editor.getPath(), editor.getText()
+
     @analysisServer.sendMessage
       method: 'completion.getSuggestions'
       params:
