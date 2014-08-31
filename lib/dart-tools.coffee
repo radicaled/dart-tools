@@ -6,7 +6,7 @@ PubComponent = require './pub_component'
 PubStatusView = require('./views/pub_status_view')
 DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
 
-AutocompleteComponent = require './autocomplete_component'
+AutocompleteComponent = require './autocomplete/autocomplete_component'
 
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)

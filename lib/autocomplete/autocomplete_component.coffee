@@ -1,5 +1,4 @@
-AutocompleteView = require './views/autocomplete_view'
-Autocompleter = require './autocompleter'
+AutocompleteView = require './autocomplete_view'
 
 module.exports =
 class AutocompleteComponent
