@@ -30,7 +30,7 @@ module.exports =
 
     Utils.whenDartProject =>
       @analysisComponent.enable()
-      # @dartExplorerComponent.enable()
+      @dartExplorerComponent.enable()
 
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
