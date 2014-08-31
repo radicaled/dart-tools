@@ -10,7 +10,7 @@ class AutocompleteView extends SelectListView
 
   maxItems: 20
 
-  initialize: (@editorView, @autocompleter) ->
+  initialize: (@editorView, @api) ->
     super
     @editor = @editorView.editor
 
@@ -22,12 +22,11 @@ class AutocompleteView extends SelectListView
       offset = @editor.buffer.characterIndexForPosition(pos)
 
       @setLoading('Fetching results...')
-      @autocompleter.autocomplete @editor, path, offset
-
-    @subscribe @autocompleter, 'autocomplete', (@autocompleteInfo) =>
-      results = @autocompleteInfo.results
-      sortedResults = _.sortBy results, (res) => @SORT_MAP[res.relevance]
-      @setItems(sortedResults)
+      @api.updateFile @editor.getPath(), @editor.getText()
+      @api.completion.getSuggestions(path, offset).then (@autocompleteInfo)=>
+        results = @autocompleteInfo.params.results
+        sortedResults = _.sortBy results, (res) => @SORT_MAP[res.relevance]
+        @setItems(sortedResults)
 
   # Copied from atom/autocomplete/lib/autocomplete-view.coffee
   attach: ->
@@ -57,7 +56,7 @@ class AutocompleteView extends SelectListView
       @css(left: left, top: potentialTop, bottom: 'inherit')
 
   confirmed: (item) ->
-    {replacementOffset} = @autocompleteInfo
+    {replacementOffset} = @autocompleteInfo.params
     {buffer} = @editor
     {selectionOffset} = item
 

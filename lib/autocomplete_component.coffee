@@ -6,6 +6,5 @@ class AutocompleteComponent
   constructor: (@analysisComponent) ->
 
   enable: =>
-    autocompleter = new Autocompleter(@analysisComponent)
     atom.workspaceView.eachEditorView (ev) =>
-      new AutocompleteView(ev, autocompleter)
+      new AutocompleteView(ev, @analysisComponent.analysisAPI)

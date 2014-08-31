@@ -1,4 +1,5 @@
 SearchAPI = require './analysis_api/search_api'
+CompletionAPI = require './analysis_api/completion_api'
 
 module.exports =
   class AnalysisAPI
@@ -11,6 +12,7 @@ module.exports =
 
     setServer: (@_analysisServer) =>
       @search ||= new SearchAPI(this)
+      @completion ||= new CompletionAPI(this)
 
     sendMessage: (obj) => @analysisServer?.sendMessage(obj)
 
