@@ -30,7 +30,7 @@ module.exports =
 
     Utils.whenDartProject =>
       @analysisComponent.enable()
-      @dartExplorerComponent.enable()
+      # @dartExplorerComponent.enable()
 
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
@@ -56,15 +56,6 @@ module.exports =
     atom.workspaceView.command 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
         atom.workspace.emit 'dart-tools:show-sdk-info', sdkInfo
-
-
-
-
-    # Not Ready Yet
-    #atom.workspaceView.command 'dart-tools:explorer', =>
-      #ExplorerView = require('./views/explorer')
-      #atom.workspaceView.prependToBottom(new ExplorerView())
-
 
     atom.workspace.on 'dart-tools:cannot-find-sdk', (sdkInfo) =>
       Sdk404View = require('./views/sdk_404_view')
