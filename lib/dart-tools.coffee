@@ -4,6 +4,7 @@ Utils = require './utils'
 Formatter = require './formatter'
 PubComponent = require './pub_component'
 PubStatusView = require('./views/pub_status_view')
+DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
 
 AutocompleteComponent = require './autocomplete_component'
 
@@ -27,9 +28,11 @@ module.exports =
     @pubStatusView = new PubStatusView()
 
     @analysisComponent = new AnalysisComponent()
+    @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
 
     Utils.whenDartProject =>
       @analysisComponent.enable()
+      # @dartExplorerComponent.enable()
 
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
@@ -55,13 +58,6 @@ module.exports =
     atom.workspaceView.command 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
         atom.workspace.emit 'dart-tools:show-sdk-info', sdkInfo
-
-
-    # Not Ready Yet
-    #atom.workspaceView.command 'dart-tools:explorer', =>
-      #ExplorerView = require('./views/explorer')
-      #atom.workspaceView.prependToBottom(new ExplorerView())
-
 
     atom.workspace.on 'dart-tools:cannot-find-sdk', (sdkInfo) =>
       Sdk404View = require('./views/sdk_404_view')

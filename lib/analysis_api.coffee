@@ -1,15 +1,23 @@
+SearchAPI = require './analysis_api/search_api'
+
 module.exports =
   class AnalysisAPI
-    analysisServer: null
+    _analysisServer: null
 
     constructor: (@analysisServer) ->
+      Object.defineProperty this, 'analysisServer',
+        set: (newValue) => @setServer(newValue)
+        get: => @_analysisServer
+
+    setServer: (@_analysisServer) =>
+      @search ||= new SearchAPI(this)
 
     sendMessage: (obj) => @analysisServer?.sendMessage(obj)
 
     perform: (methodName, params) =>
       @sendMessage
         method: methodName
-        {params}
+        params: params
 
     updateFile: (path, contents) =>
       files = {}
