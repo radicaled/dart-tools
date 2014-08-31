@@ -3,6 +3,11 @@ _ = require 'lodash'
 
 module.exports =
 class AutocompleteView extends SelectListView
+  SORT_MAP:
+    'LOW': 1
+    'DEFAULT': 0
+    'HIGH': -1
+
   initialize: (@editorView, @autocompleter) ->
     super
     @editor = @editorView.editor
@@ -18,7 +23,8 @@ class AutocompleteView extends SelectListView
 
     @subscribe @autocompleter, 'autocomplete', (@autocompleteInfo) =>
       results = @autocompleteInfo.results
-      @setItems(results)
+      sortedResults = _.sortBy results, (res) => @SORT_MAP[res.relevance]
+      @setItems(sortedResults)
 
   # Copied from atom/autocomplete/lib/autocomplete-view.coffee
   attach: ->
@@ -72,7 +78,7 @@ class AutocompleteView extends SelectListView
     $$ ->
       @li class: 'two-lines', =>
         @div class: 'primary-line', item.completion
-        @div class: 'secondary-line', item.docSummary        
+        @div class: 'secondary-line', item.docSummary
 
   selectNextItemView: ->
     super
