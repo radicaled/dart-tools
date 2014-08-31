@@ -7,8 +7,12 @@ module.exports =
 class DartExplorerView extends ScrollView
   @content: ->
     @div class: 'native-key-bindings dart-explorer', tabindex: -1, =>
-      @h2 class: 'text-highlight', =>
-        @text 'Dart Explorer'
+      @header =>
+        @h2 class: 'text-highlight', =>
+          @text 'Dart Explorer'
+          @span
+            class: 'loading loading-spinner-small inline-block off'
+            outlet: 'loadingSpinner'
       @subview 'filterEditorView', new EditorView(mini: true)
       @ol outlet: 'list'
 
@@ -26,12 +30,15 @@ class DartExplorerView extends ScrollView
 
     editor = @filterEditorView.getEditor()
     @subscribe editor, 'contents-modified', =>
+      @loadingSpinner.removeClass('off')
+      
       text = editor.getText()
       promise = promise.then => @api.search.findTopLevelDeclarations 'String'
       promise = promise.then (obj) => @setItems(obj.params.results)
 
 
   setItems: (items) =>
+    @loadingSpinner.addClass('off')
     @list.empty()
     for item in items
       for path in item.path # ???
