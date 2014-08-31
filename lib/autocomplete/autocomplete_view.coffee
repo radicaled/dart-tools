@@ -23,10 +23,9 @@ class AutocompleteView extends SelectListView
 
       @setLoading('Fetching results...')
       @api.updateFile @editor.getPath(), @editor.getText()
-      @api.completion.getSuggestions(path, offset).then (@autocompleteInfo)=>
-        results = @autocompleteInfo.params.results
-        sortedResults = _.sortBy results, (res) => @SORT_MAP[res.relevance]
-        @setItems(sortedResults)
+      @api.completion.getSuggestions(path, offset)
+        .progress(@handleAutocompleteResult)
+        .then(@handleAutocompleteResult)
 
   # Copied from atom/autocomplete/lib/autocomplete-view.coffee
   attach: ->
@@ -81,6 +80,12 @@ class AutocompleteView extends SelectListView
       @li class: 'two-lines', =>
         @div class: 'primary-line', item.completion
         @div class: 'secondary-line', item.docSummary
+
+  handleAutocompleteResult: (@autocompleteInfo) =>
+    results = @autocompleteInfo.params.results
+    sortedResults = _.sortBy results, (res) => @SORT_MAP[res.relevance]
+    @setItems(sortedResults)
+
 
   selectNextItemView: ->
     super
