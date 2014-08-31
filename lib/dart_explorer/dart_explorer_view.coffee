@@ -6,7 +6,7 @@ _ = require 'lodash'
 module.exports =
 class DartExplorerView extends ScrollView
   @content: ->
-    @div class: 'native-key-bindings dart-explorer', tabindex: -1, =>
+    @div class: 'dart-explorer', tabindex: -1, =>
       @header =>
         @h2 class: 'text-highlight', =>
           @text 'Dart Explorer'
