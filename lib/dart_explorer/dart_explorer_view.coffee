@@ -34,7 +34,7 @@ class DartExplorerView extends ScrollView
       @loadingSpinner.removeClass('off')
 
       text = editor.getText()
-      promise = promise.then => @api.search.findTopLevelDeclarations 'String'
+      promise = promise.then => @api.search.findTopLevelDeclarations text
       promise = promise.then (obj) => @setItems(obj.params.results)
 
 
