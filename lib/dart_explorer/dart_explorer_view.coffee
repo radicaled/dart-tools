@@ -18,6 +18,7 @@ class DartExplorerView extends ScrollView
 
   initialize: (@project, @api) =>
     @handleEvents()
+    @filterEditorView.focus()
 
   getTitle: =>
     'Dart Explorer'
