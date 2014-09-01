@@ -19,6 +19,7 @@ class AutocompleteView extends SelectListView
       @attach()
 
       selection = _.first @editor.selectWord()
+      @adjustSelectionForDot(selection)
       @filterEditorView.setText(selection.getText())
 
       path = @editor.getPath()
@@ -77,6 +78,7 @@ class AutocompleteView extends SelectListView
     # @editor.setTextInBufferRange range, item.completion
     # instead, we make a gamble that all completions are word-based:
     selection = _.first @editor.selectWord()
+    @adjustSelectionForDot(selection)
     selection?.insertText(item.completion)
 
   cancelled: ->
@@ -106,7 +108,11 @@ class AutocompleteView extends SelectListView
 
     if match = @getSelectedItem()
       selection = _.first @editor.selectWord()
-      selection?.insertText(match.completion)
+      return unless selection
+
+      @adjustSelectionForDot(selection)
+
+      selection.insertText(match.completion)
       @editor.selectWord()
 
   selectNextItemView: ->
@@ -116,3 +122,9 @@ class AutocompleteView extends SelectListView
   selectPreviousItemView: ->
     super
     false
+
+  adjustSelectionForDot: (selection) ->
+    if selection.getText()[0] == '.'
+      rng = selection.getBufferRange()
+      rng.start = rng.start.translate({ column: 1 })
+      selection.setBufferRange(rng)
