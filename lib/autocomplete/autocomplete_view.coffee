@@ -17,6 +17,10 @@ class AutocompleteView extends SelectListView
     @addClass('autocomplete popover-list dart-tools-autocomplete')
     @subscribe editorView, 'dart-tools:autocomplete', =>
       @attach()
+
+      selection = _.first @editor.selectWord()
+      @filterEditorView.setText(selection.getText())
+
       path = @editor.getPath()
       pos = @editor.getCursorBufferPosition()
       offset = @editor.buffer.characterIndexForPosition(pos)
@@ -29,6 +33,8 @@ class AutocompleteView extends SelectListView
 
   # Copied from atom/autocomplete/lib/autocomplete-view.coffee
   attach: ->
+    @editor.beginTransaction()
+
     @aboveCursor = false
     @originalCursorPosition = @editor.getCursorScreenPosition()
 
@@ -59,6 +65,8 @@ class AutocompleteView extends SelectListView
     {buffer} = @editor
     {selectionOffset} = item
 
+    @cancel()
+
     startPos = buffer.positionForCharacterIndex(replacementOffset)
     endPos   = buffer.positionForCharacterIndex(replacementOffset + selectionOffset)
     range    = new Range(startPos, endPos)
@@ -70,7 +78,10 @@ class AutocompleteView extends SelectListView
     # instead, we make a gamble that all completions are word-based:
     selection = _.first @editor.selectWord()
     selection?.insertText(item.completion)
-    @cancel()
+
+  cancelled: ->
+    super
+    @editor.abortTransaction()
 
   getFilterKey: ->
     'completion'
@@ -89,6 +100,14 @@ class AutocompleteView extends SelectListView
 
   showFetchingResults: =>
     @setLoading('Fetching results...')
+
+  selectItemView: (item) =>
+    super
+
+    if match = @getSelectedItem()
+      selection = _.first @editor.selectWord()
+      selection?.insertText(match.completion)
+      @editor.selectWord()
 
   selectNextItemView: ->
     super
