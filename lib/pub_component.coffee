@@ -2,10 +2,12 @@ path  = require 'path'
 spawn = require('child_process').spawn
 PathWatcher = require('pathwatcher')
 Utils = require './utils'
+PubStatusView = require './views/pub_status_view'
 
 module.exports =
 class PubComponent
   constructor: (@rootPath) ->
+    @pubStatusView = new PubStatusView()
     @observePubspec()
 
   run: (args) =>

@@ -3,9 +3,7 @@ AnalysisView = require './views/analysis_view'
 Utils = require './utils'
 Formatter = require './formatter'
 PubComponent = require './pub_component'
-PubStatusView = require('./views/pub_status_view')
 DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
-
 AutocompleteComponent = require './autocomplete/autocomplete_component'
 
 module.exports =
@@ -24,17 +22,18 @@ module.exports =
 
   # TODO: becoming massive, refactor.
   activate: (state) ->
+    return unless Utils.isDartProject()
+
     @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
-    @pubStatusView = new PubStatusView()
 
     @analysisComponent = new AnalysisComponent()
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
     @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
 
-    Utils.whenDartProject =>
-      @analysisComponent.enable()
-      # @dartExplorerComponent.enable()
-      @autocompleteComponent.enable()
+
+    @analysisComponent.enable()
+    # @dartExplorerComponent.enable()
+    @autocompleteComponent.enable()
 
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
