@@ -1,10 +1,4 @@
-AnalysisComponent = require './analysis_component'
-AnalysisView = require './views/analysis_view'
 Utils = require './utils'
-Formatter = require './formatter'
-PubComponent = require './pub_component'
-DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
-AutocompleteComponent = require './autocomplete/autocomplete_component'
 
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
@@ -24,9 +18,14 @@ module.exports =
   activate: (state) ->
     return unless Utils.isDartProject()
 
-    @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
+    AnalysisComponent = require './analysis_component'
+    Formatter = require './formatter'
+    PubComponent = require './pub_component'
+    DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
+    AutocompleteComponent = require './autocomplete/autocomplete_component'
 
     @analysisComponent = new AnalysisComponent()
+    @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
     @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
 
