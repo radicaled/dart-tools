@@ -20,7 +20,7 @@ module.exports =
 
     AnalysisComponent = require './analysis_component'
     Formatter = require './formatter'
-    PubComponent = require './pub_component'
+    PubComponent = require './pub/pub_component'
     DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
     AutocompleteComponent = require './autocomplete/autocomplete_component'
 
