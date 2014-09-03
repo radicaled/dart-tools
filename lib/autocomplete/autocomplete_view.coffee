@@ -22,8 +22,6 @@ class AutocompleteView extends SelectListView
       pos = @editor.getCursorBufferPosition()
       offset = @editor.buffer.characterIndexForPosition(pos)
 
-      console.log 'autocompleting at', offset
-
       @showFetchingResults()
       @api.updateFile @editor.getPath(), @editor.getText()
       @api.completion.getSuggestions(path, offset)
@@ -89,11 +87,8 @@ class AutocompleteView extends SelectListView
   selectItemView: (item) =>
     super
 
-    if match = @getSelectedItem()
-      selection = _.first @editor.selectWord()
-      return unless selection
-
-      @insertMatch(match)
+    # if match = @getSelectedItem()
+      # @insertMatch(match)
 
   selectNextItemView: ->
     super
@@ -103,21 +98,16 @@ class AutocompleteView extends SelectListView
     super
     false
 
-  insertMatch: (item) =>
-    {replacementOffset} = @autocompleteInfo.params
+  getReplacementRange: =>
+    {replacementOffset, replacementLength} = @autocompleteInfo.params
     {buffer} = @editor
-    {selectionOffset} = item
-
-    pos = @editor.getCursorBufferPosition()
-
-    cursorOffset  = buffer.characterIndexForPosition(pos)
     startPos      = buffer.positionForCharacterIndex(replacementOffset)
-    # endPos        = buffer.positionForCharacterIndex(replacementOffset + selectionOffset)
-    endPos        = @editor.getCursorBufferPosition()
-    range         = new Range(startPos, endPos)
+    endPos        = buffer.positionForCharacterIndex(replacementOffset + replacementLength)
+
+    new Range(startPos, endPos)
+
+  insertMatch: (item) =>
+    range = @getReplacementRange()
 
     @editor.setSelectedBufferRange(range)
     @editor.insertText(item.completion)
-    
-    console.log 'replacementOffset', replacementOffset, 'for item', item
-    console.log 'Range is', range
