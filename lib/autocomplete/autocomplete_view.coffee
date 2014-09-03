@@ -18,13 +18,11 @@ class AutocompleteView extends SelectListView
     @subscribe editorView, 'dart-tools:autocomplete', =>
       @attach()
 
-      selection = _.first @editor.selectWord()
-      @adjustSelectionForDot(selection)
-      @filterEditorView.setText(selection.getText())
-
       path = @editor.getPath()
       pos = @editor.getCursorBufferPosition()
       offset = @editor.buffer.characterIndexForPosition(pos)
+
+      console.log 'autocompleting at', offset
 
       @showFetchingResults()
       @api.updateFile @editor.getPath(), @editor.getText()
@@ -62,24 +60,9 @@ class AutocompleteView extends SelectListView
       @css(left: left, top: potentialTop, bottom: 'inherit')
 
   confirmed: (item) ->
-    {replacementOffset} = @autocompleteInfo.params
-    {buffer} = @editor
-    {selectionOffset} = item
-
     @cancel()
 
-    startPos = buffer.positionForCharacterIndex(replacementOffset)
-    endPos   = buffer.positionForCharacterIndex(replacementOffset + selectionOffset)
-    range    = new Range(startPos, endPos)
-
-    # TODO: replace when analysis_server is fixed (?)
-    # Or I might be using it wrong. Whatever.
-    # if replacementOffset were accurate, we'd use the following:
-    # @editor.setTextInBufferRange range, item.completion
-    # instead, we make a gamble that all completions are word-based:
-    selection = _.first @editor.selectWord()
-    @adjustSelectionForDot(selection)
-    selection?.insertText(item.completion)
+    @insertMatch(item)
 
   cancelled: ->
     super
@@ -110,10 +93,7 @@ class AutocompleteView extends SelectListView
       selection = _.first @editor.selectWord()
       return unless selection
 
-      @adjustSelectionForDot(selection)
-
-      selection.insertText(match.completion)
-      @editor.selectWord()
+      @insertMatch(match)
 
   selectNextItemView: ->
     super
@@ -123,8 +103,21 @@ class AutocompleteView extends SelectListView
     super
     false
 
-  adjustSelectionForDot: (selection) ->
-    if selection.getText()[0] == '.'
-      rng = selection.getBufferRange()
-      rng.start = rng.start.translate({ column: 1 })
-      selection.setBufferRange(rng)
+  insertMatch: (item) =>
+    {replacementOffset} = @autocompleteInfo.params
+    {buffer} = @editor
+    {selectionOffset} = item
+
+    pos = @editor.getCursorBufferPosition()
+
+    cursorOffset  = buffer.characterIndexForPosition(pos)
+    startPos      = buffer.positionForCharacterIndex(replacementOffset)
+    # endPos        = buffer.positionForCharacterIndex(replacementOffset + selectionOffset)
+    endPos        = @editor.getCursorBufferPosition()
+    range         = new Range(startPos, endPos)
+
+    @editor.setSelectedBufferRange(range)
+    @editor.insertText(item.completion)
+    
+    console.log 'replacementOffset', replacementOffset, 'for item', item
+    console.log 'Range is', range
