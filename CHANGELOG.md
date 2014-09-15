@@ -1,3 +1,7 @@
+## 0.8.3
+
+* Minor performance improvements.
+
 ## 0.8.2
 
 * Added autocomplete based on analysis_server package.
