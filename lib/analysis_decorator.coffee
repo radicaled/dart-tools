@@ -1,4 +1,5 @@
 {Model} = require 'theorist'
+_       = require 'lodash'
 
 module.exports =
 class AnalysisDecorator extends Model
@@ -52,8 +53,8 @@ class AnalysisDecorator extends Model
   refreshDecoratorsForPath: (fullPath) ->
     for editor in atom.workspace.getEditors()
       if editor.getPath() == fullPath
-        for marker in editor.getMarkers()
-          marker.destroy() if @isDartMarker(marker)
+        markers = editor.findMarkers(isDartMarker: true)
+        _.invoke markers, 'destroy'
         return
 
   annotateMarker: (marker, analysisResult) ->
