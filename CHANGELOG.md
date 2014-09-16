@@ -1,3 +1,8 @@
+## 0.8.4
+
+* Quick issue view now updates live as analysis results are updated under the
+cursor.
+
 ## 0.8.3
 
 * Minor performance improvements.
