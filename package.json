@@ -6,7 +6,7 @@
   "repository": "https://github.com/radicaled/dart-tools",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.124.0"
+    "atom": ">=0.127.0"
   },
   "constributors": [
     "Arron Washington <arron@theradicaledwards.com>"

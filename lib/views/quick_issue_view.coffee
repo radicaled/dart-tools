@@ -1,4 +1,5 @@
-{View} = require 'atom'
+{$, $$, View} = require 'atom'
+_ = require 'lodash'
 QuickIssueModel = require '../quick_issue_model'
 Utils = require '../utils'
 
@@ -21,6 +22,14 @@ class QuickIssueView extends View
 
   watchEditor: (editor) =>
     model = new QuickIssueModel(editor)
+    editor.onDidAddDecoration (decoration) =>
+      selectedBufferRange = editor.getSelectedBufferRange()
+      marker = decoration.getMarker()
+      markerRange = marker.getBufferRange()
+      if markerRange.containsRange(selectedBufferRange)
+        @showMarker(marker)
+        @show()
+
     @subscribe editor.on 'selection-added selection-screen-range-changed', =>
       @hide()
       @issues.empty()
@@ -29,9 +38,29 @@ class QuickIssueView extends View
       markers = model.findMarkersInRange(selectedBufferRange)
 
       for marker in markers
-        ar = marker.getAttributes().analysisResult
-        if ar
-          className = 'text-' + ar.severity.toLowerCase()
-          @issues.empty()
-          @issues.append("<li class='#{className}'>#{ar.message}</li>")
+        @showMarker(marker)
+
       @show()
+
+  showMarker: (marker) =>
+    ar = marker.getAttributes().analysisResult
+    # We can't detect when new markers are added, only decorations
+    # Since 2 decorations can point to the same marker, let's just filter
+    # by analysisResult message by now. Duplicate messages aren't helpful
+    # anyway.
+    knownMarkers = _.map @issues.find('li'), (view) ->
+      $(view).data('marker')    
+    if ar && !_.contains(knownMarkers, marker)
+      view = @viewForAnalysisResult(ar)
+      view.data('marker', marker)
+      @issues.append(view)
+      # Remove this marker from our list if we're still on top of it
+      # and its been destroyed. Automated tools may do something
+      # to trigger this.
+      marker.onDidDestroy =>
+        view.remove()
+
+  viewForAnalysisResult: (ar) =>
+    $$ ->
+      @li class: 'text-' + ar.severity.toLowerCase(), =>
+        @text ar.message
