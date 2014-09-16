@@ -30,7 +30,7 @@ class QuickIssueView extends View
         @showMarker(marker)
         @show()
 
-    @subscribe editor.on 'selection-added selection-screen-range-changed', =>
+    @subscribe editor.on 'selection-added selection-screen-range-changed dart-tools:refresh-quick-issue-view', =>
       @hide()
       @issues.empty()
 
@@ -49,7 +49,7 @@ class QuickIssueView extends View
     # by analysisResult message by now. Duplicate messages aren't helpful
     # anyway.
     knownMarkers = _.map @issues.find('li'), (view) ->
-      $(view).data('marker')    
+      $(view).data('marker')
     if ar && !_.contains(knownMarkers, marker)
       view = @viewForAnalysisResult(ar)
       view.data('marker', marker)

@@ -1,4 +1,4 @@
-{View} = require 'atom'
+{Point, View} = require 'atom'
 {_} = require 'lodash'
 
 module.exports =
@@ -47,13 +47,28 @@ class AnalysisResultRow extends View
   @content: (params) ->
     @analysisRow(params.analysisResult)
 
+  initialize: ({@analysisResult}) ->
+
   @analysisRow: (analysisResult) ->
     className = 'text-' + analysisResult.severity.toLowerCase()
-    @div class: className, @analysisText(analysisResult)
+    @div class: className, =>
+      @a click: 'gotoAnalysis', =>
+        @text @analysisText(analysisResult)
 
   @analysisText: (analysisResult) ->
      loc = analysisResult.location
      "#{loc.file}:#{loc.startLine}: #{analysisResult.message}"
+
+  gotoAnalysis: =>
+    loc = @analysisResult.location
+    point = new Point(loc.startLine - 1, loc.startColumn - 1)
+
+    promise = atom.workspace.open loc.file
+
+    promise.then (editor) ->
+      editor.setCursorBufferPosition(point)
+      editor.scrollToBufferPosition(point)
+      editor.emit 'dart-tools:refresh-quick-issue-view'
 
 class LennyRow extends View
   @content: ->
