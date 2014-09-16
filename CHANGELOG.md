@@ -1,3 +1,7 @@
+## 0.8.5 (again)
+
+* Try to more gracefully handle analysis server crashes.
+
 ## 0.8.5
 
 * Items in the analysis issue list can now be clicked on. They will open the
