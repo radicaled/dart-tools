@@ -1,3 +1,12 @@
+## 0.8.5
+
+* Items in the analysis issue list can now be clicked on. They will open the
+relevant file and bring the cursor to the start of the issue.
+* Analysis View now appears above status bar.
+* 'Toggle Analysis View' command will toggle analysis issue view. It can be
+bound with the command 'dart-tools:toggle-analysis-view'
+
+
 ## 0.8.4
 
 * Quick issue view now updates live as analysis results are updated under the
