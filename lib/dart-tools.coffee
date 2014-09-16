@@ -59,6 +59,8 @@ module.exports =
       Utils.dartSdkInfo (sdkInfo) =>
         atom.workspace.emit 'dart-tools:show-sdk-info', sdkInfo
 
+    atom.workspaceView.command 'dart-tools:toggle-analysis-view'
+
     atom.workspace.on 'dart-tools:cannot-find-sdk', (sdkInfo) =>
       Sdk404View = require('./views/sdk_404_view')
       atom.workspaceView.prependToBottom(new Sdk404View(sdkInfo))

@@ -13,6 +13,9 @@ class AnalysisView extends View
 
 
   initialize: =>
+    @subscribe atom.workspaceView, 'dart-tools:toggle-analysis-view', =>
+      @toggle()
+
     @subscribe atom.workspaceView, 'dart-tools:problems:show', =>
       @show()
 
