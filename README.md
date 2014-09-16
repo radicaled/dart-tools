@@ -15,6 +15,16 @@ and code transformation.
 * Automatic and manual "pub get."
 * Putting a cursor within an analysis error quickly shows the problem text
 
+Available Commands
+==================
+
+* Pub Get
+* Sdk Info
+* Format Code
+* Format Whitespace
+* Analyze File
+* Toggle Analysis View
+
 Notes
 =====
 
