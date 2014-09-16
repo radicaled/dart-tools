@@ -9,9 +9,13 @@ Q = require 'q'
 
 module.exports =
 class AnalysisServer extends Model
+  FAILURE_HARD_STOP: 3
+  FAILURE_HARD_STOP_TIMEOUT: 30
   analysisResults: []
   id: 1
   promiseMap = {}
+  serverFailureCount: 0
+  writable: false
 
   start: (packageRoot) =>
     promiseMap = {}
@@ -27,8 +31,19 @@ class AnalysisServer extends Model
     cmd = path.join(sdkPath, "bin", "dart")
     Utils.whenDartSdkFound =>
       @process = spawn cmd, args
+      @writable = true
       @process.stdout.pipe(StreamSplitter("\n")).on 'token', @processMessage
+      @process.on 'exit', =>
+        @writable = false
+        @serverFailureCount += 1
 
+        setTimeout (=> @serverFailureCount = 0), @FAILURE_HARD_STOP_TIMEOUT * 1000
+
+
+        if @serverFailureCount < @FAILURE_HARD_STOP
+          @start()
+        else
+          console.log 'Could not run analysis server. :/'
 
       # Set analysis root.
       @sendMessage
@@ -53,7 +68,8 @@ class AnalysisServer extends Model
   sendMessage: (obj) =>
     obj.id ||= "dart-tools-#{(@id++)}"
     msg = JSON.stringify(obj)
-    @process?.stdin?.write(msg + "\n")
+    if @writable
+      @process?.stdin?.write(msg + "\n")
 
     deferred = Q.defer()
     promiseMap[obj.id] = deferred
