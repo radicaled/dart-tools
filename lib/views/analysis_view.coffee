@@ -6,11 +6,10 @@ class AnalysisView extends View
   items: []
 
   @content: ->
-    @div class: 'inline-block', =>
-      @div class: 'tool-panel panel-bottom padded', =>
-        @div class: 'pull-right', =>
-          @a href: '#', class: 'icon icon-x', rel: 'dismiss', click: 'dismiss'
-        @div class: 'dart-tools-analysis-tool-panel'
+    @div class: 'tool-panel panel-bottom padded', =>
+      @div class: 'pull-right', =>
+        @a href: '#', class: 'icon icon-x', rel: 'dismiss', click: 'dismiss'
+      @div class: 'dart-tools-analysis-tool-panel'
 
 
   initialize: =>
@@ -29,7 +28,7 @@ class AnalysisView extends View
   attach: ->
     @updateState()
     @hide()
-    atom.workspaceView.appendToBottom(this)
+    atom.workspaceView.prependToBottom(this)
 
   updateState: ->
     panel = @find('.dart-tools-analysis-tool-panel')
