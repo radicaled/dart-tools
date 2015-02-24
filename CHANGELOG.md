@@ -1,3 +1,7 @@
+## 0.8.6
+
+Update dependencies to handle deprecations.
+
 ## 0.8.5 (again)
 
 * Try to more gracefully handle analysis server crashes.
