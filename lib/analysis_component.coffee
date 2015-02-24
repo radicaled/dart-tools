@@ -38,7 +38,7 @@ class AnalysisComponent extends Model
 
   isDartProject: =>
     pubspec = atom.project.getRootDirectory().getFile('pubspec.yaml')
-    pubspec.exists()
+    pubspec.existsSync()
 
   watchDartProject: =>
     @cleanup()
