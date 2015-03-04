@@ -1,3 +1,7 @@
+## 0.8.7
+
+Use the 'atom-text-editor' tag instead of the 'editor' class in dart-tools.cson
+
 ## 0.8.6
 
 Update dependencies to handle deprecations.
