@@ -38,7 +38,7 @@ class Utils
     fxn() if @isDartProject()
 
   @isDartProject: =>
-    pubspec = atom.project.getRootDirectory().getFile('pubspec.yaml')
+    pubspec = atom.project.getDirectories()[0].getFile('pubspec.yaml')
     pubspec.existsSync()
 
   @isDartFile: (filename = '') =>
