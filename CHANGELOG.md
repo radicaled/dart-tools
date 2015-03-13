@@ -1,3 +1,7 @@
+## 0.8.9
+
+dart-tools no longer crashes when opening a blank Atom window
+
 ## 0.8.8
 
 Remove the last of the known deprecations from dart-tools
