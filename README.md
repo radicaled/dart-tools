@@ -14,6 +14,7 @@ at project root. (see note section)
 and code transformation.
 * Automatic and manual "pub get."
 * Putting a cursor within an analysis error quickly shows the problem text
+* Autocomplete, via the `autocomplete-plus` package.
 
 Available Commands
 ==================

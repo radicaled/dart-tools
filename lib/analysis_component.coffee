@@ -24,10 +24,10 @@ class AnalysisComponent extends Model
   enable: =>
     @subscriptions.push atom.project.on 'path-changed', @watchDartProject
     @watchDartProject()
-    @createAnalysisStatusView()
-    @createAnalysisView()
-    @analysisDecorator = new AnalysisDecorator(this)
-    @createQuickIssueView()
+    # @createAnalysisStatusView()
+    # @createAnalysisView()
+    # @analysisDecorator = new AnalysisDecorator(this)
+    # @createQuickIssueView()
 
     atom.workspace.eachEditor (editor) =>
       buc = new BufferUpdateComponent(editor, @analysisAPI)

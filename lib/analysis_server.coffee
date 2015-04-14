@@ -23,10 +23,10 @@ class AnalysisServer extends Model
     sdkPath = Utils.dartSdkPath()
     atomConfigRoot = atom.getConfigDirPath()
     args = [
-      path.join(atomConfigRoot,
-        'packages',
-        'dart-tools/dart/analysis_server.dart'),
-      "--sdk=#{sdkPath}"
+      path.join(sdkPath,
+        "bin",
+        "snapshots",
+        "analysis_server.dart.snapshot")
     ]
     cmd = path.join(sdkPath, "bin", "dart")
     Utils.whenDartSdkFound =>

@@ -6,19 +6,27 @@
   "repository": "https://github.com/radicaled/dart-tools",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.180.0"
+    "atom": ">=0.188.0"
   },
   "constributors": [
     "Arron Washington <arron@theradicaledwards.com>"
   ],
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "provideAutocompleter"
+      }
+    }
+  },
   "dependencies": {
-    "theorist": "~1.0.1",
-    "lodash": "~2.4.1",
     "envify": "~1.2.1",
+    "fuzzaldrin": "^2.1.0",
+    "lodash": "~2.4.1",
+    "pathwatcher": "3.3.1",
+    "q": "^1.0.1",
     "react-atom-fork": "~0.10.0",
     "reactionary-atom-fork": "~0.9.0",
     "stream-splitter": "~0.3.0",
-    "pathwatcher": "3.3.1",
-    "q": "^1.0.1"
+    "theorist": "~1.0.1"
   }
 }

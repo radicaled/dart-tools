@@ -1,4 +1,5 @@
 Utils = require './utils'
+AutoCompletePlusProvider = require './autocomplete/provider'
 
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
@@ -13,6 +14,12 @@ module.exports =
   configDefaults:
     automaticPubGet: true
     dartSdkLocation: ''
+
+
+  # Provider for `autocomplete-plus`
+  provideAutocompleter: ->
+    AutoCompletePlusProvider
+
 
   # TODO: becoming massive, refactor.
   activate: (state) ->
@@ -31,6 +38,7 @@ module.exports =
 
 
     @analysisComponent.enable()
+    AutoCompletePlusProvider.analysisAPI = @analysisComponent.analysisAPI
     # @dartExplorerComponent.enable()
     @autocompleteComponent.enable()
 

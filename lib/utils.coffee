@@ -52,12 +52,14 @@ class Utils
     if process
       sdkPath = @dartSdkPath()
       whereCmd = if process.platform == 'win32' then 'where' else 'which'
-      execPath = if sdkPath then path.join(sdkPath, 'bin', 'dart') else 'dart'
+      if sdkPath
+        execPath = path.join(sdkPath, 'bin', 'dart')
+        process = spawn whereCmd, [execPath]
 
-      process = spawn whereCmd, [execPath]
-
-      process.on 'exit', (code) =>
-        if code == 0
-          fxn()
-        else
-          atom.workspace.emit 'dart-tools:cannot-find-sdk', @dartSdkInfo()
+        process.on 'exit', (code) =>
+          if code == 0
+            fxn()
+          else
+            atom.workspace.emit 'dart-tools:cannot-find-sdk', @dartSdkInfo()
+      else
+        atom.workspace.emit 'dart-tools:cannot-find-sdk', @dartSdkInfo()
