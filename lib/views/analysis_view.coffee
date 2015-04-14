@@ -1,4 +1,5 @@
-{Point, View} = require 'atom'
+{Point} = require 'atom'
+{View} = require 'atom-space-pen-views'
 {_} = require 'lodash'
 
 module.exports =

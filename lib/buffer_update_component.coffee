@@ -3,5 +3,5 @@
 module.exports =
 class BufferUpdateComponent extends Model
   constructor: (@editor, @analysisAPI) ->
-    @subscribe @editor, 'contents-modified', =>      
+    @editor.onDidStopChanging =>
       @analysisAPI.updateFile @editor.getPath(), @editor.getText()

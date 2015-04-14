@@ -1,27 +1,27 @@
-{View} = require 'atom'
+{View} = require 'atom-space-pen-views'
 
 module.exports =
 class PubStatusView extends View
   initialize: (params) ->
     @hide()
-    atom.workspaceView.appendToBottom(this)
+    atom.workspace.addBottomPanel(item: this)
 
-    @subscribe atom.workspace, 'dart-tools:pub-start', (commandName) =>
+    atom.workspace.on 'dart-tools:pub-start', (commandName) =>
       @clear()
       @commandName.text(commandName)
       @show()
 
-    @subscribe atom.workspace, 'dart-tools:pub-update', (msg) =>
+    atom.workspace.on 'dart-tools:pub-update', (msg) =>
       formatted = msg.replace '\n', "<br />"
       html = "<span>#{formatted}</span>"
       @pubOutput.append(html)
 
-    @subscribe atom.workspace, 'dart-tools:pub-error', (msg) =>
+    atom.workspace.on 'dart-tools:pub-error', (msg) =>
       formatted = msg.replace '\n', "<br />"
       html = "<span class='text-error'>#{formatted}</span>"
       @pubOutput.append(html)
 
-    @subscribe atom.workspaceView, 'core:cancel', =>
+    atom.workspaceView.on 'core:cancel', =>
       @hide()
 
   clear: ->
@@ -32,5 +32,5 @@ class PubStatusView extends View
     @div class: 'overlay from-bottom', =>
       @div class: 'pull-right', =>
         @a href: '#', class: 'icon icon-x', rel: 'dismiss', click: 'hide'
-      @h2 outlet: 'commandName'        
+      @h2 outlet: 'commandName'
       @div outlet: 'pubOutput'

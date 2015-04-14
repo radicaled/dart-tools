@@ -31,7 +31,7 @@ module.exports =
     DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
 
     @analysisComponent = new AnalysisComponent()
-    @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
+    @pubComponent = new PubComponent(atom.project.getPaths()[0])
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
 
 

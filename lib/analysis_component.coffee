@@ -3,6 +3,7 @@ AnalysisView = require './views/analysis_view'
 AnalysisDecorator = require './analysis_decorator'
 AnalysisAPI = require './analysis_api'
 BufferUpdateComponent = require './buffer_update_component'
+Utils = require './utils'
 
 {Model} = require 'theorist'
 spawn = require('child_process').spawn
@@ -22,34 +23,29 @@ class AnalysisComponent extends Model
   analysisResultsMap: {}
 
   enable: =>
-    @subscriptions.push atom.project.on 'path-changed', @watchDartProject
+    @subscriptions.push atom.project.onDidChangePaths @watchDartProject
     @watchDartProject()
     # @createAnalysisStatusView()
     # @createAnalysisView()
     # @analysisDecorator = new AnalysisDecorator(this)
     # @createQuickIssueView()
 
-    atom.workspace.eachEditor (editor) =>
-      buc = new BufferUpdateComponent(editor, @analysisAPI)
-      @subscribe editor, 'destroyed', => buc.destroy()
+    atom.workspace.observeTextEditors (editor) =>
+      new BufferUpdateComponent(editor, @analysisAPI)
 
   disable: =>
     @cleanup()
 
-  isDartProject: =>
-    pubspec = atom.project.getRootDirectory().getFile('pubspec.yaml')
-    pubspec.existsSync()
-
   watchDartProject: =>
     @cleanup()
 
-    return unless @isDartProject()
+    return unless Utils.isDartProject()
 
-    rootPath = atom.project.getPath()
+    rootPath = atom.project.getPaths()[0]
     @analysisServer = new AnalysisServer(rootPath)
     @analysisAPI.analysisServer = @analysisServer
 
-    @analysisServer.start atom.project.getPath()
+    @analysisServer.start rootPath
 
     @analysisServer.on 'analysis', (result) =>
       results = @analysisResultsMap[result.location.file] ||= []
@@ -65,7 +61,7 @@ class AnalysisComponent extends Model
       @analysisServer.check(fullPath)
 
   cleanup: =>
-    subscription.off() for subscription in @subscriptions
+    subscription.dispose() for subscription in @subscriptions
     @subscriptions = []
     @watcher?.close()
     @analysisServer?.stop()
