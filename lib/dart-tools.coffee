@@ -29,18 +29,15 @@ module.exports =
     Formatter = require './formatter'
     PubComponent = require './pub/pub_component'
     DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
-    AutocompleteComponent = require './autocomplete/autocomplete_component'
 
     @analysisComponent = new AnalysisComponent()
     @pubComponent = new PubComponent(atom.project.getRootDirectory().getPath())
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
-    @autocompleteComponent = new AutocompleteComponent(@analysisComponent)
 
 
     @analysisComponent.enable()
     AutoCompletePlusProvider.analysisAPI = @analysisComponent.analysisAPI
     # @dartExplorerComponent.enable()
-    @autocompleteComponent.enable()
 
     @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
       atom.workspace.emit 'dart-tools:refresh', fullPath
