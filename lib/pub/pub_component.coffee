@@ -1,29 +1,37 @@
+{Emitter} = require 'event-kit'
+DartTools = require '../dart_tools'
+
 path  = require 'path'
 spawn = require('child_process').spawn
 PathWatcher = require('pathwatcher')
 Utils = require '../utils'
 PubStatusView = require './pub_status_view'
 
-module.exports =
 class PubComponent
   constructor: (@rootPath) ->
-    @pubStatusView = new PubStatusView()
+    @emitter = new Emitter
+    @dartTools = new DartTools(@rootPath)
+    @pubStatusView = new PubStatusView(this)
     @observePubspec()
 
+    atom.workspaceView.command 'dart-tools:pub-get', =>
+      @get()
+
   run: (args) =>
-    sdkPath = Utils.dartSdkPath()
-    cmd  = if sdkPath then path.join(sdkPath, 'bin', 'pub') else 'pub'
-    args = Array(args)
-    @process = spawn cmd, args,
-      cwd: @rootPath
-    @process.stdout.on 'data', (data) =>
-      atom.workspace.emit('dart-tools:pub-update', data.toString())
-    @process.stderr.on 'data', (data) =>
-      atom.workspace.emit('dart-tools:pub-error', data.toString())
+    process = @dartTools.runPubCommand('pub', args)
+    process.stdout.on 'data', (data) =>
+      @emitter.emit 'pub-update',
+        output: data.toString()
+    process.stderr.on 'data', (data) =>
+      @emitter.emit 'pub-error',
+        output: data.toString()
+    process.on 'exit', =>      
+      @emitter.emit 'pub-finished'
 
   get: =>
-    Utils.whenDartSdkFound =>
-      atom.workspace.emit('dart-tools:pub-start', 'Pub Get')
+    @dartTools.withSdk =>
+      @emitter.emit 'pub-start',
+        title: 'Pub Get'
       @run 'get'
 
   observePubspec: =>
@@ -31,3 +39,22 @@ class PubComponent
     @watcher = PathWatcher.watch path.join(@rootPath, 'pubspec.yaml'), =>
       if atom.config.get 'dart-tools.automaticPubGet'
         @get()
+
+  # Events
+
+  onPubStart: (callback) =>
+    @emitter.on 'pub-start', callback
+
+  onPubUpdate: (callback) =>
+    @emitter.on 'pub-update', callback
+
+  onPubError: (callback) =>
+    @emitter.on 'pub-error', callback
+
+  onPubFinished: (callback) =>
+    @emitter.on 'pub-finished', callback
+
+  destroy: ->
+    @emitter.dispose()
+
+module.exports = PubComponent

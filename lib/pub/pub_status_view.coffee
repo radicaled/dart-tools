@@ -1,36 +1,43 @@
-{View} = require 'atom-space-pen-views'
+rivets = require 'rivets'
+Template = require '../templates/template'
 
-module.exports =
-class PubStatusView extends View
-  initialize: (params) ->
-    @hide()
-    atom.workspace.addBottomPanel(item: this)
+class PubStatusView
+  @title        = ''
+  @output       = ''
+  @shouldShow   = false
 
-    atom.workspace.on 'dart-tools:pub-start', (commandName) =>
-      @clear()
-      @commandName.text(commandName)
-      @show()
-
-    atom.workspace.on 'dart-tools:pub-update', (msg) =>
-      formatted = msg.replace '\n', "<br />"
-      html = "<span>#{formatted}</span>"
-      @pubOutput.append(html)
-
-    atom.workspace.on 'dart-tools:pub-error', (msg) =>
-      formatted = msg.replace '\n', "<br />"
-      html = "<span class='text-error'>#{formatted}</span>"
-      @pubOutput.append(html)
-
+  constructor: (@pubComponent) ->
+    element = Template.get('pub/status_view.html')
+    atom.workspace.addBottomPanel(item: element)
     atom.workspaceView.on 'core:cancel', =>
-      @hide()
+      @shouldShow = false
 
-  clear: ->
-    @commandName.text('')
-    @pubOutput.text('')
+    @view = rivets.bind(element, {it: this})
 
-  @content: ->
-    @div class: 'overlay from-bottom', =>
-      @div class: 'pull-right', =>
-        @a href: '#', class: 'icon icon-x', rel: 'dismiss', click: 'hide'
-      @h2 outlet: 'commandName'
-      @div outlet: 'pubOutput'
+    @listen()
+
+  listen: =>
+
+    asHtml = (input, textClass) =>
+      textClass = '' unless textClass
+      formatted = input.replace '\n', "<br />"
+      "<span class=\"#{textClass}\">#{formatted}</span>"
+
+    @pubComponent.onPubStart (data) =>
+      @title = data.title
+      @output = ''
+      @shouldShow = true
+
+    @pubComponent.onPubUpdate (data) =>
+      @output = @output + asHtml(data.output)
+
+    @pubComponent.onPubError (data) =>
+      @output = @output + asHtml(data.output, 'text-error')
+
+    @pubComponent.onPubFinished (data) =>
+      @title = @title + ' (Finished)'
+
+  hide: =>
+    @shouldShow = false
+
+module.exports = PubStatusView

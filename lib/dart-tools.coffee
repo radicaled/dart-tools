@@ -57,9 +57,6 @@ module.exports =
         editor.save()
         Formatter.formatCode(editor.getPath())
 
-    atom.workspaceView.command 'dart-tools:pub-get', =>
-      @pubComponent.get()
-
     atom.workspaceView.command 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
         atom.workspace.emit 'dart-tools:show-sdk-info', sdkInfo
