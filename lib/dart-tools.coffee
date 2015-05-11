@@ -49,11 +49,6 @@ module.exports =
     @analysisComponent.on 'dart-tools:analysis', (result) =>
       atom.workspace.emit 'dart-tools:analysis', result
 
-    atom.workspaceView.command 'dart-tools:analyze-file', =>
-      Utils.whenEditor (editor) =>
-        editor.save()
-        @analysisComponent.checkFile(editor.getPath())
-
     atom.workspaceView.command 'dart-tools:format-code', =>
       Utils.whenEditor (editor) ->
         editor.save()
