@@ -1,6 +1,5 @@
 AnalysisServer = require './analysis_server'
 AnalysisView = require './views/analysis_view'
-AnalysisDecorator = require './analysis_decorator'
 AnalysisAPI = require './analysis_api'
 BufferUpdateComponent = require './buffer_update_component'
 Utils = require './utils'
@@ -14,7 +13,6 @@ class AnalysisComponent
   subscriptions: []
   analysisView: null
   analysisServer: null
-  analysisDecorator: null
   analysisAPI: new AnalysisAPI()
 
   quickIssueView: null
@@ -26,7 +24,6 @@ class AnalysisComponent
     @subscriptions.push atom.project.onDidChangePaths @watchDartProject
     @watchDartProject()
     # @createAnalysisView()
-    # @analysisDecorator = new AnalysisDecorator(this)
     # @createQuickIssueView()
 
     atom.workspace.observeTextEditors (editor) =>
