@@ -24,7 +24,8 @@ class AnalysisComponent
     # @createAnalysisView()
 
     atom.workspace.observeTextEditors (editor) =>
-      new BufferUpdateComponent(editor, @analysisAPI)
+      buc = new BufferUpdateComponent(editor, @analysisAPI)
+      editor.onDidDestroy => buc.destroy()
 
   disable: =>
     @cleanup()
