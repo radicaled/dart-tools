@@ -29,6 +29,7 @@ module.exports =
     AnalysisToolbar = require './analysis/analysis_toolbar'
     ErrorRepository = require './errors/error_repository'
     SdkInfo = require './sdk/sdk_info'
+    AnalysisDecorator = require './analysis/analysis_decorator'
 
     @analysisComponent = new AnalysisComponent()
 
@@ -37,6 +38,7 @@ module.exports =
     @pubComponent = new PubComponent(atom.project.getPaths()[0])
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
     @sdkInfo = new SdkInfo()
+    @analysisDecorator = new AnalysisDecorator(@errorRepository)
 
     @analysisComponent.enable()
     AutoCompletePlusProvider.analysisApi = @analysisComponent.analysisAPI
