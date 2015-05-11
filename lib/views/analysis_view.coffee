@@ -14,17 +14,17 @@ class AnalysisView extends View
 
 
   initialize: =>
-    @subscribe atom.workspaceView, 'dart-tools:toggle-analysis-view', =>
+    atom.commands.add 'atom-workspace', 'dart-tools:toggle-analysis-view', =>
       @toggle()
 
-    @subscribe atom.workspaceView, 'dart-tools:problems:show', =>
+    atom.commands.add 'atom-workspace', 'dart-tools:problems:show', =>
       @show()
 
-    @subscribe atom.workspace, 'dart-tools:analysis', (result) =>
+    atom.commands.add 'atom-workspace', 'dart-tools:analysis', (result) =>
       @items.push(result)
       @updateState()
 
-    @subscribe atom.workspace, 'dart-tools:refresh', (fullPath) =>
+    atom.commands.add 'atom-workspace', 'dart-tools:refresh', (fullPath) =>
       _.remove @items, (item) => item.location.file == fullPath
       @updateState()
     this

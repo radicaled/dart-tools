@@ -44,16 +44,16 @@ module.exports =
     AutoCompletePlusProvider.analysisAPI = @analysisComponent.analysisAPI
     # @dartExplorerComponent.enable()
 
-    atom.workspaceView.command 'dart-tools:format-code', =>
+    atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>
       Utils.whenEditor (editor) ->
         editor.save()
         Formatter.formatCode(editor.getPath())
 
-    atom.workspaceView.command 'dart-tools:sdk-info', =>
+    atom.commands.add 'atom-workspace', 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
         @sdkInfo.showInfo(sdkInfo)
 
-    atom.workspaceView.command 'dart-tools:toggle-analysis-view'
+    atom.commands.add 'atom-workspace', 'dart-tools:toggle-analysis-view'
 
   deactivate: ->
     @analysisComponent.disable()

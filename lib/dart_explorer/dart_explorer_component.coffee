@@ -19,7 +19,7 @@ class DartExplorerComponent
       DartExplorerView = require './dart_explorer_view'
       new DartExplorerView(atom.project, @analysisComponent.analysisAPI)
 
-    atom.workspaceView.command 'dart-tools:dart-explorer', =>
+    atom.commands.add 'atom-workspace', 'dart-tools:dart-explorer', =>
       atom.workspace.open(@uri, split: 'right')
 
   disable: =>

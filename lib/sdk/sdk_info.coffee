@@ -24,7 +24,7 @@ class View
     @listen()
 
   listen: =>
-    atom.workspaceView.on 'core:cancel', =>
+    atom.commands.add 'atom-text-editor', 'core:cancel', =>
       @shouldShow = false
 
   hide: =>

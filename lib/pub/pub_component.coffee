@@ -14,7 +14,7 @@ class PubComponent
     @pubStatusView = new PubStatusView(this)
     @observePubspec()
 
-    atom.workspaceView.command 'dart-tools:pub-get', =>
+    atom.commands.add 'atom-workspace', 'dart-tools:pub-get', =>
       @get()
 
   run: (args) =>
@@ -25,7 +25,7 @@ class PubComponent
     process.stderr.on 'data', (data) =>
       @emitter.emit 'pub-error',
         output: data.toString()
-    process.on 'exit', =>      
+    process.on 'exit', =>
       @emitter.emit 'pub-finished'
 
   get: =>
