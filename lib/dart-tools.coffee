@@ -30,6 +30,7 @@ module.exports =
     DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
     AnalysisToolbar = require './analysis/analysis_toolbar'
     ErrorRepository = require './errors/error_repository'
+    SdkInfo = require('./sdk/sdk_info')
 
     @analysisComponent = new AnalysisComponent()
 
@@ -37,7 +38,7 @@ module.exports =
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
     @pubComponent = new PubComponent(atom.project.getPaths()[0])
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
-
+    @sdkInfo = new SdkInfo()
 
     @analysisComponent.enable()
     AutoCompletePlusProvider.analysisAPI = @analysisComponent.analysisAPI
@@ -63,17 +64,9 @@ module.exports =
 
     atom.workspaceView.command 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
-        atom.workspace.emit 'dart-tools:show-sdk-info', sdkInfo
+        @sdkInfo.showInfo(sdkInfo)
 
     atom.workspaceView.command 'dart-tools:toggle-analysis-view'
-
-    atom.workspace.on 'dart-tools:cannot-find-sdk', (sdkInfo) =>
-      Sdk404View = require('./views/sdk_404_view')
-      atom.workspaceView.prependToBottom(new Sdk404View(sdkInfo))
-
-    atom.workspace.on 'dart-tools:show-sdk-info', (sdkInfo) =>
-      SdkInfoView = require('./views/sdk_info_view')
-      atom.workspaceView.prependToBottom(new SdkInfoView(sdkInfo))
 
   deactivate: ->
     @analysisComponent.disable()
