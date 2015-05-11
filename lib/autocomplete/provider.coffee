@@ -1,4 +1,5 @@
 {filter} = require 'fuzzaldrin'
+{_} = require 'lodash'
 
 AutoCompletePlusProvider =
   selector: '.source.dart'
@@ -22,15 +23,20 @@ AutoCompletePlusProvider =
           .then (autocompleteInfo) ->
             items = []
             results = autocompleteInfo.params.results
-            sortedResults = if prefix == "."
-              results
-            else
-              filter(results, prefix, { key: 'completion'})
+            sortedResults = _.chain(results)
+              .where((i) -> i.relevance > 500) # 500 = garbage tier
+              .sort( (a, b) -> a.relevance - b.relevance)
+              .value()
+            # Side-step the analzyer's sad, sad relevance scores.
+            # Both "XmlDocument" and "XmlName" have the same relevance score
+            # for the fragment "XmlDocumen"
+            if prefix != "."
+              sortedResults = filter(results, prefix, { key: 'completion'})
 
             for result in sortedResults
               items.push
                 text: result.completion,
-                rightLabel: result.element.kind
+                rightLabel: result.element?.kind
 
             resolve(items)
 
