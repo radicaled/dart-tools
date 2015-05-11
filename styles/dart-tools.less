@@ -50,6 +50,27 @@ ul.dart-tools-quick-issue-view {
   margin-bottom: 0;
 }
 
+html /deep/ #quick-info-view {
+  [data-dart-analysis] {
+    margin-bottom: 2px;
+  }
+  [data-dart-analysis] > span.badge {
+    margin-right: 10px;
+  }
+}
+
+html /deep/ #analysis-toolbar {
+    & > .container {
+      display: flex;
+      align-items: baseline;
+
+      & > * {
+        margin-right: 15px;
+      }
+    }
+}
+
+
 atom-text-editor::shadow {
   .dart-analysis-info {
     .region {
