@@ -2,13 +2,7 @@ Utils = require './utils'
 AutoCompletePlusProvider = require './autocomplete/provider'
 
 module.exports =
-  # spooky ( ͡° ͜ʖ ͡°)
-  analysisComponent: null
-
-  pubComponent: null
-  pubStatusView: null
-
-
+  
   # Wizardry
   config:
     automaticPubGet:
