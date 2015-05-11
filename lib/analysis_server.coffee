@@ -19,7 +19,6 @@ class AnalysisServer extends Model
 
   start: (packageRoot) =>
     promiseMap = {}
-    @listenForEvents()
     sdkPath = Utils.dartSdkPath()
     atomConfigRoot = atom.getConfigDirPath()
     args = [
@@ -101,13 +100,6 @@ class AnalysisServer extends Model
     else # A one off event, resolve immediately
       delete promiseMap[obj.id]
       promise?.resolve(obj)
-
-
-  listenForEvents: =>
-    @subscribe this, 'analysis-server:analysis.errors', (obj) =>
-      @emit 'refresh', obj.params.file
-      for error in obj.params.errors
-        @emit 'analysis', error
 
   forEachEvent: (callback) =>
     @subscribe this, 'new-event', (obj) =>

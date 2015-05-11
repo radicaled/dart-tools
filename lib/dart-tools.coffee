@@ -44,11 +44,6 @@ module.exports =
     AutoCompletePlusProvider.analysisAPI = @analysisComponent.analysisAPI
     # @dartExplorerComponent.enable()
 
-    @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
-      atom.workspace.emit 'dart-tools:refresh', fullPath
-    @analysisComponent.on 'dart-tools:analysis', (result) =>
-      atom.workspace.emit 'dart-tools:analysis', result
-
     atom.workspaceView.command 'dart-tools:format-code', =>
       Utils.whenEditor (editor) ->
         editor.save()

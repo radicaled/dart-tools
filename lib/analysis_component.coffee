@@ -45,15 +45,6 @@ class AnalysisComponent extends Model
 
     @analysisServer.start rootPath
 
-    @analysisServer.on 'analysis', (result) =>
-      results = @analysisResultsMap[result.location.file] ||= []
-      results.push(result)
-      @emit 'dart-tools:analysis', result
-
-    @analysisServer.on 'refresh', (fullPath) =>
-      @analysisResultsMap[fullPath] = []
-      @emit 'dart-tools:refresh', fullPath
-
   checkFile: (fullPath) =>
     if extname(fullPath) == '.dart'
       @analysisServer.check(fullPath)
