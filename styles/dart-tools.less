@@ -33,6 +33,19 @@
 
 }
 
+html /deep/ * {
+  .info[data-dart-analysis] {
+    color: @text-color-info;
+  }
+  .warning[data-dart-analysis] {
+    color: @text-color-warning;
+  }
+  .error[data-dart-analysis] {
+    color: @text-color-error;
+  }
+}
+
+
 ul.dart-tools-quick-issue-view {
   margin-bottom: 0;
 }

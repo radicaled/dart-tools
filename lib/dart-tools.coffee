@@ -30,6 +30,7 @@ module.exports =
     ErrorRepository = require './errors/error_repository'
     SdkInfo = require './sdk/sdk_info'
     AnalysisDecorator = require './analysis/analysis_decorator'
+    QuickInfoView = require './info/quick_info_view'
 
     @analysisComponent = new AnalysisComponent()
 
@@ -39,6 +40,7 @@ module.exports =
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
     @sdkInfo = new SdkInfo()
     @analysisDecorator = new AnalysisDecorator(@errorRepository)
+    @quickInfoView = new QuickInfoView()
 
     @analysisComponent.enable()
     AutoCompletePlusProvider.analysisApi = @analysisComponent.analysisAPI
