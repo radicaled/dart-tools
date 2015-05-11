@@ -29,7 +29,6 @@
     "react-atom-fork": "~0.10.0",
     "reactionary-atom-fork": "~0.9.0",
     "rivets": "^0.8.1",
-    "stream-splitter": "~0.3.0",
-    "theorist": "~1.0.1"
+    "stream-splitter": "~0.3.0"
   }
 }

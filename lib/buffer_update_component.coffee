@@ -1,7 +1,5 @@
-{Model} = require 'theorist'
-
 module.exports =
-class BufferUpdateComponent extends Model
+class BufferUpdateComponent
   constructor: (@editor, @analysisAPI) ->
     @editor.onDidStopChanging =>
       @analysisAPI.updateFile @editor.getPath(), @editor.getText()

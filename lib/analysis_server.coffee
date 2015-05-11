@@ -1,6 +1,5 @@
-{Model} = require 'theorist'
+{Emitter} = require 'event-kit'
 {_} = require 'lodash'
-AnalysisResult = require './analysis_result'
 Utils = require './utils'
 spawn = require('child_process').spawn
 path  = require 'path'
@@ -8,14 +7,16 @@ StreamSplitter = require 'stream-splitter'
 Q = require 'q'
 
 module.exports =
-class AnalysisServer extends Model
+class AnalysisServer
   FAILURE_HARD_STOP: 3
   FAILURE_HARD_STOP_TIMEOUT: 30
-  analysisResults: []
   id: 1
   promiseMap = {}
   serverFailureCount: 0
   writable: false
+
+  constructor: ->
+    @emitter = new Emitter()
 
   start: (packageRoot) =>
     promiseMap = {}
@@ -79,8 +80,7 @@ class AnalysisServer extends Model
     promise = promiseMap[obj.id]
 
     if obj.event
-      @emit 'new-event', obj
-      @emit "analysis-server:#{obj.event}", obj
+      @emitter.emit 'new-event', obj
       id = obj.params?.id
       promise = promiseMap[id]
 
@@ -102,5 +102,5 @@ class AnalysisServer extends Model
       promise?.resolve(obj)
 
   forEachEvent: (callback) =>
-    @subscribe this, 'new-event', (obj) =>
+    @emitter.on 'new-event', (obj) =>
       callback(obj.event, obj)

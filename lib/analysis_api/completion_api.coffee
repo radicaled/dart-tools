@@ -1,4 +1,3 @@
-{Model} = require 'theorist'
 
 module.exports =
 class CompletionAPI

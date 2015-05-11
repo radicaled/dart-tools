@@ -4,13 +4,13 @@ AnalysisDecorator = require './analysis_decorator'
 AnalysisAPI = require './analysis_api'
 BufferUpdateComponent = require './buffer_update_component'
 Utils = require './utils'
+{Emitter} = require 'event-kit'
 
-{Model} = require 'theorist'
 spawn = require('child_process').spawn
 extname = require('path').extname
 
 module.exports =
-class AnalysisComponent extends Model
+class AnalysisComponent
   subscriptions: []
   analysisView: null
   analysisServer: null
@@ -19,7 +19,8 @@ class AnalysisComponent extends Model
 
   quickIssueView: null
 
-  analysisResultsMap: {}
+  constructor: ->
+    @emitter = new Emitter()
 
   enable: =>
     @subscriptions.push atom.project.onDidChangePaths @watchDartProject

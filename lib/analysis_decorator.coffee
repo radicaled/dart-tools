@@ -1,13 +1,8 @@
-{Model} = require 'theorist'
 _       = require 'lodash'
 
 module.exports =
-class AnalysisDecorator extends Model
+class AnalysisDecorator
   constructor: (@analysisComponent) ->
-    @analysisComponent.on 'dart-tools:analysis', (result) =>
-      @addDecoratorForAnalysis result
-    @analysisComponent.on 'dart-tools:refresh', (fullPath) =>
-      @refreshDecoratorsForPath fullPath
     that = this
 
     atom.workspace.eachEditor (editor) =>

@@ -1,8 +1,7 @@
-{Model} = require 'theorist'
 {_}     = require 'lodash'
 
 module.exports =
-class QuickIssueModel extends Model
+class QuickIssueModel
   constructor: (@editor) ->
 
   findMarkersInRange: (range) =>

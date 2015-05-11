@@ -1,8 +1,7 @@
-{Model} = require 'theorist'
 url = require 'url'
 
 module.exports =
-class DartExplorerComponent extends Model
+class DartExplorerComponent
   uri: 'dart-tools://dart_explorer/'
 
   constructor: (@analysisComponent) ->
