@@ -29,8 +29,13 @@ module.exports =
     Formatter = require './formatter'
     PubComponent = require './pub/pub_component'
     DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
+    AnalysisToolbar = require './analysis/analysis_toolbar'
+    ErrorRepository = require './errors/error_repository'
 
     @analysisComponent = new AnalysisComponent()
+
+    @errorRepository = new ErrorRepository(@analysisComponent.analysisAPI)
+    @analysisToolbar = new AnalysisToolbar(@errorRepository)
     @pubComponent = new PubComponent(atom.project.getPaths()[0])
     @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
 

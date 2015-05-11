@@ -80,6 +80,7 @@ class AnalysisServer extends Model
     promise = promiseMap[obj.id]
 
     if obj.event
+      @emit 'new-event', obj
       @emit "analysis-server:#{obj.event}", obj
       id = obj.params?.id
       promise = promiseMap[id]
@@ -107,3 +108,7 @@ class AnalysisServer extends Model
       @emit 'refresh', obj.params.file
       for error in obj.params.errors
         @emit 'analysis', error
+
+  forEachEvent: (callback) =>
+    @subscribe this, 'new-event', (obj) =>
+      callback(obj.event, obj)

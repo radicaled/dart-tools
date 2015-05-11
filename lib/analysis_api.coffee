@@ -1,11 +1,13 @@
 SearchAPI = require './analysis_api/search_api'
 CompletionAPI = require './analysis_api/completion_api'
+{Emitter} = require 'event-kit'
 
 module.exports =
   class AnalysisAPI
     _analysisServer: null
 
     constructor: (@analysisServer) ->
+      @emitter = new Emitter
       Object.defineProperty this, 'analysisServer',
         set: (newValue) => @setServer(newValue)
         get: => @_analysisServer
@@ -13,6 +15,10 @@ module.exports =
     setServer: (@_analysisServer) =>
       @search ||= new SearchAPI(this)
       @completion ||= new CompletionAPI(this)
+
+      # TODO: bit of a hack here
+      @_analysisServer.forEachEvent (name, e) =>
+        @emitter.emit name, e
 
     sendMessage: (obj) => @analysisServer?.sendMessage(obj)
 
@@ -29,3 +35,6 @@ module.exports =
 
       @perform 'analysis.updateContent',
         {files}
+
+    on: (event, callback) =>
+      @emitter.on event, callback

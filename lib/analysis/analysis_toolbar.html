@@ -1,0 +1,15 @@
+<atom-panel id='analysis-toolbar' class='from-bottom' rv-if="it.shouldShow">
+  <div class="padded">
+    <h3>Dart Tools</h3>
+    <div>
+      Status:
+      <span rv-unless="it.hasProblems < errorCount warningCount">
+        <i class="icon-check"></i> A OK!
+      </span>
+      <span rv-if="it.hasProblems < errorCount warningCount">
+        warnings: <span rv-text="it.warningCount"></span>
+        errors: <span rv-text="it.errorCount"></span>
+      </span>
+    </div>
+  </div>
+</atom-panel>
