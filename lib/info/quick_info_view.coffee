@@ -16,11 +16,14 @@ class QuickInfoView
     @editorEvents.dispose()
 
     @editorEvents.add editor.onDidAddDecoration (decoration) =>
-      selectedBufferRange = editor.getSelectedBufferRange()
       marker = decoration.getMarker()
-      markerRange = marker.getBufferRange()
-      if markerRange.containsRange(selectedBufferRange)
-        @addMarker(marker) if marker.getProperties().isDartMarker
+      @withValidMarker editor, marker, (marker) =>
+        @addMarker(marker)
+
+    @editorEvents.add editor.onDidRemoveDecoration (decoration) =>
+      marker = decoration.getMarker()
+      @withValidMarker editor, marker, (marker) =>
+        @removeMarker(marker)
 
     @editorEvents.add editor.onDidChangeSelectionRange =>
       selectedBufferRange = editor.getSelectedBufferRange()
@@ -31,6 +34,19 @@ class QuickInfoView
 
   addMarker: (marker) =>
     @view.addProblem(marker.getProperties().problem)
+
+  removeMarker: (marker) =>
+    @view.removeProblem(marker.getProperties().problem)
+
+  # Helpers
+
+  withValidMarker: (editor, marker, callback) =>
+    return unless marker.getProperties().isDartMarker
+
+    selectedBufferRange = editor.getSelectedBufferRange()
+    markerRange = marker.getBufferRange()
+    if markerRange.containsRange(selectedBufferRange)
+      callback(marker)
 
   findMarkersInRange: (editor, range) =>
     attrs =
@@ -62,6 +78,9 @@ class View
   addProblem: (problem) =>
     return if _.any(@problems, (p) => _.isEqual(p, problem))
     @problems.push problem
+
+  removeProblem: (problem) =>
+    _.remove(@problems, (p) => _.isEqual(p, problem))
 
   reset: =>
     @problems = []
