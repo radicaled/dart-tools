@@ -46,6 +46,10 @@ class Utils
   @isDartFile: (filename = '') =>
     path.extname(filename) == '.dart'
 
+  @isCompatible: (editor) =>
+    # We only support pure Dart files for now
+    @isDartFile editor.getPath()
+
   @whenDartSdkFound: (fxn) =>
     # Why is process null??
     process = window.process unless process

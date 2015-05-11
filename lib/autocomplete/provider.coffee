@@ -1,5 +1,6 @@
 {filter} = require 'fuzzaldrin'
 {_} = require 'lodash'
+Utils = require '../utils'
 
 AutoCompletePlusProvider =
   selector: '.source.dart'
@@ -17,6 +18,7 @@ AutoCompletePlusProvider =
       if @analysisApi
         path = editor.getPath()
         offset = editor.buffer.characterIndexForPosition(bufferPosition)
+        return unless Util.isCompatible(editor)
 
         @analysisApi.updateFile path, editor.getText()
         @analysisApi.completion.getSuggestions(path, offset)
