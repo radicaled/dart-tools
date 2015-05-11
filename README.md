@@ -2,19 +2,17 @@
 
 Various tools for Dart support in Atom.
 
-**NOTE**: very alpha quality
+**NOTE**: somewhat alpha quality
 
 Features
 ========
 
-* Lints the current Dart file, on change, when a pubspec.yaml file exists
+* Lints the current Dart file when a pubspec.yaml file exists
 at project root. (see note section)
-* Lints the current Dart file via command palette. (see note section)
-* Formats the current Dart file via command palette, supporting both whitespace-only
-and code transformation.
+* Formats the current Dart file via command palette
 * Automatic and manual "pub get."
 * Putting a cursor within an analysis error quickly shows the problem text
-* Autocomplete, via the `autocomplete-plus` package.
+* Basic autocomplete, via the `autocomplete-plus` package.
 
 Available Commands
 ==================
@@ -22,15 +20,11 @@ Available Commands
 * Pub Get
 * Sdk Info
 * Format Code
-* Format Whitespace
-* Analyze File
-* Toggle Analysis View
 
 Notes
 =====
 
-Linting and formatting will save the current editor buffer first.
+Formatting will save the current editor buffer first.
 
-**Linting requires you to set your dart-sdk location.** You can do it inside Atom
-(Settings View: Open -> Filter Packages -> Dart Tools) or set a DART_SDK
-environment variable.
+**Linting requires you to set your dart-sdk location.** You can do from
+Settings View: Open -> Filter Packages -> Dart Tools.
