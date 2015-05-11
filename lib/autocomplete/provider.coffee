@@ -22,7 +22,10 @@ AutoCompletePlusProvider =
           .then (autocompleteInfo) ->
             items = []
             results = autocompleteInfo.params.results
-            sortedResults = filter(results, prefix, { key: 'completion'})
+            sortedResults = if prefix == "."
+              results
+            else
+              filter(results, prefix, { key: 'completion'})
 
             for result in sortedResults
               items.push
