@@ -15,8 +15,6 @@ class AnalysisComponent
   analysisServer: null
   analysisAPI: new AnalysisAPI()
 
-  quickIssueView: null
-
   constructor: ->
     @emitter = new Emitter()
 
@@ -24,7 +22,6 @@ class AnalysisComponent
     @subscriptions.push atom.project.onDidChangePaths @watchDartProject
     @watchDartProject()
     # @createAnalysisView()
-    # @createQuickIssueView()
 
     atom.workspace.observeTextEditors (editor) =>
       new BufferUpdateComponent(editor, @analysisAPI)
@@ -57,14 +54,6 @@ class AnalysisComponent
     atom.packages.once 'activated', =>
       @analysisView = new AnalysisView()
       @analysisView.attach()
-
-  createQuickIssueView: =>
-    QuickIssueView = require './views/quick_issue_view'
-    qv = new QuickIssueView()
-    atom.workspaceView.appendToBottom(qv)
-
-    atom.workspace.eachEditor (editor) ->
-      qv.watchEditor(editor)
 
   showProblems: =>
     console.log 'showing problems'
