@@ -6,9 +6,12 @@
         <i class="icon-check"></i> Everything is A OK!
       </span>
       <span rv-if="it.hasProblems < errorCount warningCount">
-        <span rv-text="it.errorCount"
-          class="badge badge-error icon icon-stop">
-        </span>
+        <button class="btn text-error">
+          <span rv-text="it.errorCount"
+            class="">
+          </span>
+          errors
+        </button>
       </span>
     </div>
   </div>
