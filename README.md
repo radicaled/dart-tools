@@ -28,3 +28,5 @@ Formatting will save the current editor buffer first.
 
 **Linting requires you to set your dart-sdk location.** You can do from
 Settings View: Open -> Filter Packages -> Dart Tools.
+
+Linting will not be performed until you have run `pub get` at least once.
