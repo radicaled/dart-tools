@@ -45,7 +45,7 @@ module.exports =
     @sdkInfo = new SdkInfo()
 
     @analysisComponent.enable()
-    AutoCompletePlusProvider.analysisAPI = @analysisComponent.analysisAPI
+    AutoCompletePlusProvider.analysisApi = @analysisComponent.analysisAPI
     # @dartExplorerComponent.enable()
 
     atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>

@@ -8,17 +8,17 @@ AutoCompletePlusProvider =
   excludeLowerPriority: true
 
   # Our analysis API service object
-  analysisAPI: null
+  analysisApi: null
 
   # Required: Return a promise, an array of suggestions, or null.
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
     new Promise (resolve) =>
-      if @analysisAPI
+      if @analysisApi
         path = editor.getPath()
         offset = editor.buffer.characterIndexForPosition(bufferPosition)
 
-        @analysisAPI.updateFile path, editor.getText()
-        @analysisAPI.completion.getSuggestions(path, offset)
+        @analysisApi.updateFile path, editor.getText()
+        @analysisApi.completion.getSuggestions(path, offset)
           .then (autocompleteInfo) ->
             items = []
             results = autocompleteInfo.params.results
