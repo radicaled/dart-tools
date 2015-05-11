@@ -43,12 +43,13 @@ dt.typeDefinition {
 </style></head>
   <body>
     <h1>Analysis Server API Specification</h1>
-    <h1 style="color:#999999">WORKING DRAFT - Version 0.3</h1>
+    <h1 style="color:#999999">Version 1.6.2</h1>
     <p>
-      This document contains a specification of the API provided by
-      the analysis server. The API in this document is currently under
-      development and should be expected to change. In some cases
-      those changes will be substantial.
+      This document contains a specification of the API provided by the
+      analysis server.  The API in this document is currently under
+      development.  Changes to the API will be accompanied by an update to the
+      protocol version number according to the principles of semantic
+      versioning <a href="http://semver.org/">http://semver.org/</a>.
     </p>
     <h2>Overview</h2>
     <p>
@@ -68,6 +69,10 @@ dt.typeDefinition {
       encoding process must not introduce newlines within a
       message. Note however that newlines are used in this document
       for readability.
+    </p>
+    <p>
+      It is the client's responsibility to read output from the server to
+      avoid its blocking.
     </p>
     <p>
       To ease interoperability with Lisp-based clients (which may not
@@ -96,15 +101,20 @@ dt.typeDefinition {
       longer to process than others.
     </p>
     <p>
-      Every request is required to have two fields and may have an
-      optional third field. The first required field is the ‘id’
+      Every request is required to have two fields and may have two
+      additional optional fields. The first required field is the ‘id’
       field, which is only used by the server to associate a response
       with the request that generated the response. The second
       required field is the ‘method’ field, which is used to determine
-      what the server is being requested to do. The optional field is
+      what the server is being requested to do. One optional field is
       the ‘params’ field, whose structure is dependent on the method
       being requested. The structure of this field is described with
-      each request for which it is required.
+      each request for which it is required. The other optional field
+      is the 'clientRequestTime' field, which is a number indicating
+      the time at which the client made the request (milliseconds
+      since epoch). Providing clientRequestTime helps us track
+      how responsive analysis server is to client requests
+      and better address any issues that occur.
     </p>
     <p>
       Every response has up to three fields. The first field is the
@@ -137,6 +147,12 @@ dt.typeDefinition {
       kind of notification being sent. The structure of this field is
       described with each notification.
     </p>
+    <p>
+      In order to be backward compatible, clients should ignore fields that were
+      not specified in the version of the API on which they were based. Clients
+      should also use the server.getVersion request to test that the version of
+      the server supports an API before using it.
+    </p>
     <h3>Eventual Consistency</h3>
     <p>
       TBD
@@ -152,7 +168,7 @@ dt.typeDefinition {
       <li><a href="#domain_completion">Code Completion</a></li>
       <li><a href="#domain_search">Search</a></li>
       <li><a href="#domain_edit">Edit</a></li>
-      <li><a href="#domain_debug">Debugging</a></li>
+      <li><a href="#domain_execution">Execution</a></li>
     </ul>
     <p>
       The specifications of the API’s refer to data structures beyond
@@ -164,15 +180,42 @@ dt.typeDefinition {
       The command-line arguments that can be passed to the server.
     </p>
     <h4>Options</h4>
+    <blockquote>
     <dl>
       <dt>--no-error-notification</dt>
-      <dd></dd>
-    </dl>
-    <p>
+      <dd>
       Disable notifications about errors (see analysis.error). If this
       flag is not specified then notifications will be sent for all
       errors produced for all files in the actual analysis roots.
-    </p>
+      </dd>
+    </dl>
+    <dl>
+      <dt>--file-read-mode</dt>
+      <dd>
+      An enumeration of the ways files can be read from disk. Some clients
+      normalize end of line characters which would make the file offset and
+      range information incorrect. The default option is <tt>as-is</tt>, but
+      can also be set to <tt>normalize-eol-always</tt>. The default option
+      (<tt>as-is</tt>) reads files as they are on disk. The
+      <tt>normalize-eol-always</tt> option does the following:
+      <ul>
+        <li>'\r\n' is converted to '\n';</li>
+        <li>'\r' by itself is converted to '\n';</li>
+        <li>this happens regardless of the OS editor is running on.</li>
+      </ul>
+      </dd>
+    </dl>
+    <dl>
+      <dt>--no-index</dt>
+      <dd>
+      Disable the server from generating an index. If this flag is passed and an
+      API is used that requires an index, then an error, <tt>NO_INDEX_GENERATED</tt>,
+      will be thrown. The set of API calls that require an index include:
+      refactoring calls, code completions and searching.
+      
+      </dd>
+    </dl>
+    </blockquote>
     <h2 class="domain"><a name="domain_server">Domain: server</a></h2>
       <p>
         The server domain contains API’s related to the execution of
@@ -184,12 +227,12 @@ dt.typeDefinition {
       
       
       
-    <h3>Requests</h3><dl><dt class="request">server.getVersion</dt><dd><div class="box"><pre>request: {
+    <h3>Requests</h3><dl><dt class="request"><a name="request_server.getVersion">server.getVersion</a> (<a href="#request_server.getVersion">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "server.getVersion"
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>version</b>": String
   }
@@ -199,12 +242,12 @@ dt.typeDefinition {
       <h4>Returns</h4><dl><dt class="field"><b><i>version ( String )</i></b></dt><dd>
             
             <p>The version number of the analysis server.</p>
-          </dd></dl></dd><dt class="request">server.shutdown</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_server.shutdown">server.shutdown</a> (<a href="#request_server.shutdown">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "server.shutdown"
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
           Cleanly shutdown the analysis server. Requests that are
@@ -214,7 +257,7 @@ dt.typeDefinition {
           further responses or notifications will be sent after the
           response to this request has been sent.
         </p>
-      </dd><dt class="request">server.setSubscriptions</dt><dd><div class="box"><pre>request: {
+      </dd><dt class="request"><a name="request_server.setSubscriptions">server.setSubscriptions</a> (<a href="#request_server.setSubscriptions">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "server.setSubscriptions"
   "params": {
@@ -222,7 +265,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
           Subscribe for services. All previous subscriptions are
@@ -237,8 +280,11 @@ dt.typeDefinition {
       <h4>Parameters</h4><dl><dt class="field"><b><i>subscriptions ( List&lt;<a href="#type_ServerService">ServerService</a>&gt; )</i></b></dt><dd>
             
             <p>A list of the services being subscribed to.</p>
-          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification">server.connected</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification"><a name="notification_server.connected">server.connected</a> (<a href="#notification_server.connected">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "server.connected"
+  "params": {
+    "<b>version</b>": String
+  }
 }</pre></div>
         <p>
           Reports that the server is running. This notification is
@@ -250,7 +296,11 @@ dt.typeDefinition {
           It is not possible to subscribe to or unsubscribe from this
           notification.
         </p>
-      </dd><dt class="notification">server.error</dt><dd><div class="box"><pre>notification: {
+       
+      <h4>Parameters</h4><dl><dt class="field"><b><i>version ( String )</i></b></dt><dd>
+            
+            <p>The version number of the analysis server.</p>
+          </dd></dl></dd><dt class="notification"><a name="notification_server.error">server.error</a> (<a href="#notification_server.error">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "server.error"
   "params": {
     "<b>isFatal</b>": bool
@@ -290,10 +340,11 @@ dt.typeDefinition {
               The stack trace associated with the generation of the
               error, used for debugging the server.
             </p>
-          </dd></dl></dd><dt class="notification">server.status</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd><dt class="notification"><a name="notification_server.status">server.status</a> (<a href="#notification_server.status">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "server.status"
   "params": {
     "<b>analysis</b>": <span style="color:#999999">optional</span> <a href="#type_AnalysisStatus">AnalysisStatus</a>
+    "<b>pub</b>": <span style="color:#999999">optional</span> <a href="#type_PubStatus">PubStatus</a>
   }
 }</pre></div>
         <p>
@@ -314,6 +365,12 @@ dt.typeDefinition {
               The current status of analysis, including whether
               analysis is being performed and if so what is being
               analyzed.
+            </p>
+          </dd><dt class="field"><b><i>pub ( <span style="color:#999999">optional</span> <a href="#type_PubStatus">PubStatus</a> )</i></b></dt><dd>
+            
+            <p>
+              The current status of pub execution, indicating whether we are
+              currently running pub.
             </p>
           </dd></dl></dd></dl>
     <h2 class="domain"><a name="domain_analysis">Domain: analysis</a></h2>
@@ -337,7 +394,10 @@ dt.typeDefinition {
       
       
       
-    <h3>Requests</h3><dl><dt class="request">analysis.getErrors</dt><dd><div class="box"><pre>request: {
+      
+      
+      
+    <h3>Requests</h3><dl><dt class="request"><a name="request_analysis.getErrors">analysis.getErrors</a> (<a href="#request_analysis.getErrors">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "analysis.getErrors"
   "params": {
@@ -345,7 +405,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>errors</b>": List&lt;<a href="#type_AnalysisError">AnalysisError</a>&gt;
   }
@@ -359,7 +419,9 @@ dt.typeDefinition {
           for the file cannot be computed, then the subset of the
           errors that can be computed will be returned and the
           response will contain an error to indicate why the errors
-          could not be computed.
+          could not be computed. If the content of the file changes after this
+          request was received but before a response could be sent, then an
+          error of type <tt>CONTENT_MODIFIED</tt> will be generated.
         </p>
         <p>
           This request is intended to be used by clients that cannot
@@ -367,6 +429,13 @@ dt.typeDefinition {
           <b>can</b> apply error information as it becomes available
           should use the information provided by the 'analysis.errors'
           notification.
+        </p>
+        <p>
+          If a request is made for a file which does not exist, or
+          which is not currently subject to analysis (e.g. because it
+          is not associated with any analysis root specified to
+          analysis.setAnalysisRoots), an error of type
+          <tt>GET_ERRORS_INVALID_FILE</tt> will be generated.
         </p>
         
         
@@ -380,7 +449,7 @@ dt.typeDefinition {
             <p>
               The errors associated with the file.
             </p>
-          </dd></dl></dd><dt class="request">analysis.getHover</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_analysis.getHover">analysis.getHover</a> (<a href="#request_analysis.getHover">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "analysis.getHover"
   "params": {
@@ -389,7 +458,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>hovers</b>": List&lt;<a href="#type_HoverInformation">HoverInformation</a>&gt;
   }
@@ -405,14 +474,12 @@ dt.typeDefinition {
       <h4>Parameters</h4><dl><dt class="field"><b><i>file ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
             
             <p>
-              The file in which hover information is being
-              requested.
+              The file in which hover information is being requested.
             </p>
           </dd><dt class="field"><b><i>offset ( int )</i></b></dt><dd>
             
             <p>
-              The offset for which hover information is being
-              requested.
+              The offset for which hover information is being requested.
             </p>
           </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>hovers ( List&lt;<a href="#type_HoverInformation">HoverInformation</a>&gt; )</i></b></dt><dd>
             
@@ -424,35 +491,156 @@ dt.typeDefinition {
               in multiple contexts in conflicting ways (such as a
               part that is included in multiple libraries).
             </p>
-          </dd></dl></dd><dt class="request">analysis.reanalyze</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_analysis.getLibraryDependencies">analysis.getLibraryDependencies</a> (<a href="#request_analysis.getLibraryDependencies">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
-  "method": "analysis.reanalyze"
+  "method": "analysis.getLibraryDependencies"
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
+  "result": {
+    "<b>libraries</b>": List&lt;<a href="#type_FilePath">FilePath</a>&gt;
+    "<b>packageMap</b>": Map&lt;String, Map&lt;String, List&lt;<a href="#type_FilePath">FilePath</a>&gt;&gt;&gt;
+  }
 }</pre></div>
         <p>
-          Force the re-analysis of everything contained in the
-          existing analysis roots. This will cause all previously
-          computed analysis results to be discarded and recomputed,
-          and will cause all subscribed notifications to be re-sent.
+          Return library dependency information for use in client-side indexing
+          and package URI resolution.
         </p>
-      </dd><dt class="request">analysis.setAnalysisRoots</dt><dd><div class="box"><pre>request: {
+        
+      <h4>Returns</h4><dl><dt class="field"><b><i>libraries ( List&lt;<a href="#type_FilePath">FilePath</a>&gt; )</i></b></dt><dd>
+            
+              <p>
+                A list of the paths of library elements referenced by
+                files in existing analysis roots.
+              </p>
+            </dd><dt class="field"><b><i>packageMap ( Map&lt;String, Map&lt;String, List&lt;<a href="#type_FilePath">FilePath</a>&gt;&gt;&gt; )</i></b></dt><dd>
+              
+              <p>
+                A mapping from context source roots to package maps which map
+                package names to source directories for use in client-side
+                package URI resolution.
+              </p>
+            </dd></dl></dd><dt class="request"><a name="request_analysis.getNavigation">analysis.getNavigation</a> (<a href="#request_analysis.getNavigation">#</a>)</dt><dd><div class="box"><pre>request: {
+  "id": String
+  "method": "analysis.getNavigation"
+  "params": {
+    "<b>file</b>": <a href="#type_FilePath">FilePath</a>
+    "<b>offset</b>": int
+    "<b>length</b>": int
+  }
+}</pre><br><pre>response: {
+  "id": String
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
+  "result": {
+    "<b>files</b>": List&lt;<a href="#type_FilePath">FilePath</a>&gt;
+    "<b>targets</b>": List&lt;<a href="#type_NavigationTarget">NavigationTarget</a>&gt;
+    "<b>regions</b>": List&lt;<a href="#type_NavigationRegion">NavigationRegion</a>&gt;
+  }
+}</pre></div>
+        <p>
+          Return the navigation information associated with the given region of
+          the given file. If the navigation information for the given file has
+          not yet been computed, or the most recently computed navigation
+          information for the given file is out of date, then the response for
+          this request will be delayed until it has been computed. If the
+          content of the file changes after this request was received but before
+          a response could be sent, then an error of type
+          <tt>CONTENT_MODIFIED</tt> will be generated.
+        </p>
+        <p>
+          If a navigation region overlaps (but extends either before or after)
+          the given region of the file it will be included in the result. This
+          means that it is theoretically possible to get the same navigation
+          region in response to multiple requests. Clients can avoid this by
+          always choosing a region that starts at the beginning of a line and
+          ends at the end of a (possibly different) line in the file.
+        </p>
+        
+        
+      <h4>Parameters</h4><dl><dt class="field"><b><i>file ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
+            
+            <p>
+              The file in which navigation information is being requested.
+            </p>
+          </dd><dt class="field"><b><i>offset ( int )</i></b></dt><dd>
+            
+            <p>
+              The offset of the region for which navigation information is being
+              requested.
+            </p>
+          </dd><dt class="field"><b><i>length ( int )</i></b></dt><dd>
+            
+            <p>
+              The length of the region for which navigation information is being
+              requested.
+            </p>
+          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>files ( List&lt;<a href="#type_FilePath">FilePath</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              A list of the paths of files that are referenced by the navigation
+              targets.
+            </p>
+          </dd><dt class="field"><b><i>targets ( List&lt;<a href="#type_NavigationTarget">NavigationTarget</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              A list of the navigation targets that are referenced by the
+              navigation regions.
+            </p>
+          </dd><dt class="field"><b><i>regions ( List&lt;<a href="#type_NavigationRegion">NavigationRegion</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              A list of the navigation regions within the requested region of
+              the file.
+            </p>
+          </dd></dl></dd><dt class="request"><a name="request_analysis.reanalyze">analysis.reanalyze</a> (<a href="#request_analysis.reanalyze">#</a>)</dt><dd><div class="box"><pre>request: {
+  "id": String
+  "method": "analysis.reanalyze"
+  "params": {
+    "<b>roots</b>": <span style="color:#999999">optional</span> List&lt;<a href="#type_FilePath">FilePath</a>&gt;
+  }
+}</pre><br><pre>response: {
+  "id": String
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
+}</pre></div>
+        <p>
+          Force the re-analysis of everything contained in the specified
+          analysis roots. This will cause all previously computed analysis
+          results to be discarded and recomputed, and will cause all subscribed
+          notifications to be re-sent.
+        </p>
+        <p>
+          If no analysis roots are provided, then all current analysis roots
+          will be re-analyzed. If an empty list of analysis roots is provided,
+          then nothing will be re-analyzed. If the list contains one or more
+          paths that are not currently analysis roots, then an error of type
+          <tt>INVALID_ANALYSIS_ROOT</tt> will be generated.
+        </p>
+        
+      <h4>Parameters</h4><dl><dt class="field"><b><i>roots ( <span style="color:#999999">optional</span> List&lt;<a href="#type_FilePath">FilePath</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              A list of the analysis roots that are to be re-analyzed.
+            </p>
+          </dd></dl></dd><dt class="request"><a name="request_analysis.setAnalysisRoots">analysis.setAnalysisRoots</a> (<a href="#request_analysis.setAnalysisRoots">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "analysis.setAnalysisRoots"
   "params": {
     "<b>included</b>": List&lt;<a href="#type_FilePath">FilePath</a>&gt;
     "<b>excluded</b>": List&lt;<a href="#type_FilePath">FilePath</a>&gt;
+    "<b>packageRoots</b>": <span style="color:#999999">optional</span> Map&lt;<a href="#type_FilePath">FilePath</a>, <a href="#type_FilePath">FilePath</a>&gt;
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
-          Sets the root paths used to determine which files to
-          analyze. The set of files to be analyzed are all of the
-          files in one of the root paths that are not also in one of
-          the excluded paths.
+          Sets the root paths used to determine which files to analyze. The set
+          of files to be analyzed are all of the files in one of the root paths
+          that are not either explicitly or implicitly excluded. A file is
+          explicitly excluded if it is in one of the excluded paths. A file is
+          implicitly excluded if it is in a subdirectory of one of the root
+          paths where the name of the subdirectory starts with a period (that
+          is, a hidden directory).
         </p>
         <p>
           Note that this request determines the set of requested
@@ -490,7 +678,27 @@ dt.typeDefinition {
               A list of the files and directories within the
               included directories that should not be analyzed.
             </p>
-          </dd></dl></dd><dt class="request">analysis.setPriorityFiles</dt><dd><div class="box"><pre>request: {
+          </dd><dt class="field"><b><i>packageRoots ( <span style="color:#999999">optional</span> Map&lt;<a href="#type_FilePath">FilePath</a>, <a href="#type_FilePath">FilePath</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              A mapping from source directories to target directories
+              that should override the normal package: URI resolution
+              mechanism.  The analyzer will behave as though each
+              source directory in the map contains a special
+              pubspec.yaml file which resolves any package: URI to the
+              corresponding path within the target directory.  The
+              effect is the same as specifying the target directory as
+              a "--package_root" parameter to the Dart VM when
+              executing any Dart file inside the source directory.
+            </p>
+            <p>
+              Files in any directories that are not overridden by this
+              mapping have their package: URI's resolved using the
+              normal pubspec.yaml mechanism.  If this field is absent,
+              or the empty map is specified, that indicates that the
+              normal pubspec.yaml mechanism should always be used.
+            </p>
+          </dd></dl></dd><dt class="request"><a name="request_analysis.setPriorityFiles">analysis.setPriorityFiles</a> (<a href="#request_analysis.setPriorityFiles">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "analysis.setPriorityFiles"
   "params": {
@@ -498,7 +706,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
           Set the priority files to the files in the given list. A
@@ -531,7 +739,7 @@ dt.typeDefinition {
             <p>
               The files that are to be a priority for analysis.
             </p>
-          </dd></dl></dd><dt class="request">analysis.setSubscriptions</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_analysis.setSubscriptions">analysis.setSubscriptions</a> (<a href="#request_analysis.setSubscriptions">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "analysis.setSubscriptions"
   "params": {
@@ -539,7 +747,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
           Subscribe for services. All previous subscriptions are
@@ -581,7 +789,7 @@ dt.typeDefinition {
               A table mapping services to a list of the files being
               subscribed to the service.
             </p>
-          </dd></dl></dd><dt class="request">analysis.updateContent</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_analysis.updateContent">analysis.updateContent</a> (<a href="#request_analysis.updateContent">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "analysis.updateContent"
   "params": {
@@ -589,7 +797,9 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
+  "result": {
+  }
 }</pre></div>
         <p>
           Update the content of one or more files. Files that were
@@ -602,13 +812,14 @@ dt.typeDefinition {
           filesystem.
         </p>
         
+        
       <h4>Parameters</h4><dl><dt class="field"><b><i>files ( Map&lt;<a href="#type_FilePath">FilePath</a>, <a href="#type_AddContentOverlay">AddContentOverlay</a> | <a href="#type_ChangeContentOverlay">ChangeContentOverlay</a> | <a href="#type_RemoveContentOverlay">RemoveContentOverlay</a>&gt; )</i></b></dt><dd>
             
             <p>
               A table mapping the files whose content has changed to a
               description of the content change.
             </p>
-          </dd></dl></dd><dt class="request">analysis.updateOptions</dt><dd><div class="box"><pre>request: {
+          </dd></dl><h4>Returns</h4><dl></dl></dd><dt class="request"><a name="request_analysis.updateOptions">analysis.updateOptions</a> (<a href="#request_analysis.updateOptions">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "analysis.updateOptions"
   "params": {
@@ -616,7 +827,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
           Update the options controlling analysis based on the given
@@ -631,7 +842,7 @@ dt.typeDefinition {
             <p>
               The options that are to be used to control analysis.
             </p>
-          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification">analysis.errors</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification"><a name="notification_analysis.errors">analysis.errors</a> (<a href="#notification_analysis.errors">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.errors"
   "params": {
     "<b>file</b>": <a href="#type_FilePath">FilePath</a>
@@ -658,7 +869,7 @@ dt.typeDefinition {
             <p>
               The errors contained in the file.
             </p>
-          </dd></dl></dd><dt class="notification">analysis.flushResults</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.flushResults">analysis.flushResults</a> (<a href="#notification_analysis.flushResults">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.flushResults"
   "params": {
     "<b>files</b>": List&lt;<a href="#type_FilePath">FilePath</a>&gt;
@@ -687,7 +898,7 @@ dt.typeDefinition {
             <p>
               The files that are no longer being analyzed.
             </p>
-          </dd></dl></dd><dt class="notification">analysis.folding</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.folding">analysis.folding</a> (<a href="#notification_analysis.folding">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.folding"
   "params": {
     "<b>file</b>": <a href="#type_FilePath">FilePath</a>
@@ -718,7 +929,7 @@ dt.typeDefinition {
             <p>
               The folding regions contained in the file.
             </p>
-          </dd></dl></dd><dt class="notification">analysis.highlights</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.highlights">analysis.highlights</a> (<a href="#notification_analysis.highlights">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.highlights"
   "params": {
     "<b>file</b>": <a href="#type_FilePath">FilePath</a>
@@ -750,11 +961,54 @@ dt.typeDefinition {
               other highlight regions if there is more than one
               meaning associated with a particular region.
             </p>
-          </dd></dl></dd><dt class="notification">analysis.navigation</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.invalidate">analysis.invalidate</a> (<a href="#notification_analysis.invalidate">#</a>)</dt><dd><div class="box"><pre>notification: {
+  "event": "analysis.invalidate"
+  "params": {
+    "<b>file</b>": <a href="#type_FilePath">FilePath</a>
+    "<b>offset</b>": int
+    "<b>length</b>": int
+    "<b>delta</b>": int
+  }
+}</pre></div>
+        <p>
+          Reports that the navigation information associated with a region of a
+          single file has become invalid and should be re-requested.
+        </p>
+        <p>
+          This notification is not subscribed to by default. Clients can
+          subscribe by including the value <tt>"INVALIDATE"</tt> in the list of
+          services passed in an analysis.setSubscriptions request.
+        </p>
+        
+      <h4>Parameters</h4><dl><dt class="field"><b><i>file ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
+            
+            <p>
+              The file whose information has been invalidated.
+            </p>
+          </dd><dt class="field"><b><i>offset ( int )</i></b></dt><dd>
+            
+            <p>
+              The offset of the invalidated region.
+            </p>
+          </dd><dt class="field"><b><i>length ( int )</i></b></dt><dd>
+            
+            <p>
+              The length of the invalidated region.
+            </p>
+          </dd><dt class="field"><b><i>delta ( int )</i></b></dt><dd>
+            
+            <p>
+              The delta to be applied to the offsets in information that follows
+              the invalidated region in order to update it so that it doesn't
+              need to be re-requested.
+            </p>
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.navigation">analysis.navigation</a> (<a href="#notification_analysis.navigation">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.navigation"
   "params": {
     "<b>file</b>": <a href="#type_FilePath">FilePath</a>
     "<b>regions</b>": List&lt;<a href="#type_NavigationRegion">NavigationRegion</a>&gt;
+    "<b>targets</b>": List&lt;<a href="#type_NavigationTarget">NavigationTarget</a>&gt;
+    "<b>files</b>": List&lt;<a href="#type_FilePath">FilePath</a>&gt;
   }
 }</pre></div>
         <p>
@@ -775,8 +1029,9 @@ dt.typeDefinition {
           </dd><dt class="field"><b><i>regions ( List&lt;<a href="#type_NavigationRegion">NavigationRegion</a>&gt; )</i></b></dt><dd>
             
             <p>
-              The navigation regions contained in the file. Each
-              navigation region represents a list of targets
+              The navigation regions contained in the file.
+              The regions are sorted by their offsets.
+              Each navigation region represents a list of targets
               associated with some range. The lists will usually
               contain a single target, but can contain more in the
               case of a part that is included in multiple libraries
@@ -785,7 +1040,21 @@ dt.typeDefinition {
               regions that are returned do not overlap other
               navigation regions.
             </p>
-          </dd></dl></dd><dt class="notification">analysis.occurrences</dt><dd><div class="box"><pre>notification: {
+          </dd><dt class="field"><b><i>targets ( List&lt;<a href="#type_NavigationTarget">NavigationTarget</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              The navigation targets referenced in the file.
+              They are referenced by <tt>NavigationRegion</tt>s by their
+              index in this array.
+            </p>
+          </dd><dt class="field"><b><i>files ( List&lt;<a href="#type_FilePath">FilePath</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              The files containing navigation targets referenced in the file.
+              They are referenced by <tt>NavigationTarget</tt>s by their
+              index in this array.
+            </p>
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.occurrences">analysis.occurrences</a> (<a href="#notification_analysis.occurrences">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.occurrences"
   "params": {
     "<b>file</b>": <a href="#type_FilePath">FilePath</a>
@@ -814,7 +1083,7 @@ dt.typeDefinition {
               The occurrences of references to elements within the
               file.
             </p>
-          </dd></dl></dd><dt class="notification">analysis.outline</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.outline">analysis.outline</a> (<a href="#notification_analysis.outline">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.outline"
   "params": {
     "<b>file</b>": <a href="#type_FilePath">FilePath</a>
@@ -841,7 +1110,7 @@ dt.typeDefinition {
             <p>
               The outline associated with the file.
             </p>
-          </dd></dl></dd><dt class="notification">analysis.overrides</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd><dt class="notification"><a name="notification_analysis.overrides">analysis.overrides</a> (<a href="#notification_analysis.overrides">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "analysis.overrides"
   "params": {
     "<b>file</b>": <a href="#type_FilePath">FilePath</a>
@@ -876,7 +1145,7 @@ dt.typeDefinition {
       </p>
       
       
-    <h3>Requests</h3><dl><dt class="request">completion.getSuggestions</dt><dd><div class="box"><pre>request: {
+    <h3>Requests</h3><dl><dt class="request"><a name="request_completion.getSuggestions">completion.getSuggestions</a> (<a href="#request_completion.getSuggestions">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "completion.getSuggestions"
   "params": {
@@ -885,7 +1154,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "<b>id</b>": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>id</b>": <a href="#type_CompletionId">CompletionId</a>
   }
@@ -914,7 +1183,7 @@ dt.typeDefinition {
               The identifier used to associate results with this
               completion request.
             </p>
-          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification">completion.results</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification"><a name="notification_completion.results">completion.results</a> (<a href="#notification_completion.results">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "completion.results"
   "params": {
     "<b>id</b>": <a href="#type_CompletionId">CompletionId</a>
@@ -982,7 +1251,7 @@ dt.typeDefinition {
       
       
       
-    <h3>Requests</h3><dl><dt class="request">search.findElementReferences</dt><dd><div class="box"><pre>request: {
+    <h3>Requests</h3><dl><dt class="request"><a name="request_search.findElementReferences">search.findElementReferences</a> (<a href="#request_search.findElementReferences">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "search.findElementReferences"
   "params": {
@@ -992,9 +1261,9 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "<b>id</b>": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
-    "<b>id</b>": <a href="#type_SearchId">SearchId</a>
+    "<b>id</b>": <span style="color:#999999">optional</span> <a href="#type_SearchId">SearchId</a>
     "<b>element</b>": <span style="color:#999999">optional</span> <a href="#type_Element">Element</a>
   }
 }</pre></div>
@@ -1027,11 +1296,16 @@ dt.typeDefinition {
               True if potential matches are to be included in the
               results.
             </p>
-          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>id ( <a href="#type_SearchId">SearchId</a> )</i></b></dt><dd>
+          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>id ( <span style="color:#999999">optional</span> <a href="#type_SearchId">SearchId</a> )</i></b></dt><dd>
             
             <p>
               The identifier used to associate results with this
               search request.
+            </p>
+            <p>
+              If no element was found at the given location, this
+              field will be absent, and no results will be reported
+              via the search.results notification.
             </p>
           </dd><dt class="field"><b><i>element ( <span style="color:#999999">optional</span> <a href="#type_Element">Element</a> )</i></b></dt><dd>
             
@@ -1044,7 +1318,7 @@ dt.typeDefinition {
               If no element was found at the given location, this
               field will be absent.
             </p>
-          </dd></dl></dd><dt class="request">search.findMemberDeclarations</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_search.findMemberDeclarations">search.findMemberDeclarations</a> (<a href="#request_search.findMemberDeclarations">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "search.findMemberDeclarations"
   "params": {
@@ -1052,7 +1326,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "<b>id</b>": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>id</b>": <a href="#type_SearchId">SearchId</a>
   }
@@ -1079,7 +1353,7 @@ dt.typeDefinition {
               The identifier used to associate results with this
               search request.
             </p>
-          </dd></dl></dd><dt class="request">search.findMemberReferences</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_search.findMemberReferences">search.findMemberReferences</a> (<a href="#request_search.findMemberReferences">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "search.findMemberReferences"
   "params": {
@@ -1087,7 +1361,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "<b>id</b>": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>id</b>": <a href="#type_SearchId">SearchId</a>
   }
@@ -1116,7 +1390,7 @@ dt.typeDefinition {
               The identifier used to associate results with this
               search request.
             </p>
-          </dd></dl></dd><dt class="request">search.findTopLevelDeclarations</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_search.findTopLevelDeclarations">search.findTopLevelDeclarations</a> (<a href="#request_search.findTopLevelDeclarations">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "search.findTopLevelDeclarations"
   "params": {
@@ -1124,7 +1398,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "<b>id</b>": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>id</b>": <a href="#type_SearchId">SearchId</a>
   }
@@ -1153,7 +1427,7 @@ dt.typeDefinition {
               The identifier used to associate results with this
               search request.
             </p>
-          </dd></dl></dd><dt class="request">search.getTypeHierarchy</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_search.getTypeHierarchy">search.getTypeHierarchy</a> (<a href="#request_search.getTypeHierarchy">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "search.getTypeHierarchy"
   "params": {
@@ -1162,7 +1436,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>hierarchyItems</b>": <span style="color:#999999">optional</span> List&lt;<a href="#type_TypeHierarchyItem">TypeHierarchyItem</a>&gt;
   }
@@ -1200,7 +1474,7 @@ dt.typeDefinition {
               not been sufficiently analyzed to allow a type hierarchy
               to be produced.
             </p>
-          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification">search.results</dt><dd><div class="box"><pre>notification: {
+          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification"><a name="notification_search.results">search.results</a> (<a href="#notification_search.results">#</a>)</dt><dd><div class="box"><pre>notification: {
   "event": "search.results"
   "params": {
     "<b>id</b>": <a href="#type_SearchId">SearchId</a>
@@ -1242,7 +1516,77 @@ dt.typeDefinition {
       
       
       
-    <h3>Requests</h3><dl><dt class="request">edit.getAssists</dt><dd><div class="box"><pre>request: {
+      
+      
+    <h3>Requests</h3><dl><dt class="request"><a name="request_edit.format">edit.format</a> (<a href="#request_edit.format">#</a>)</dt><dd><div class="box"><pre>request: {
+  "id": String
+  "method": "edit.format"
+  "params": {
+    "<b>file</b>": <a href="#type_FilePath">FilePath</a>
+    "<b>selectionOffset</b>": int
+    "<b>selectionLength</b>": int
+  }
+}</pre><br><pre>response: {
+  "id": String
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
+  "result": {
+    "<b>edits</b>": List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt;
+    "<b>selectionOffset</b>": int
+    "<b>selectionLength</b>": int
+  }
+}</pre></div>
+        <p>
+          Format the contents of a single file. The currently selected region of
+          text is passed in so that the selection can be preserved across the
+          formatting operation. The updated selection will be as close to
+          matching the original as possible, but whitespace at the beginning or
+          end of the selected region will be ignored. If preserving selection
+          information is not required, zero (0) can be specified for both the
+          selection offset and selection length.
+        </p>
+        <p>
+          If a request is made for a file which does not exist, or which is not
+          currently subject to analysis (e.g. because it is not associated with
+          any analysis root specified to analysis.setAnalysisRoots), an error of
+          type <tt>FORMAT_INVALID_FILE</tt> will be generated. If the source
+          contains syntax errors, an error of type <tt>FORMAT_WITH_ERRORS</tt>
+          will be generated.
+        </p>
+        
+        
+      <h4>Parameters</h4><dl><dt class="field"><b><i>file ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
+            
+            <p>
+              The file containing the code to be formatted.
+            </p>
+          </dd><dt class="field"><b><i>selectionOffset ( int )</i></b></dt><dd>
+            
+            <p>
+              The offset of the current selection in the file.
+            </p>
+          </dd><dt class="field"><b><i>selectionLength ( int )</i></b></dt><dd>
+            
+            <p>
+              The length of the current selection in the file.
+            </p>
+          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>edits ( List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              The edit(s) to be applied in order to format the code. The list
+              will be empty if the code was already formatted (there are no
+              changes).
+            </p>
+          </dd><dt class="field"><b><i>selectionOffset ( int )</i></b></dt><dd>
+            
+            <p>
+              The offset of the selection after formatting the code.
+            </p>
+          </dd><dt class="field"><b><i>selectionLength ( int )</i></b></dt><dd>
+            
+            <p>
+              The length of the selection after formatting the code.
+            </p>
+          </dd></dl></dd><dt class="request"><a name="request_edit.getAssists">edit.getAssists</a> (<a href="#request_edit.getAssists">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "edit.getAssists"
   "params": {
@@ -1252,7 +1596,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>assists</b>": List&lt;<a href="#type_SourceChange">SourceChange</a>&gt;
   }
@@ -1288,7 +1632,7 @@ dt.typeDefinition {
             <p>
               The assists that are available at the given location.
             </p>
-          </dd></dl></dd><dt class="request">edit.getAvailableRefactorings</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_edit.getAvailableRefactorings">edit.getAvailableRefactorings</a> (<a href="#request_edit.getAvailableRefactorings">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "edit.getAvailableRefactorings"
   "params": {
@@ -1298,7 +1642,7 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>kinds</b>": List&lt;<a href="#type_RefactoringKind">RefactoringKind</a>&gt;
   }
@@ -1333,7 +1677,7 @@ dt.typeDefinition {
               The kinds of refactorings that are valid for the given
               selection.
             </p>
-          </dd></dl></dd><dt class="request">edit.getFixes</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_edit.getFixes">edit.getFixes</a> (<a href="#request_edit.getFixes">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "edit.getFixes"
   "params": {
@@ -1342,9 +1686,9 @@ dt.typeDefinition {
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
-    "<b>fixes</b>": List&lt;<a href="#type_ErrorFixes">ErrorFixes</a>&gt;
+    "<b>fixes</b>": List&lt;<a href="#type_AnalysisErrorFixes">AnalysisErrorFixes</a>&gt;
   }
 }</pre></div>
         <p>
@@ -1365,19 +1709,12 @@ dt.typeDefinition {
               The offset used to select the errors for which fixes
               will be returned.
             </p>
-          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>fixes ( List&lt;<a href="#type_ErrorFixes">ErrorFixes</a>&gt; )</i></b></dt><dd>
+          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>fixes ( List&lt;<a href="#type_AnalysisErrorFixes">AnalysisErrorFixes</a>&gt; )</i></b></dt><dd>
             
             <p>
-              The fixes that are available for each of the analysis
-              errors. There is a one-to-one correspondence between the
-              analysis errors in the request and the lists of changes
-              in the response. In particular, it is always the case
-              that errors.length == fixes.length and that fixes[i] is
-              the list of fixes for the error in errors[i]. The list
-              of changes corresponding to an error can be empty if
-              there are no fixes available for that error.
+              The fixes that are available for the errors at the given offset.
             </p>
-          </dd></dl></dd><dt class="request">edit.getRefactoring</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_edit.getRefactoring">edit.getRefactoring</a> (<a href="#request_edit.getRefactoring">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "edit.getRefactoring"
   "params": {
@@ -1386,20 +1723,27 @@ dt.typeDefinition {
     "<b>offset</b>": int
     "<b>length</b>": int
     "<b>validateOnly</b>": bool
-    "<b>options</b>": <span style="color:#999999">optional</span> object
+    "<b>options</b>": <span style="color:#999999">optional</span> <a href="#type_RefactoringOptions">RefactoringOptions</a>
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
-    "<b>problems</b>": List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt;
-    "<b>feedback</b>": <span style="color:#999999">optional</span> object
+    "<b>initialProblems</b>": List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt;
+    "<b>optionsProblems</b>": List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt;
+    "<b>finalProblems</b>": List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt;
+    "<b>feedback</b>": <span style="color:#999999">optional</span> <a href="#type_RefactoringFeedback">RefactoringFeedback</a>
     "<b>change</b>": <span style="color:#999999">optional</span> <a href="#type_SourceChange">SourceChange</a>
     "<b>potentialEdits</b>": <span style="color:#999999">optional</span> List&lt;String&gt;
   }
 }</pre></div>
         <p>
           Get the changes required to perform a refactoring.
+        </p>
+        <p>
+          If another refactoring request is received during the processing
+          of this one, an error of type <tt>REFACTORING_REQUEST_CANCELLED</tt>
+          will be generated.
         </p>
         
         
@@ -1430,7 +1774,7 @@ dt.typeDefinition {
               True if the client is only requesting that the values of
               the options be validated and no change be generated.
             </p>
-          </dd><dt class="field"><b><i>options ( <span style="color:#999999">optional</span> object )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>options ( <span style="color:#999999">optional</span> <a href="#type_RefactoringOptions">RefactoringOptions</a> )</i></b></dt><dd>
             
             <p>
               Data used to provide values provided by the user. The
@@ -1441,13 +1785,30 @@ dt.typeDefinition {
               does not require any options or if the values of those
               options are not known.
             </p>
-          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>problems ( List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt; )</i></b></dt><dd>
+          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>initialProblems ( List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt; )</i></b></dt><dd>
             
             <p>
-              The status of the refactoring. The array will be empty
-              if there are no known problems.
+              The initial status of the refactoring, i.e. problems related to
+              the context in which the refactoring is requested.
+              The array will be empty if there are no known problems.
             </p>
-          </dd><dt class="field"><b><i>feedback ( <span style="color:#999999">optional</span> object )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>optionsProblems ( List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              The options validation status, i.e. problems in the given options,
+              such as light-weight validation of a new name, flags
+              compatibility, etc.
+              The array will be empty if there are no known problems.
+            </p>
+          </dd><dt class="field"><b><i>finalProblems ( List&lt;<a href="#type_RefactoringProblem">RefactoringProblem</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              The final status of the refactoring, i.e. problems identified in
+              the result of a full, potentially expensive validation and / or
+              change creation.
+              The array will be empty if there are no known problems.
+            </p>
+          </dd><dt class="field"><b><i>feedback ( <span style="color:#999999">optional</span> <a href="#type_RefactoringFeedback">RefactoringFeedback</a> )</i></b></dt><dd>
             
             <p>
               Data used to provide feedback to the user. The structure
@@ -1477,103 +1838,161 @@ dt.typeDefinition {
               will be omitted if the change field is omitted or if there are no
               potential edits for the refactoring.
             </p>
+          </dd></dl></dd><dt class="request"><a name="request_edit.sortMembers">edit.sortMembers</a> (<a href="#request_edit.sortMembers">#</a>)</dt><dd><div class="box"><pre>request: {
+  "id": String
+  "method": "edit.sortMembers"
+  "params": {
+    "<b>file</b>": <a href="#type_FilePath">FilePath</a>
+  }
+}</pre><br><pre>response: {
+  "id": String
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
+  "result": {
+    "<b>edit</b>": <a href="#type_SourceFileEdit">SourceFileEdit</a>
+  }
+}</pre></div>
+        <p>
+          Sort all of the directives, unit and class members
+          of the given Dart file.
+        </p>
+        <p>
+          If a request is made for a file that does not exist, does not belong
+          to an analysis root or is not a Dart file,
+          <tt>SORT_MEMBERS_INVALID_FILE</tt> will be generated.
+        </p>
+        <p>
+          If the Dart file has scan or parse errors,
+          <tt>SORT_MEMBERS_PARSE_ERRORS</tt> will be generated.
+        </p>
+        
+        
+      <h4>Parameters</h4><dl><dt class="field"><b><i>file ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
+            
+            <p>
+              The Dart file to sort.
+            </p>
+          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>edit ( <a href="#type_SourceFileEdit">SourceFileEdit</a> )</i></b></dt><dd>
+            
+            <p>
+              The file edit that is to be applied to the given file to effect
+              the sorting.
+            </p>
           </dd></dl></dd></dl>
-    <h2 class="domain"><a name="domain_debug">Domain: debug</a></h2>
+    <h2 class="domain"><a name="domain_execution">Domain: execution</a></h2>
       <p>
-        The debugging domain contains commands related to providing a
-        debugging experience.
+        The execution domain contains commands related to providing an execution
+        or debugging experience.
       </p>
       
       
       
       
       
-    <h3>Requests</h3><dl><dt class="request">debug.createContext</dt><dd><div class="box"><pre>request: {
+    <h3>Requests</h3><dl><dt class="request"><a name="request_execution.createContext">execution.createContext</a> (<a href="#request_execution.createContext">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
-  "method": "debug.createContext"
+  "method": "execution.createContext"
   "params": {
     "<b>contextRoot</b>": <a href="#type_FilePath">FilePath</a>
   }
 }</pre><br><pre>response: {
   "<b>id</b>": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
-    "<b>id</b>": <a href="#type_DebugContextId">DebugContextId</a>
+    "<b>id</b>": <a href="#type_ExecutionContextId">ExecutionContextId</a>
   }
 }</pre></div>
         <p>
-          Create a debugging context for the executable file with the
-          given path. The context that is created will persist until
-          debug.deleteContext is used to delete it. Clients,
-          therefore, are responsible for managing the lifetime of
-          debugging contexts.
+          Create an execution context for the executable file with the given
+          path. The context that is created will persist until
+          execution.deleteContext is used to delete it. Clients, therefore, are
+          responsible for managing the lifetime of execution contexts.
         </p>
         
         
       <h4>Parameters</h4><dl><dt class="field"><b><i>contextRoot ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
             
             <p>
-              The path of the Dart or HTML file that will be launched.
+              The path of the Dart or HTML file that will be launched, or the
+              path of the directory containing the file.
             </p>
-          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>id ( <a href="#type_DebugContextId">DebugContextId</a> )</i></b></dt><dd>
+          </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>id ( <a href="#type_ExecutionContextId">ExecutionContextId</a> )</i></b></dt><dd>
             
             <p>
-              The identifier used to refer to the debugging context
-              that was created.
+              The identifier used to refer to the execution context that was
+              created.
             </p>
-          </dd></dl></dd><dt class="request">debug.deleteContext</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_execution.deleteContext">execution.deleteContext</a> (<a href="#request_execution.deleteContext">#</a>)</dt><dd><div class="box"><pre>request: {
   "<b>id</b>": String
-  "method": "debug.deleteContext"
+  "method": "execution.deleteContext"
   "params": {
-    "<b>id</b>": <a href="#type_DebugContextId">DebugContextId</a>
+    "<b>id</b>": <a href="#type_ExecutionContextId">ExecutionContextId</a>
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
-          Delete the debugging context with the given identifier. The
-          context id is no longer valid after this command. The server
-          is allowed to re-use ids when they are no longer valid.
+          Delete the execution context with the given identifier. The context id
+          is no longer valid after this command. The server is allowed to re-use
+          ids when they are no longer valid.
         </p>
         
-      <h4>Parameters</h4><dl><dt class="field"><b><i>id ( <a href="#type_DebugContextId">DebugContextId</a> )</i></b></dt><dd>
+      <h4>Parameters</h4><dl><dt class="field"><b><i>id ( <a href="#type_ExecutionContextId">ExecutionContextId</a> )</i></b></dt><dd>
             
             <p>
-              The identifier of the debugging context that is to be
-              deleted.
+              The identifier of the execution context that is to be deleted.
             </p>
-          </dd></dl></dd><dt class="request">debug.mapUri</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_execution.mapUri">execution.mapUri</a> (<a href="#request_execution.mapUri">#</a>)</dt><dd><div class="box"><pre>request: {
   "<b>id</b>": String
-  "method": "debug.mapUri"
+  "method": "execution.mapUri"
   "params": {
-    "<b>id</b>": <a href="#type_DebugContextId">DebugContextId</a>
+    "<b>id</b>": <a href="#type_ExecutionContextId">ExecutionContextId</a>
     "<b>file</b>": <span style="color:#999999">optional</span> <a href="#type_FilePath">FilePath</a>
     "<b>uri</b>": <span style="color:#999999">optional</span> String
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>file</b>": <span style="color:#999999">optional</span> <a href="#type_FilePath">FilePath</a>
     "<b>uri</b>": <span style="color:#999999">optional</span> String
   }
 }</pre></div>
         <p>
-          Map a URI from the debugging context to the file that it
-          corresponds to, or map a file to the URI that it corresponds
-          to in the debugging context.
+          Map a URI from the execution context to the file that it corresponds
+          to, or map a file to the URI that it corresponds to in the execution
+          context.
         </p>
         <p>
-          Exactly one of the file and uri fields must be provided.
+          Exactly one of the file and uri fields must be provided. If both
+          fields are provided, then an error of type <tt>INVALID_PARAMETER</tt>
+          will be generated. Similarly, if neither field is provided, then an
+          error of type <tt>INVALID_PARAMETER</tt> will be generated.
+        </p>
+        <p>
+          If the file field is provided and the value is not the path of a file
+          (either the file does not exist or the path references something other
+          than a file), then an error of type <tt>INVALID_PARAMETER</tt> will
+          be generated.
+        </p>
+        <p>
+          If the uri field is provided and the value is not a valid URI or if
+          the URI references something that is not a file (either a file that
+          does not exist or something other than a file), then an error of type
+          <tt>INVALID_PARAMETER</tt> will be generated.
+        </p>
+        <p>
+          If the contextRoot used to create the execution context does not
+          exist, then an error of type <tt>INVALID_EXECUTION_CONTEXT</tt> will
+          be generated.
         </p>
         
         
-      <h4>Parameters</h4><dl><dt class="field"><b><i>id ( <a href="#type_DebugContextId">DebugContextId</a> )</i></b></dt><dd>
+      <h4>Parameters</h4><dl><dt class="field"><b><i>id ( <a href="#type_ExecutionContextId">ExecutionContextId</a> )</i></b></dt><dd>
             
             <p>
-              The identifier of the debugging context in which the URI
-              is to be mapped.
+              The identifier of the execution context in which the URI is to be
+              mapped.
             </p>
           </dd><dt class="field"><b><i>file ( <span style="color:#999999">optional</span> <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
             
@@ -1588,85 +2007,85 @@ dt.typeDefinition {
           </dd></dl><h4>Returns</h4><dl><dt class="field"><b><i>file ( <span style="color:#999999">optional</span> <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
             
             <p>
-              The file to which the URI was mapped. This field is
-              omitted if the uri field was not given in the request.
+              The file to which the URI was mapped. This field is omitted if the
+              uri field was not given in the request.
             </p>
           </dd><dt class="field"><b><i>uri ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
             
             <p>
-              The URI to which the file path was mapped. This field is
-              omitted if the file field was not given in the request.
+              The URI to which the file path was mapped. This field is omitted
+              if the file field was not given in the request.
             </p>
-          </dd></dl></dd><dt class="request">debug.setSubscriptions</dt><dd><div class="box"><pre>request: {
+          </dd></dl></dd><dt class="request"><a name="request_execution.setSubscriptions">execution.setSubscriptions</a> (<a href="#request_execution.setSubscriptions">#</a>)</dt><dd><div class="box"><pre>request: {
   "id": String
-  "method": "debug.setSubscriptions"
+  "method": "execution.setSubscriptions"
   "params": {
-    "<b>subscriptions</b>": List&lt;<a href="#type_DebugService">DebugService</a>&gt;
+    "<b>subscriptions</b>": List&lt;<a href="#type_ExecutionService">ExecutionService</a>&gt;
   }
 }</pre><br><pre>response: {
   "id": String
-  "error": <span style="color:#999999">optional</span> <a href="#type_Error">Error</a>
+  "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
 }</pre></div>
         <p>
-          Subscribe for services. All previous subscriptions are
-          replaced by the given set of services.
+          Subscribe for services. All previous subscriptions are replaced by the
+          given set of services.
         </p>
         <p>
-          It is an error if any of the elements in the list are not
-          valid services. If there is an error, then the current
-          subscriptions will remain unchanged.
+          It is an error if any of the elements in the list are not valid
+          services. If there is an error, then the current subscriptions will
+          remain unchanged.
         </p>
         
-      <h4>Parameters</h4><dl><dt class="field"><b><i>subscriptions ( List&lt;<a href="#type_DebugService">DebugService</a>&gt; )</i></b></dt><dd>
+      <h4>Parameters</h4><dl><dt class="field"><b><i>subscriptions ( List&lt;<a href="#type_ExecutionService">ExecutionService</a>&gt; )</i></b></dt><dd>
             
             <p>
               A list of the services being subscribed to.
             </p>
-          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification">debug.launchData</dt><dd><div class="box"><pre>notification: {
-  "event": "debug.launchData"
+          </dd></dl></dd></dl><h3>Notifications</h3><dl><dt class="notification"><a name="notification_execution.launchData">execution.launchData</a> (<a href="#notification_execution.launchData">#</a>)</dt><dd><div class="box"><pre>notification: {
+  "event": "execution.launchData"
   "params": {
-    "<b>executables</b>": List&lt;<a href="#type_ExecutableFile">ExecutableFile</a>&gt;
-    "<b>dartToHtml</b>": Map&lt;<a href="#type_FilePath">FilePath</a>, List&lt;<a href="#type_FilePath">FilePath</a>&gt;&gt;
-    "<b>htmlToDart</b>": Map&lt;<a href="#type_FilePath">FilePath</a>, List&lt;<a href="#type_FilePath">FilePath</a>&gt;&gt;
+    "<b>file</b>": <a href="#type_FilePath">FilePath</a>
+    "<b>kind</b>": <span style="color:#999999">optional</span> <a href="#type_ExecutableKind">ExecutableKind</a>
+    "<b>referencedFiles</b>": <span style="color:#999999">optional</span> List&lt;<a href="#type_FilePath">FilePath</a>&gt;
   }
 }</pre></div>
         <p>
-          Reports information needed to allow applications within the
-          given context to be launched.
+          Reports information needed to allow a single file to be launched.
         </p>
         <p>
-          This notification is not subscribed to by default. Clients
-          can subscribe by including the value "LAUNCH_DATA" in the
-          list of services passed in a debug.setSubscriptions request.
+          This notification is not subscribed to by default. Clients can
+          subscribe by including the value "LAUNCH_DATA" in the list of services
+          passed in an <tt>execution.setSubscriptions</tt> request.
         </p>
         
-      <h4>Parameters</h4><dl><dt class="field"><b><i>executables ( List&lt;<a href="#type_ExecutableFile">ExecutableFile</a>&gt; )</i></b></dt><dd>
+      <h4>Parameters</h4><dl><dt class="field"><b><i>file ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
             
             <p>
-              A list of the files that are executable in the given
-              context. This list replaces any previous list provided
-              for the given context.
+              The file for which launch data is being provided. This will either
+              be a Dart library or an HTML file.
             </p>
-          </dd><dt class="field"><b><i>dartToHtml ( Map&lt;<a href="#type_FilePath">FilePath</a>, List&lt;<a href="#type_FilePath">FilePath</a>&gt;&gt; )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>kind ( <span style="color:#999999">optional</span> <a href="#type_ExecutableKind">ExecutableKind</a> )</i></b></dt><dd>
             
             <p>
-              A mapping from the paths of Dart files that are
-              referenced by HTML files to a list of the HTML files
-              that reference the Dart files.
+              The kind of the executable file. This field is omitted if the file
+              is not a Dart file.
             </p>
-          </dd><dt class="field"><b><i>htmlToDart ( Map&lt;<a href="#type_FilePath">FilePath</a>, List&lt;<a href="#type_FilePath">FilePath</a>&gt;&gt; )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>referencedFiles ( <span style="color:#999999">optional</span> List&lt;<a href="#type_FilePath">FilePath</a>&gt; )</i></b></dt><dd>
             
             <p>
-              A mapping from the paths of HTML files that reference
-              Dart files to a list of the Dart files they reference.
+              A list of the Dart files that are referenced by the file. This
+              field is omitted if the file is not an HTML file.
             </p>
           </dd></dl></dd></dl>
     
-      <h2><a name="types">Types</a></h2>
+      <h2 class="domain"><a name="types">Types</a></h2>
       <p>
         This section contains descriptions of the data types referenced
         in the API’s of the various domains.
       </p>
+      
+      
+      
       
       
       
@@ -1741,12 +2160,12 @@ dt.typeDefinition {
           by the analysis.
         </p>
         
-      <dl><dt class="field"><b><i>severity ( <a href="#type_ErrorSeverity">ErrorSeverity</a> )</i></b></dt><dd>
+      <dl><dt class="field"><b><i>severity ( <a href="#type_AnalysisErrorSeverity">AnalysisErrorSeverity</a> )</i></b></dt><dd>
             
             <p>
               The severity of the error.
             </p>
-          </dd><dt class="field"><b><i>type ( <a href="#type_ErrorType">ErrorType</a> )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>type ( <a href="#type_AnalysisErrorType">AnalysisErrorType</a> )</i></b></dt><dd>
             
             <p>
               The type of the error.
@@ -1771,7 +2190,33 @@ dt.typeDefinition {
               the error. The field is omitted if there is no correction
               message associated with the error code.
             </p>
-          </dd></dl></dd><dt class="typeDefinition"><a name="type_AnalysisOptions">AnalysisOptions: object</a></dt><dd>
+          </dd></dl></dd><dt class="typeDefinition"><a name="type_AnalysisErrorFixes">AnalysisErrorFixes: object</a></dt><dd>
+        <p>
+          A list of fixes associated with a specific error
+        </p>
+        
+      <dl><dt class="field"><b><i>error ( <a href="#type_AnalysisError">AnalysisError</a> )</i></b></dt><dd>
+            
+            <p>
+              The error with which the fixes are associated.
+            </p>
+          </dd><dt class="field"><b><i>fixes ( List&lt;<a href="#type_SourceChange">SourceChange</a>&gt; )</i></b></dt><dd>
+            
+            <p>
+              The fixes associated with the error.
+            </p>
+          </dd></dl></dd><dt class="typeDefinition"><a name="type_AnalysisErrorSeverity">AnalysisErrorSeverity: String</a></dt><dd>
+        <p>
+          An enumeration of the possible severities of analysis
+          errors.
+        </p>
+        
+      <dl><dt class="value">INFO</dt><dt class="value">WARNING</dt><dt class="value">ERROR</dt></dl></dd><dt class="typeDefinition"><a name="type_AnalysisErrorType">AnalysisErrorType: String</a></dt><dd>
+        <p>
+          An enumeration of the possible types of analysis errors.
+        </p>
+        
+      <dl><dt class="value">CHECKED_MODE_COMPILE_TIME_ERROR</dt><dt class="value">COMPILE_TIME_ERROR</dt><dt class="value">HINT</dt><dt class="value">LINT</dt><dt class="value">STATIC_TYPE_WARNING</dt><dt class="value">STATIC_WARNING</dt><dt class="value">SYNTACTIC_ERROR</dt><dt class="value">TODO</dt></dl></dd><dt class="typeDefinition"><a name="type_AnalysisOptions">AnalysisOptions: object</a></dt><dd>
         <p>
           A set of options controlling what kind of analysis is to be
           performed. If the value of a field is omitted the value of the
@@ -1780,21 +2225,30 @@ dt.typeDefinition {
         
       <dl><dt class="field"><b><i>enableAsync ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
             
+            <p><b><i>Deprecated</i></b></p>
             <p>
               True if the client wants to enable support for the
               proposed async feature.
             </p>
           </dd><dt class="field"><b><i>enableDeferredLoading ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
             
+            <p><b><i>Deprecated</i></b></p>
             <p>
               True if the client wants to enable support for the
               proposed deferred loading feature.
             </p>
           </dd><dt class="field"><b><i>enableEnums ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
             
+            <p><b><i>Deprecated</i></b></p>
             <p>
               True if the client wants to enable support for the
               proposed enum feature.
+            </p>
+          </dd><dt class="field"><b><i>enableNullAwareOperators ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
+            
+            <p>
+              True if the client wants to enable support for the
+              proposed "null aware operators" feature.
             </p>
           </dd><dt class="field"><b><i>generateDart2jsHints ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
             
@@ -1805,7 +2259,13 @@ dt.typeDefinition {
           </dd><dt class="field"><b><i>generateHints ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
             
             <p>
-              True is hints should be generated as part of generating
+              True if hints should be generated as part of generating
+              errors and warnings.
+            </p>
+          </dd><dt class="field"><b><i>generateLints ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
+            
+            <p>
+              True if lints should be generated as part of generating
               errors and warnings.
             </p>
           </dd></dl></dd><dt class="typeDefinition"><a name="type_AnalysisService">AnalysisService: String</a></dt><dd>
@@ -1814,7 +2274,7 @@ dt.typeDefinition {
           domain.
         </p>
         
-      <dl><dt class="value">FOLDING</dt><dt class="value">HIGHLIGHTS</dt><dt class="value">NAVIGATION</dt><dt class="value">OCCURRENCES</dt><dt class="value">OUTLINE</dt><dt class="value">OVERRIDES</dt></dl></dd><dt class="typeDefinition"><a name="type_AnalysisStatus">AnalysisStatus: object</a></dt><dd>
+      <dl><dt class="value">FOLDING</dt><dt class="value">HIGHLIGHTS</dt><dt class="value">INVALIDATE</dt><dt class="value">NAVIGATION</dt><dt class="value">OCCURRENCES</dt><dt class="value">OUTLINE</dt><dt class="value">OVERRIDES</dt></dl></dd><dt class="typeDefinition"><a name="type_AnalysisStatus">AnalysisStatus: object</a></dt><dd>
         <p>
           An indication of the current state of analysis.
         </p>
@@ -1844,6 +2304,11 @@ dt.typeDefinition {
           a file content overlay or that has had its overlay removed via
           <a href="#type_RemoveContentOverlay">RemoveContentOverlay</a>.
         </p>
+        <p>
+          If any of the edits cannot be applied due to its offset or
+          length being out of range, an INVALID_OVERLAY_CHANGE error
+          will be reported.
+        </p>
         
       <dl><dt class="field"><b><i>type = "change"</i></b></dt><dd></dd><dt class="field"><b><i>edits ( List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt; )</i></b></dt><dd>
             
@@ -1856,13 +2321,7 @@ dt.typeDefinition {
           An identifier used to associate completion results with a
           completion request.
         </p>
-      </dd><dt class="typeDefinition"><a name="type_CompletionRelevance">CompletionRelevance: String</a></dt><dd>
-        <p>
-          An enumeration of the relevance of a completion
-          suggestion.
-        </p>
-        
-      <dl><dt class="value">LOW</dt><dt class="value">DEFAULT</dt><dt class="value">HIGH</dt></dl></dd><dt class="typeDefinition"><a name="type_CompletionSuggestion">CompletionSuggestion: object</a></dt><dd>
+      </dd><dt class="typeDefinition"><a name="type_CompletionSuggestion">CompletionSuggestion: object</a></dt><dd>
         <p>
           A suggestion for how to complete partially entered text. Many
           of the fields are optional, depending on the kind of element
@@ -1874,10 +2333,11 @@ dt.typeDefinition {
             <p>
               The kind of element being suggested.
             </p>
-          </dd><dt class="field"><b><i>relevance ( <a href="#type_CompletionRelevance">CompletionRelevance</a> )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>relevance ( int )</i></b></dt><dd>
             
             <p>
-              The relevance of this completion suggestion.
+              The relevance of this completion suggestion
+              where a higher number indicates a higher relevance.
             </p>
           </dd><dt class="field"><b><i>completion ( String )</i></b></dt><dd>
             
@@ -1932,11 +2392,17 @@ dt.typeDefinition {
               field is omitted if the suggested element is not a member
               of a class.
             </p>
+          </dd><dt class="field"><b><i>element ( <span style="color:#999999">optional</span> <a href="#type_Element">Element</a> )</i></b></dt><dd>
+            
+            <p>
+              Information about the element reference being suggested.
+            </p>
           </dd><dt class="field"><b><i>returnType ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
             
             <p>
-              The return type of the getter, function or method being
-              suggested. This field is omitted if the suggested element
+              The return type of the getter, function or method
+              or the type of the field being suggested.
+              This field is omitted if the suggested element
               is not a getter, function or method.
             </p>
           </dd><dt class="field"><b><i>parameterNames ( <span style="color:#999999">optional</span> List&lt;String&gt; )</i></b></dt><dd>
@@ -1960,11 +2426,11 @@ dt.typeDefinition {
               method being suggested. This field is omitted if the
               parameterNames field is omitted.
             </p>
-          </dd><dt class="field"><b><i>positionalParameterCount ( <span style="color:#999999">optional</span> int )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>hasNamedParameters ( <span style="color:#999999">optional</span> bool )</i></b></dt><dd>
             
             <p>
-              The number of positional parameters for the function or
-              method being suggested. This field is omitted if the
+              True if the function or method being suggested has at
+              least one named parameter. This field is omitted if the
               parameterNames field is omitted.
             </p>
           </dd><dt class="field"><b><i>parameterName ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
@@ -1980,24 +2446,56 @@ dt.typeDefinition {
               The type of the options parameter being suggested. This
               field is omitted if the parameterName field is omitted.
             </p>
+          </dd><dt class="field"><b><i>importUri ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
+            
+            <p>
+              The import to be added if the suggestion is out of scope
+              and needs an import to be added to be in scope.
+            </p>
           </dd></dl></dd><dt class="typeDefinition"><a name="type_CompletionSuggestionKind">CompletionSuggestionKind: String</a></dt><dd>
         <p>
           An enumeration of the kinds of elements that can be included
           in a completion suggestion.
         </p>
         
-      <dl><dt class="value">ARGUMENT_LIST</dt><dt class="value">CLASS</dt><dt class="value">CLASS_ALIAS</dt><dt class="value">CONSTRUCTOR</dt><dt class="value">FIELD</dt><dt class="value">FUNCTION</dt><dt class="value">FUNCTION_TYPE_ALIAS</dt><dt class="value">GETTER</dt><dt class="value">IMPORT</dt><dt class="value">KEYWORD</dt><dt class="value">LIBRARY_PREFIX</dt><dt class="value">LOCAL_VARIABLE</dt><dt class="value">METHOD</dt><dt class="value">METHOD_NAME</dt><dt class="value">NAMED_ARGUMENT</dt><dt class="value">OPTIONAL_ARGUMENT</dt><dt class="value">PARAMETER</dt><dt class="value">SETTER</dt><dt class="value">TOP_LEVEL_VARIABLE</dt><dt class="value">TYPE_PARAMETER</dt></dl></dd><dt class="typeDefinition"><a name="type_DebugContextId">DebugContextId: String</a></dt><dd>
-        
-        <p>
-          The identifier for a debug context.
-        </p>
-      </dd><dt class="typeDefinition"><a name="type_DebugService">DebugService: String</a></dt><dd>
-        <p>
-          An enumeration of the services provided by the debug
-          domain.
-        </p>
-        
-      <dl><dt class="value">LAUNCH_DATA</dt></dl></dd><dt class="typeDefinition"><a name="type_Element">Element: object</a></dt><dd>
+      <dl><dt class="value">ARGUMENT_LIST</dt><dd>
+          
+            <p>
+              A list of arguments for the method or function that is being invoked.
+              For this suggestion kind, the completion field is a textual representation
+              of the invocation and the parameterNames, parameterTypes, and requiredParameterCount
+              attributes are defined.
+            </p>
+          </dd><dt class="value">IMPORT</dt><dt class="value">IDENTIFIER</dt><dd>
+            
+            <p>
+              The element identifier should be inserted at the completion location.
+              For example "someMethod" in import 'myLib.dart' show someMethod; .
+              For suggestions of this kind, the element attribute is defined
+              and the completion field is the element's identifier.
+            </p>
+          </dd><dt class="value">INVOCATION</dt><dd>
+            
+            <p>
+              The element is being invoked at the completion location.
+              For example, "someMethod" in x.someMethod(); .
+              For suggestions of this kind, the element attribute is defined
+              and the completion field is the element's identifier.
+            </p>
+          </dd><dt class="value">KEYWORD</dt><dd>
+            
+            <p>
+              A keyword is being suggested.
+              For suggestions of this kind, the completion is the keyword.
+            </p>
+          </dd><dt class="value">NAMED_ARGUMENT</dt><dd>
+            
+            <p>
+              A named argument for the current callsite is being suggested.
+              For suggestions of this kind, the completion is
+              the named argument identifier including a trailing ':' and space.
+            </p>
+          </dd><dt class="value">OPTIONAL_ARGUMENT</dt><dt class="value">PARAMETER</dt></dl></dd><dt class="typeDefinition"><a name="type_Element">Element: object</a></dt><dd>
         <p>
           Information about an element (something that can be declared
           in code).
@@ -2038,8 +2536,9 @@ dt.typeDefinition {
             <p>
               The parameter list for the element. If the element is not
               a method or function this field will not be defined. If
-              the element has zero parameters, this field will have a
-              value of "()".
+              the element doesn't have parameters (e.g. getter), this field
+              will not be defined. If the element has zero parameters, this
+              field will have a value of "()".
             </p>
           </dd><dt class="field"><b><i>returnType ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
             
@@ -2049,60 +2548,18 @@ dt.typeDefinition {
               element does not have a declared return type, this field
               will contain an empty string.
             </p>
+          </dd><dt class="field"><b><i>typeParameters ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
+            
+            <p>
+              The type parameter list for the element. If the element doesn't
+              have type parameters, this field will not be defined.
+            </p>
           </dd></dl></dd><dt class="typeDefinition"><a name="type_ElementKind">ElementKind: String</a></dt><dd>
         <p>
           An enumeration of the kinds of elements.
         </p>
         
-      <dl><dt class="value">CLASS</dt><dt class="value">CLASS_TYPE_ALIAS</dt><dt class="value">COMPILATION_UNIT</dt><dt class="value">CONSTRUCTOR</dt><dt class="value">FIELD</dt><dt class="value">FUNCTION</dt><dt class="value">FUNCTION_TYPE_ALIAS</dt><dt class="value">GETTER</dt><dt class="value">LIBRARY</dt><dt class="value">LOCAL_VARIABLE</dt><dt class="value">METHOD</dt><dt class="value">PARAMETER</dt><dt class="value">SETTER</dt><dt class="value">TOP_LEVEL_VARIABLE</dt><dt class="value">TYPE_PARAMETER</dt><dt class="value">UNIT_TEST_GROUP</dt><dt class="value">UNIT_TEST_TEST</dt><dt class="value">UNKNOWN</dt></dl></dd><dt class="typeDefinition"><a name="type_Error">Error: object</a></dt><dd>
-        <p>
-          An indication of a problem with the execution of the server,
-          typically in response to a request.
-        </p>
-        
-      <dl><dt class="field"><b><i>code ( <a href="#type_RequestErrorCode">RequestErrorCode</a> )</i></b></dt><dd>
-            
-            <p>
-              A code that uniquely identifies the error that occurred.
-            </p>
-          </dd><dt class="field"><b><i>message ( String )</i></b></dt><dd>
-            
-            <p>
-              A short description of the error.
-            </p>
-          </dd><dt class="field"><b><i>data ( <span style="color:#999999">optional</span> object )</i></b></dt><dd>
-            
-            <p>
-              Additional data related to the error. This field is
-              omitted if there is no additional data available.
-            </p>
-          </dd></dl></dd><dt class="typeDefinition"><a name="type_ErrorFixes">ErrorFixes: object</a></dt><dd>
-        <p>
-          A list of fixes associated with a specific error
-        </p>
-        
-      <dl><dt class="field"><b><i>error ( <a href="#type_AnalysisError">AnalysisError</a> )</i></b></dt><dd>
-            
-            <p>
-              The error with which the fixes are associated.
-            </p>
-          </dd><dt class="field"><b><i>fixes ( List&lt;<a href="#type_SourceChange">SourceChange</a>&gt; )</i></b></dt><dd>
-            
-            <p>
-              The fixes associated with the error.
-            </p>
-          </dd></dl></dd><dt class="typeDefinition"><a name="type_ErrorSeverity">ErrorSeverity: String</a></dt><dd>
-        <p>
-          An enumeration of the possible severities of analysis
-          errors.
-        </p>
-        
-      <dl><dt class="value">INFO</dt><dt class="value">WARNING</dt><dt class="value">ERROR</dt></dl></dd><dt class="typeDefinition"><a name="type_ErrorType">ErrorType: String</a></dt><dd>
-        <p>
-          An enumeration of the possible types of analysis errors.
-        </p>
-        
-      <dl><dt class="value">COMPILE_TIME_ERROR</dt><dt class="value">HINT</dt><dt class="value">STATIC_TYPE_WARNING</dt><dt class="value">STATIC_WARNING</dt><dt class="value">SYNTACTIC_ERROR</dt><dt class="value">TODO</dt></dl></dd><dt class="typeDefinition"><a name="type_ExecutableFile">ExecutableFile: object</a></dt><dd>
+      <dl><dt class="value">CLASS</dt><dt class="value">CLASS_TYPE_ALIAS</dt><dt class="value">COMPILATION_UNIT</dt><dt class="value">CONSTRUCTOR</dt><dt class="value">ENUM</dt><dt class="value">ENUM_CONSTANT</dt><dt class="value">FIELD</dt><dt class="value">FUNCTION</dt><dt class="value">FUNCTION_TYPE_ALIAS</dt><dt class="value">GETTER</dt><dt class="value">LABEL</dt><dt class="value">LIBRARY</dt><dt class="value">LOCAL_VARIABLE</dt><dt class="value">METHOD</dt><dt class="value">PARAMETER</dt><dt class="value">PREFIX</dt><dt class="value">SETTER</dt><dt class="value">TOP_LEVEL_VARIABLE</dt><dt class="value">TYPE_PARAMETER</dt><dt class="value">UNIT_TEST_GROUP</dt><dt class="value">UNIT_TEST_TEST</dt><dt class="value">UNKNOWN</dt></dl></dd><dt class="typeDefinition"><a name="type_ExecutableFile">ExecutableFile: object</a></dt><dd>
         <p>
           A description of an executable file.
         </p>
@@ -2112,17 +2569,28 @@ dt.typeDefinition {
             <p>
               The path of the executable file.
             </p>
-          </dd><dt class="field"><b><i>offset ( <a href="#type_ExecutableKind">ExecutableKind</a> )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>kind ( <a href="#type_ExecutableKind">ExecutableKind</a> )</i></b></dt><dd>
             
             <p>
-              The offset of the region to be highlighted.
+              The kind of the executable file.
             </p>
           </dd></dl></dd><dt class="typeDefinition"><a name="type_ExecutableKind">ExecutableKind: String</a></dt><dd>
         <p>
           An enumeration of the kinds of executable files.
         </p>
         
-      <dl><dt class="value">CLIENT</dt><dt class="value">EITHER</dt><dt class="value">SERVER</dt></dl></dd><dt class="typeDefinition"><a name="type_FilePath">FilePath: String</a></dt><dd>
+      <dl><dt class="value">CLIENT</dt><dt class="value">EITHER</dt><dt class="value">NOT_EXECUTABLE</dt><dt class="value">SERVER</dt></dl></dd><dt class="typeDefinition"><a name="type_ExecutionContextId">ExecutionContextId: String</a></dt><dd>
+        
+        <p>
+          The identifier for a execution context.
+        </p>
+      </dd><dt class="typeDefinition"><a name="type_ExecutionService">ExecutionService: String</a></dt><dd>
+        <p>
+          An enumeration of the services provided by the execution
+          domain.
+        </p>
+        
+      <dl><dt class="value">LAUNCH_DATA</dt></dl></dd><dt class="typeDefinition"><a name="type_FilePath">FilePath: String</a></dt><dd>
         
         <p>
           The absolute path of a file.
@@ -2179,7 +2647,7 @@ dt.typeDefinition {
           applied to files.
         </p>
         
-      <dl><dt class="value">ANNOTATION</dt><dt class="value">BUILT_IN</dt><dt class="value">CLASS</dt><dt class="value">COMMENT_BLOCK</dt><dt class="value">COMMENT_DOCUMENTATION</dt><dt class="value">COMMENT_END_OF_LINE</dt><dt class="value">CONSTRUCTOR</dt><dt class="value">DIRECTIVE</dt><dt class="value">DYNAMIC_TYPE</dt><dt class="value">FIELD</dt><dt class="value">FIELD_STATIC</dt><dt class="value">FUNCTION</dt><dt class="value">FUNCTION_DECLARATION</dt><dt class="value">FUNCTION_TYPE_ALIAS</dt><dt class="value">GETTER_DECLARATION</dt><dt class="value">IDENTIFIER_DEFAULT</dt><dt class="value">IMPORT_PREFIX</dt><dt class="value">KEYWORD</dt><dt class="value">LITERAL_BOOLEAN</dt><dt class="value">LITERAL_DOUBLE</dt><dt class="value">LITERAL_INTEGER</dt><dt class="value">LITERAL_LIST</dt><dt class="value">LITERAL_MAP</dt><dt class="value">LITERAL_STRING</dt><dt class="value">LOCAL_VARIABLE</dt><dt class="value">LOCAL_VARIABLE_DECLARATION</dt><dt class="value">METHOD</dt><dt class="value">METHOD_DECLARATION</dt><dt class="value">METHOD_DECLARATION_STATIC</dt><dt class="value">METHOD_STATIC</dt><dt class="value">PARAMETER</dt><dt class="value">SETTER_DECLARATION</dt><dt class="value">TOP_LEVEL_VARIABLE</dt><dt class="value">TYPE_NAME_DYNAMIC</dt><dt class="value">TYPE_PARAMETER</dt></dl></dd><dt class="typeDefinition"><a name="type_HoverInformation">HoverInformation: object</a></dt><dd>
+      <dl><dt class="value">ANNOTATION</dt><dt class="value">BUILT_IN</dt><dt class="value">CLASS</dt><dt class="value">COMMENT_BLOCK</dt><dt class="value">COMMENT_DOCUMENTATION</dt><dt class="value">COMMENT_END_OF_LINE</dt><dt class="value">CONSTRUCTOR</dt><dt class="value">DIRECTIVE</dt><dt class="value">DYNAMIC_TYPE</dt><dt class="value">ENUM</dt><dt class="value">ENUM_CONSTANT</dt><dt class="value">FIELD</dt><dt class="value">FIELD_STATIC</dt><dt class="value">FUNCTION</dt><dt class="value">FUNCTION_DECLARATION</dt><dt class="value">FUNCTION_TYPE_ALIAS</dt><dt class="value">GETTER_DECLARATION</dt><dt class="value">IDENTIFIER_DEFAULT</dt><dt class="value">IMPORT_PREFIX</dt><dt class="value">KEYWORD</dt><dt class="value">LABEL</dt><dt class="value">LITERAL_BOOLEAN</dt><dt class="value">LITERAL_DOUBLE</dt><dt class="value">LITERAL_INTEGER</dt><dt class="value">LITERAL_LIST</dt><dt class="value">LITERAL_MAP</dt><dt class="value">LITERAL_STRING</dt><dt class="value">LOCAL_VARIABLE</dt><dt class="value">LOCAL_VARIABLE_DECLARATION</dt><dt class="value">METHOD</dt><dt class="value">METHOD_DECLARATION</dt><dt class="value">METHOD_DECLARATION_STATIC</dt><dt class="value">METHOD_STATIC</dt><dt class="value">PARAMETER</dt><dt class="value">SETTER_DECLARATION</dt><dt class="value">TOP_LEVEL_VARIABLE</dt><dt class="value">TYPE_NAME_DYNAMIC</dt><dt class="value">TYPE_PARAMETER</dt></dl></dd><dt class="typeDefinition"><a name="type_HoverInformation">HoverInformation: object</a></dt><dd>
         <p>
           The hover information associated with a specific location.
         </p>
@@ -2203,14 +2671,23 @@ dt.typeDefinition {
             <p>
               The path to the defining compilation unit of the library
               in which the referenced element is declared. This data is
-              omitted if there is no referenced element.
+              omitted if there is no referenced element, or if the
+              element is declared inside an HTML file.
             </p>
           </dd><dt class="field"><b><i>containingLibraryName ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
             
             <p>
               The name of the library in which the referenced element is
               declared. This data is omitted if there is no referenced
-              element.
+              element, or if the element is declared inside an HTML
+              file.
+            </p>
+          </dd><dt class="field"><b><i>containingClassDescription ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
+            
+            <p>
+              A human-readable description of the class declaring the element
+              being referenced. This data is omitted if there is no referenced
+              element, or if the element is not a class member.
             </p>
           </dd><dt class="field"><b><i>dartdoc ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
             
@@ -2219,7 +2696,8 @@ dt.typeDefinition {
               than the removal of the comment delimiters, including
               leading asterisks in the case of a block comment, the
               dartdoc is unprocessed markdown. This data is omitted if
-              there is no referenced element.
+              there is no referenced element, or if the element has no
+              dartdoc.
             </p>
           </dd><dt class="field"><b><i>elementDescription ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
             
@@ -2358,12 +2836,50 @@ dt.typeDefinition {
             <p>
               The length of the region from which the user can navigate.
             </p>
-          </dd><dt class="field"><b><i>targets ( List&lt;<a href="#type_Element">Element</a>&gt; )</i></b></dt><dd>
+          </dd><dt class="field"><b><i>targets ( List&lt;int&gt; )</i></b></dt><dd>
             
             <p>
-              The elements to which the given region is bound. By
-              opening the declaration of the elements, clients can
-              implement one form of navigation.
+              The indexes of the targets (in the enclosing navigation response)
+              to which the given region is bound. By opening the target, clients
+              can implement one form of navigation.
+            </p>
+          </dd></dl></dd><dt class="typeDefinition"><a name="type_NavigationTarget">NavigationTarget: object</a></dt><dd>
+        <p>
+          A description of a target to which the user can navigate.
+        </p>
+        
+      <dl><dt class="field"><b><i>kind ( <a href="#type_ElementKind">ElementKind</a> )</i></b></dt><dd>
+            
+            <p>
+              The kind of the element.
+            </p>
+          </dd><dt class="field"><b><i>fileIndex ( int )</i></b></dt><dd>
+            
+            <p>
+              The index of the file (in the enclosing navigation response) to
+              navigate to.
+            </p>
+          </dd><dt class="field"><b><i>offset ( int )</i></b></dt><dd>
+            
+            <p>
+              The offset of the region from which the user can navigate.
+            </p>
+          </dd><dt class="field"><b><i>length ( int )</i></b></dt><dd>
+            
+            <p>
+              The length of the region from which the user can navigate.
+            </p>
+          </dd><dt class="field"><b><i>startLine ( int )</i></b></dt><dd>
+            
+            <p>
+              The one-based index of the line containing the first
+              character of the region.
+            </p>
+          </dd><dt class="field"><b><i>startColumn ( int )</i></b></dt><dd>
+            
+            <p>
+              The one-based index of the column containing the first
+              character of the region.
             </p>
           </dd></dl></dd><dt class="typeDefinition"><a name="type_Occurrences">Occurrences: object</a></dt><dd>
         <p>
@@ -2477,13 +2993,24 @@ dt.typeDefinition {
             <p>
               The offset of the position.
             </p>
+          </dd></dl></dd><dt class="typeDefinition"><a name="type_PubStatus">PubStatus: object</a></dt><dd>
+        <p>
+          An indication of the current state of pub execution.
+        </p>
+        
+      <dl><dt class="field"><b><i>isListingPackageDirs ( bool )</i></b></dt><dd>
+            
+            <p>
+              True if the server is currently running pub to produce a list of
+              package directories.
+            </p>
           </dd></dl></dd><dt class="typeDefinition"><a name="type_RefactoringKind">RefactoringKind: String</a></dt><dd>
         <p>
           An enumeration of the kinds of refactorings that can be
           created.
         </p>
         
-      <dl><dt class="value">CONVERT_GETTER_TO_METHOD</dt><dt class="value">CONVERT_METHOD_TO_GETTER</dt><dt class="value">EXTRACT_LOCAL_VARIABLE</dt><dt class="value">EXTRACT_METHOD</dt><dt class="value">INLINE_LOCAL_VARIABLE</dt><dt class="value">INLINE_METHOD</dt><dt class="value">RENAME</dt></dl></dd><dt class="typeDefinition"><a name="type_RefactoringMethodParameter">RefactoringMethodParameter: object</a></dt><dd>
+      <dl><dt class="value">CONVERT_GETTER_TO_METHOD</dt><dt class="value">CONVERT_METHOD_TO_GETTER</dt><dt class="value">EXTRACT_LOCAL_VARIABLE</dt><dt class="value">EXTRACT_METHOD</dt><dt class="value">INLINE_LOCAL_VARIABLE</dt><dt class="value">INLINE_METHOD</dt><dt class="value">MOVE_FILE</dt><dt class="value">RENAME</dt><dt class="value">SORT_MEMBERS</dt></dl></dd><dt class="typeDefinition"><a name="type_RefactoringMethodParameter">RefactoringMethodParameter: object</a></dt><dd>
         <p>
           A description of a parameter in a method refactoring.
         </p>
@@ -2518,7 +3045,17 @@ dt.typeDefinition {
               not be defined. If the function type has zero parameters, this
               field will have a value of "()".
             </p>
-          </dd></dl></dd><dt class="typeDefinition"><a name="type_RefactoringMethodParameterKind">RefactoringMethodParameterKind: String</a></dt><dd>
+          </dd></dl></dd><dt class="typeDefinition"><a name="type_RefactoringFeedback">RefactoringFeedback: object</a></dt><dd>
+        <p>
+          An abstract superclass of all refactoring feedbacks.
+        </p>
+        
+      <dl></dl></dd><dt class="typeDefinition"><a name="type_RefactoringOptions">RefactoringOptions: object</a></dt><dd>
+        <p>
+          An abstract superclass of all refactoring options.
+        </p>
+        
+      <dl></dl></dd><dt class="typeDefinition"><a name="type_RefactoringMethodParameterKind">RefactoringMethodParameterKind: String</a></dt><dd>
         <p>
           An enumeration of the kinds of parameters.
         </p>
@@ -2564,19 +3101,80 @@ dt.typeDefinition {
           have a content overlay, it has no effect.
         </p>
         
-      <dl><dt class="field"><b><i>type = "remove"</i></b></dt><dd></dd></dl></dd><dt class="typeDefinition"><a name="type_RequestErrorCode">RequestErrorCode: String</a></dt><dd>
+      <dl><dt class="field"><b><i>type = "remove"</i></b></dt><dd></dd></dl></dd><dt class="typeDefinition"><a name="type_RequestError">RequestError: object</a></dt><dd>
+        <p>
+          An indication of a problem with the execution of the server,
+          typically in response to a request.
+        </p>
+        
+      <dl><dt class="field"><b><i>code ( <a href="#type_RequestErrorCode">RequestErrorCode</a> )</i></b></dt><dd>
+            
+            <p>
+              A code that uniquely identifies the error that occurred.
+            </p>
+          </dd><dt class="field"><b><i>message ( String )</i></b></dt><dd>
+            
+            <p>
+              A short description of the error.
+            </p>
+          </dd><dt class="field"><b><i>stackTrace ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
+            
+            <p>
+              The stack trace associated with processing the request,
+              used for debugging the server.
+            </p>
+          </dd></dl></dd><dt class="typeDefinition"><a name="type_RequestErrorCode">RequestErrorCode: String</a></dt><dd>
         <p>
           An enumeration of the types of errors that can occur in the
           execution of the server.
         </p>
         
-      <dl><dt class="value">GET_ERRORS_ERROR</dt><dd>
+      <dl><dt class="value">CONTENT_MODIFIED</dt><dd>
             
             <p>
-              An error occurred during the processing of an
-              "analysis.getErrors" request.
+              An "analysis.getErrors" or "analysis.getNavigation" request could
+              not be satisfied because the content of the file changed before
+              the requested results could be computed.
             </p>
+          </dd><dt class="value">FORMAT_INVALID_FILE</dt><dd>
             
+            <p>
+              An "edit.format" request specified a FilePath
+              which does not match a Dart file in an analysis root.
+            </p>
+          </dd><dt class="value">FORMAT_WITH_ERRORS</dt><dd>
+            
+            <p>
+              An "edit.format" request specified a file that contains syntax
+              errors.
+            </p>
+          </dd><dt class="value">GET_ERRORS_INVALID_FILE</dt><dd>
+            
+            <p>
+              An "analysis.getErrors" request specified a FilePath
+              which does not match a file currently subject to
+              analysis.
+            </p>
+          </dd><dt class="value">INVALID_ANALYSIS_ROOT</dt><dd>
+            
+            <p>
+              A path passed as an argument to a request (such as
+              analysis.reanalyze) is required to be an analysis root, but isn't.
+            </p>
+          </dd><dt class="value">INVALID_EXECUTION_CONTEXT</dt><dd>
+            
+            <p>
+              The context root used to create an execution context does not
+              exist.
+            </p>
+          </dd><dt class="value">INVALID_OVERLAY_CHANGE</dt><dd>
+            
+            <p>
+              An "analysis.updateContent" request contained a
+              ChangeContentOverlay object which can't be applied, due
+              to an edit having an offset or length that is out of
+              range.
+            </p>
           </dd><dt class="value">INVALID_PARAMETER</dt><dd>
             
             <p>
@@ -2587,20 +3185,58 @@ dt.typeDefinition {
             <p>
               A malformed request was received.
             </p>
-          </dd><dt class="value">SERVER_ALREADY_STARTED</dt><dd>
+          </dd><dt class="value">NO_INDEX_GENERATED</dt><dd>
             
+            <p>
+              The "--no-index" flag was passed when the analysis server created,
+              but this API call requires an index to have been generated.
+            </p>
+          </dd><dt class="value">REFACTORING_REQUEST_CANCELLED</dt><dd>
+            
+            <p>
+              Another refactoring request was received during processing of
+              this one.
+            </p>
+          </dd><dt class="value">SERVER_ALREADY_STARTED</dt><dd>
             
             <p>
               The analysis server has already been started (and hence
               won't accept new connections).
             </p>
-          </dd><dt class="value">UNANALYZED_PRIORITY_FILES</dt><dd>
+            <p>
+              This error is included for future expansion; at present
+              the analysis server can only speak to one client at a
+              time so this error will never occur.
+            </p>
+          </dd><dt class="value">SERVER_ERROR</dt><dd>
             
+            <p>
+              An internal error occurred in the analysis server.
+              Also see the server.error notification.
+            </p>
+          </dd><dt class="value">SORT_MEMBERS_INVALID_FILE</dt><dd>
+            
+            <p>
+              An "edit.sortMembers" request specified a FilePath
+              which does not match a Dart file in an analysis root.
+            </p>
+          </dd><dt class="value">SORT_MEMBERS_PARSE_ERRORS</dt><dd>
+            
+            <p>
+              An "edit.sortMembers" request specified a Dart file that has
+              scan or parse errors.
+            </p>
+          </dd><dt class="value">UNANALYZED_PRIORITY_FILES</dt><dd>
             
             <p>
               An "analysis.setPriorityFiles" request includes one or
               more files that are not being analyzed.
             </p>
+            <p>
+              This is a legacy error; it will be removed before the
+              API reaches version 1.0.
+            </p>
+            
           </dd><dt class="value">UNKNOWN_REQUEST</dt><dd>
             
             <p>
@@ -2608,11 +3244,21 @@ dt.typeDefinition {
               not recognize, or cannot handle in its current
               configuation.
             </p>
+          </dd><dt class="value">UNKNOWN_SOURCE</dt><dd>
+            
+            <p>
+              The analysis server was requested to perform an action
+              on a source that does not exist.
+            </p>
           </dd><dt class="value">UNSUPPORTED_FEATURE</dt><dd>
             
             <p>
               The analysis server was requested to perform an action
               which is not supported.
+            </p>
+            <p>
+              This is a legacy error; it will be removed before the
+              API reaches version 1.0.
             </p>
             
           </dd></dl></dd><dt class="typeDefinition"><a name="type_SearchId">SearchId: String</a></dt><dd>
@@ -2774,6 +3420,15 @@ dt.typeDefinition {
             <p>
               The file containing the code to be modified.
             </p>
+          </dd><dt class="field"><b><i>fileStamp ( long )</i></b></dt><dd>
+            
+            <p>
+              The modification stamp of the file at the moment when the change
+              was created, in milliseconds since the "Unix epoch". Will be -1 if
+              the file did not exist and should be created. The client may use
+              this field to make sure that the file was not changed since then,
+              so it is safe to apply the change.
+            </p>
           </dd><dt class="field"><b><i>edits ( List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt; )</i></b></dt><dd>
             
             <p>
@@ -2842,12 +3497,11 @@ dt.typeDefinition {
         This section contains additional information for each kind of
         refactoring. In addition to a brief description of the
         refactoring, there is a specification of the feedback that is
-        provided when a refactoring is created using the
-        edit.createRefactoring request (designed to improve the UX)
-        and the options that must be set using the
-        edit.setRefactoringOptions request before the refactoring can
-        be applied.
+        provided when a refactoring is requested using the
+        edit.getRefactoring request (designed to improve the UX)
+        and the options that may be provided to edit.getRefactoring.
       </p>
+      
       
       
       
@@ -2948,6 +3602,8 @@ dt.typeDefinition {
             
             <p>
               The proposed return type for the method.
+              If the returned element does not have a declared return type,
+              this field will contain an empty string.
             </p>
           </dd><dt class="field"><b><i>names ( List&lt;String&gt; )</i></b></dt><dd>
             
@@ -2963,11 +3619,6 @@ dt.typeDefinition {
             
             <p>
               The proposed parameters for the method.
-            </p>
-          </dd><dt class="field"><b><i>occurrences ( int )</i></b></dt><dd>
-            
-            <p>
-              The number of times the expression or statements occurs.
             </p>
           </dd><dt class="field"><b><i>offsets ( List&lt;int&gt; )</i></b></dt><dd>
             
@@ -3006,21 +3657,21 @@ dt.typeDefinition {
             
             <p>
               The parameters that should be defined for the method.
-              </p><p>
-                It is an error if a REQUIRED or NAMED parameter follows a
-                POSITIONAL parameter.
-                It is an error if a REQUIRED or POSITIONAL parameter follows a
-                NAMED parameter.
-              </p>
-              <ul>
-                <li>
-                  To change the order and/or update proposed paramerers, add
-                  parameters with the same identifiers as proposed.
-                </li>
-                <li>To add new parameters, omit their identifier.</li>
-                <li>To remove some parameters, omit them in this list.</li>
-              </ul>
-            <p></p>
+            </p>
+            <p>
+              It is an error if a REQUIRED or NAMED parameter follows a
+              POSITIONAL parameter.
+              It is an error if a REQUIRED or POSITIONAL parameter follows a
+              NAMED parameter.
+            </p>
+            <ul>
+              <li>
+                To change the order and/or update proposed parameters, add
+                parameters with the same identifiers as proposed.
+              </li>
+              <li>To add new parameters, omit their identifier.</li>
+              <li>To remove some parameters, omit them in this list.</li>
+            </ul>
           </dd><dt class="field"><b><i>extractAll ( bool )</i></b></dt><dd>
             
             <p>
@@ -3038,7 +3689,18 @@ dt.typeDefinition {
           It is an error if the range contains anything other than all
           or part of the name of a single local variable.
         </p>
-      <h4>Feedback</h4><p>none</p><h4>Options</h4><p>none</p></dd><dt class="refactoring">INLINE_METHOD</dt><dd>
+        
+      <h4>Feedback</h4><dl><dt class="field"><b><i>name ( String )</i></b></dt><dd>
+            
+            <p>
+              The name of the variable being inlined.
+            </p>
+          </dd><dt class="field"><b><i>occurrences ( int )</i></b></dt><dd>
+            
+            <p>
+              The number of times the variable occurs.
+            </p>
+          </dd></dl><h4>Options</h4><p>none</p></dd><dt class="refactoring">INLINE_METHOD</dt><dd>
         <p>
           Inline a method in place of one or all references to that
           method.
@@ -3048,12 +3710,29 @@ dt.typeDefinition {
           or part of the name of a single method.
         </p>
         
-      <h4>Feedback</h4><p>none</p><h4>Options</h4><dl><dt class="field"><b><i>deleteSource ( bool )</i></b></dt><dd>
+        
+      <h4>Feedback</h4><dl><dt class="field"><b><i>className ( <span style="color:#999999">optional</span> String )</i></b></dt><dd>
             
             <p>
-              True if the method being inlined should be removed. It
-              is an error if this field is true and inlineAll is
-              false.
+              The name of the class enclosing the method being inlined.
+              If not a class member is being inlined, this field will be absent.
+            </p>
+          </dd><dt class="field"><b><i>methodName ( String )</i></b></dt><dd>
+            
+            <p>
+              The name of the method (or function) being inlined.
+            </p>
+          </dd><dt class="field"><b><i>isDeclaration ( bool )</i></b></dt><dd>
+            
+            <p>
+              True if the declaration of the method is selected.
+              So all references should be inlined.
+            </p>
+          </dd></dl><h4>Options</h4><dl><dt class="field"><b><i>deleteSource ( bool )</i></b></dt><dd>
+            
+            <p>
+              True if the method being inlined should be removed.
+              It is an error if this field is true and inlineAll is false.
             </p>
           </dd><dt class="field"><b><i>inlineAll ( bool )</i></b></dt><dd>
             
@@ -3061,6 +3740,27 @@ dt.typeDefinition {
               True if all invocations of the method should be inlined,
               or false if only the invocation site used to create this
               refactoring should be inlined.
+            </p>
+          </dd></dl></dd><dt class="refactoring">MOVE_FILE</dt><dd>
+        <p>
+          Move the given file and update all of the references to that file
+          and from it. The move operation is supported in general case - for
+          renaming a file in the same folder, moving it to a different folder
+          or both.
+        </p>
+        <p>
+          The refactoring must be activated before an actual file moving
+          operation is performed.
+        </p>
+        <p>
+          The "offset" and "length" fields from the request are ignored, but the
+          file specified in the request specifies the file to be moved.
+        </p>
+        
+      <h4>Feedback</h4><p>none</p><h4>Options</h4><dl><dt class="field"><b><i>newFile ( <a href="#type_FilePath">FilePath</a> )</i></b></dt><dd>
+            
+            <p>
+              The new file path to which the given file is being moved.
             </p>
           </dd></dl></dd><dt class="refactoring">RENAME</dt><dd>
         <p>
@@ -3085,6 +3785,18 @@ dt.typeDefinition {
             
             <p>
               The length of the name selected to be renamed.
+            </p>
+          </dd><dt class="field"><b><i>elementKindName ( String )</i></b></dt><dd>
+            
+            <p>
+              The human-readable description of the kind of element being
+              renamed (such as “class” or “function type
+              alias”).
+            </p>
+          </dd><dt class="field"><b><i>oldName ( String )</i></b></dt><dd>
+            
+            <p>
+              The old name of the element before the refactoring.
             </p>
           </dd></dl><h4>Options</h4><dl><dt class="field"><b><i>newName ( String )</i></b></dt><dd>
             
