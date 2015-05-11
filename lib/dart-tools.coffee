@@ -53,10 +53,7 @@ module.exports =
       Utils.whenEditor (editor) =>
         editor.save()
         @analysisComponent.checkFile(editor.getPath())
-    atom.workspaceView.command 'dart-tools:format-whitespace', =>
-      Utils.whenEditor (editor) ->
-        editor.save()
-        Formatter.formatWhitespace(editor.getPath())
+
     atom.workspaceView.command 'dart-tools:format-code', =>
       Utils.whenEditor (editor) ->
         editor.save()

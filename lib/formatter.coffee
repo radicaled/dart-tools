@@ -3,12 +3,8 @@ Utils = require './utils'
 
 module.exports =
 class Formatter
-  # TODO: verify 'dartfmt' in path via 'which' or something
-  @formatWhitespace: (fullPath) =>
-    @format fullPath
-
   @formatCode: (fullPath) =>
-    @format fullPath, ['-t']
+    @format fullPath
 
   @format: (fullPath, options) =>
     Utils.whenDartSdkFound =>
