@@ -31,6 +31,7 @@ class AnalysisDecorator
       marker.setProperties
         isDartMarker: true
         isProblem: true
+        problem: problem
 
       editor.decorateMarker marker,
         type: 'highlight',
