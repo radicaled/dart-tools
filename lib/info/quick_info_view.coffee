@@ -80,7 +80,7 @@ class View
     @problems.push problem
 
   removeProblem: (problem) =>
-    _.remove(@problems, (p) => _.isEqual(p, problem))
+    @problems = _.where(@problems, (p) => !_.isEqual(p, problem))
 
   reset: =>
     @problems = []
