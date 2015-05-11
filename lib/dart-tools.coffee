@@ -4,7 +4,6 @@ AutoCompletePlusProvider = require './autocomplete/provider'
 module.exports =
   # spooky ( ͡° ͜ʖ ͡°)
   analysisComponent: null
-  analysisStatusView: null
 
   pubComponent: null
   pubStatusView: null

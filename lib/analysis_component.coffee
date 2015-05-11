@@ -12,7 +12,6 @@ extname = require('path').extname
 module.exports =
 class AnalysisComponent extends Model
   subscriptions: []
-  analysisStatusView: null
   analysisView: null
   analysisServer: null
   analysisDecorator: null
@@ -25,7 +24,6 @@ class AnalysisComponent extends Model
   enable: =>
     @subscriptions.push atom.project.onDidChangePaths @watchDartProject
     @watchDartProject()
-    # @createAnalysisStatusView()
     # @createAnalysisView()
     # @analysisDecorator = new AnalysisDecorator(this)
     # @createQuickIssueView()
@@ -65,16 +63,6 @@ class AnalysisComponent extends Model
     @subscriptions = []
     @watcher?.close()
     @analysisServer?.stop()
-    @analysisStatusView?.detach()
-
-  createAnalysisStatusView: =>
-    return unless @isDartProject()
-    atom.packages.once 'activated', =>
-      {statusBar} = atom.workspaceView
-      if statusBar?
-        AnalysisStatusView = require './views/analysis_status_view'
-        @analysisStatusView = new AnalysisStatusView(statusBar)
-        @analysisStatusView.attach()
 
   createAnalysisView: =>
     atom.packages.once 'activated', =>
