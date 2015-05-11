@@ -2,7 +2,7 @@ Utils = require './utils'
 AutoCompletePlusProvider = require './autocomplete/provider'
 
 module.exports =
-  
+
   # Wizardry
   config:
     automaticPubGet:
@@ -25,10 +25,10 @@ module.exports =
     AnalysisComponent = require './analysis_component'
     Formatter = require './formatter'
     PubComponent = require './pub/pub_component'
-    DartExplorerComponent = require ('./dart_explorer/dart_explorer_component')
+    DartExplorerComponent = require './dart_explorer/dart_explorer_component'
     AnalysisToolbar = require './analysis/analysis_toolbar'
     ErrorRepository = require './errors/error_repository'
-    SdkInfo = require('./sdk/sdk_info')
+    SdkInfo = require './sdk/sdk_info'
 
     @analysisComponent = new AnalysisComponent()
 
