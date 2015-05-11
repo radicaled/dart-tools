@@ -60,11 +60,10 @@ class View
     rivets.formatters.lowerCase = (s) -> if s then s.toLowerCase() else s
 
   addProblem: (problem) =>
-    console.log 'adding problem', problem
+    return if _.any(@problems, (p) => _.isEqual(p, problem))
     @problems.push problem
 
   reset: =>
-    console.log 'clearing problems'
     @problems = []
 
   formattedProblem: (problem) ->
