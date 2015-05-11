@@ -10,9 +10,13 @@ module.exports =
 
 
   # Wizardry
-  configDefaults:
-    automaticPubGet: true
-    dartSdkLocation: ''
+  config:
+    automaticPubGet:
+      type: 'boolean'
+      default: true
+    dartSdkLocation:
+      type: 'string'
+      default: ''
 
 
   # Provider for `autocomplete-plus`
