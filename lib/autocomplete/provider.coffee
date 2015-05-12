@@ -18,7 +18,7 @@ AutoCompletePlusProvider =
       if @analysisApi
         path = editor.getPath()
         offset = editor.buffer.characterIndexForPosition(bufferPosition)
-        return unless Util.isCompatible(editor)
+        return unless Utils.isCompatible(editor)
 
         @analysisApi.updateFile path, editor.getText()
         @analysisApi.completion.getSuggestions(path, offset)
