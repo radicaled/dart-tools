@@ -30,3 +30,5 @@ Formatting will save the current editor buffer first.
 Settings View: Open -> Filter Packages -> Dart Tools.
 
 Linting will not be performed until you have run `pub get` at least once.
+
+Performance: `dart-tools` doesn't handle a large number of errors very well -- around 300 errors starts slowing things down. Take care with your refactoring until this is resolved!
