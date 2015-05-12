@@ -9,7 +9,7 @@ class PubStatusView
   constructor: (@pubComponent) ->
     element = Template.get('pub/status_view.html')
     atom.workspace.addBottomPanel(item: element)
-    atom.commands.add 'atom-text-editor', 'core:cancel', =>
+    atom.commands.add 'atom-workspace', 'core:cancel', =>
       @shouldShow = false
 
     @view = rivets.bind(element, {it: this})
