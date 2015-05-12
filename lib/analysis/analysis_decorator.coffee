@@ -8,14 +8,21 @@ class AnalysisDecorator
     atom.workspace.observeTextEditors @handleEditors
     @errors.onChange @handleErrors
 
-  clearMarkers: (editor) =>
+  clearMarkers: (editor, problems) =>
     markers = editor.findMarkers
+      isValid: true
       isDartMarker: true
       isProblem: true
-    _.invoke markers, 'destroy'
+
+    ms = _.chain(markers)
+      .where( (m) =>
+        problem = m.getProperties().problem
+        _.any(problems, (p) => _.isEqual(p, problem))
+      ).value()
+    _.invoke ms, 'destroy'
 
   decorateEditor: (editor, problems) =>
-    @clearMarkers(editor)
+    # @clearMarkers(editor, problems)
     for problem in problems
       location = problem.location
 
@@ -38,11 +45,12 @@ class AnalysisDecorator
         class: css
 
   # Event handlers
-  handleErrors: ({file, errors}) =>
+  handleErrors: ({file, errors, added, removed}) =>
     for editor in atom.workspace.getTextEditors()
       fullPath = editor.getPath()
       if fullPath == file
-        @decorateEditor(editor, errors)
+        @clearMarkers(editor, removed)
+        @decorateEditor(editor, added)
         return
 
 

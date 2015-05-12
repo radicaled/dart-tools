@@ -62,5 +62,6 @@ module.exports =
 
   deactivate: ->
     @analysisComponent.disable()
+    @analysisDecorator.dispose()
 
   serialize: ->
