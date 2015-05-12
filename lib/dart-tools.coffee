@@ -31,6 +31,7 @@ module.exports =
     SdkInfo = require './sdk/sdk_info'
     AnalysisDecorator = require './analysis/analysis_decorator'
     QuickInfoView = require './info/quick_info_view'
+    ProblemView = require './info/problem_view'
 
     @analysisComponent = new AnalysisComponent()
 
@@ -41,6 +42,8 @@ module.exports =
     @sdkInfo = new SdkInfo()
     @analysisDecorator = new AnalysisDecorator(@errorRepository)
     @quickInfoView = new QuickInfoView()
+
+    ProblemView.register(@errorRepository)
 
     @analysisComponent.enable()
     AutoCompletePlusProvider.analysisApi = @analysisComponent.analysisAPI

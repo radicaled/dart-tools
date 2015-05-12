@@ -29,5 +29,7 @@ class ToolbarView
     atom.workspace.addBottomPanel(item: element)
     @view = rivets.bind(element, it: this)
 
+  showProblems: ->
+    atom.workspace.open('dart-tools://problem-view')
 
 module.exports = AnalysisToolbar

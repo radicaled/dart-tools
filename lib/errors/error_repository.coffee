@@ -11,6 +11,10 @@ class ErrorRepository
   listen: =>
     @analysisApi.on "analysis.errors", @handleErrors
 
+  forEachFileWithError: (callback) =>
+    for k, v of @repository
+      callback(k, v) if v.length > 0
+        
   handleErrors: (data) =>
     file = data.params.file
     errors = data.params.errors

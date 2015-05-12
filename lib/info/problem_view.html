@@ -1,0 +1,18 @@
+<div class="padded">
+  <h1>
+    Problems <span class="badge" rv-text="it.problemCount < problemList"></span>
+  </h1>
+
+  <div rv-each-problem="it.problemList">
+    <a rv-class="problem.severity | lowerCase"
+      data-dart-analysis
+      rv-data-file="problem.location.file"
+      rv-data-line="problem.location.startLine"
+      rv-data-col="problem.location.startColumn"
+      rv-on-click="it.navigateToProblem">
+
+      { problem.location.file } : { problem.message }
+    </a>
+
+  </div>
+</div>
