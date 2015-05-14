@@ -1,3 +1,4 @@
+{CompositeDisposable} = require 'atom'
 Utils = require './utils'
 AutoCompletePlusProvider = require './autocomplete/provider'
 
@@ -21,6 +22,13 @@ module.exports =
   # TODO: becoming massive, refactor.
   activate: (state) ->
     return unless Utils.isDartProject()
+    @subscriptions = new CompositeDisposable()
+    # HACK: for some reason Atom is saving every dart-tools marker
+    # This code flushes all pre-existing markers...
+    atom.workspace.observeTextEditors (editor) =>
+      markers = editor.findMarkers
+        isDartMarker: true
+      marker.destroy() for marker in markers
 
     AnalysisComponent = require './analysis_component'
     Formatter = require './formatter'
@@ -61,6 +69,7 @@ module.exports =
     atom.commands.add 'atom-workspace', 'dart-tools:toggle-analysis-view'
 
   deactivate: ->
+    @subscriptions.dispose()
     @analysisComponent.disable()
     @analysisDecorator.dispose()
     @quickInfoView.dispose()
