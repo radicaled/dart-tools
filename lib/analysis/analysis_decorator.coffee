@@ -10,11 +10,11 @@ class AnalysisDecorator
 
   clearMarkers: (editor, problems) =>
     markers = editor.findMarkers
-      isValid: true
       isDartMarker: true
       isProblem: true
 
     ms = _.chain(markers)
+      .where( (m) => m.isValid() )
       .where( (m) =>
         problem = m.getProperties().problem
         _.any(problems, (p) => _.isEqual(p, problem))
