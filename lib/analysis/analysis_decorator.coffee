@@ -1,12 +1,14 @@
+{CompositeDisposable} = require 'atom'
 _ = require 'lodash'
 
 class AnalysisDecorator
   constructor: (@errors) ->
+    @subscriptions = new CompositeDisposable()
     @listen()
 
   listen: =>
-    atom.workspace.observeTextEditors @handleEditors
-    @errors.onChange @handleErrors
+    @subscriptions.add atom.workspace.observeTextEditors @handleEditors
+    @subscriptions.add @errors.onChange @handleErrors
 
   clearMarkers: (editor, problems) =>
     markers = editor.findMarkers
@@ -19,10 +21,10 @@ class AnalysisDecorator
         problem = m.getProperties().problem
         _.any(problems, (p) => _.isEqual(p, problem))
       ).value()
+    # console.log "destroying #{ms.length} markers for #{problems.length} problems"
     _.invoke ms, 'destroy'
 
   decorateEditor: (editor, problems) =>
-    # @clearMarkers(editor, problems)
     for problem in problems
       location = problem.location
 
@@ -59,5 +61,9 @@ class AnalysisDecorator
     problems = @errors.repository[fullPath]
     return unless problems?.length > 0
     @decorateEditor(editor, problems)
+
+  dispose: =>
+    @subscriptions.dispose()
+
 
 module.exports = AnalysisDecorator
