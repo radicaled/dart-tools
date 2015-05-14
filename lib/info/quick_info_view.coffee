@@ -42,6 +42,7 @@ class QuickInfoView
 
   withValidMarker: (editor, marker, callback) =>
     return unless marker.getProperties().isDartMarker
+    return unless marker.isValid()
 
     selectedBufferRange = editor.getSelectedBufferRange()
     markerRange = marker.getBufferRange()
