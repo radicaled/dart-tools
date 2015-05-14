@@ -5,12 +5,13 @@ _ = require 'lodash'
 
 class QuickInfoView
   constructor: ->
+    @subscriptions = new CompositeDisposable()
     @editorEvents = new CompositeDisposable()
     @view = new View()
     @listen()
 
   listen: =>
-    atom.workspace.observeActivePaneItem @handleActivePane
+    @subscriptions.add atom.workspace.observeActivePaneItem @handleActivePane
 
   observeEditor: (editor) =>
     @editorEvents.dispose()
@@ -63,6 +64,10 @@ class QuickInfoView
     # so just see if there's an active text editor or not
     editor = atom.workspace.getActiveTextEditor()
     @observeEditor(editor) if editor
+
+  dispose: =>
+    @subscriptions.dispose()
+    @editorEvents.dispose()
 
 class View
   shouldShow: => @problems.length > 0
