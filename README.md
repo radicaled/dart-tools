@@ -8,11 +8,12 @@ Features
 ========
 
 * Updated grammar file (no need for the `language-dart` package; remove it if you have it)
-* Lints the current Dart file when a pubspec.yaml file exists
+* Lints the Dart project when a pubspec.yaml file exists
 at project root. (see note section)
 * Formats the current Dart file via command palette
-* Automatic and manual "pub get."
-* Putting a cursor within an analysis error quickly shows the problem text
+* Can perform "pub get" when pubspec.yaml is saved.
+* Can format Dart files on save.
+* Putting the caret within an analysis error quickly shows the problem text
 * Basic autocomplete, via the `autocomplete-plus` package.
 
 Available Commands
