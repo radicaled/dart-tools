@@ -18,12 +18,13 @@ class QuickInfoView
 
     @editorEvents.add editor.onDidAddDecoration (decoration) =>
       marker = decoration.getMarker()
-      @withValidMarker editor, marker, (marker) =>
+      @whenCaretInMarker editor, marker, (marker) =>
+        return unless marker.isValid()
         @addMarker(marker)
 
     @editorEvents.add editor.onDidRemoveDecoration (decoration) =>
       marker = decoration.getMarker()
-      @withValidMarker editor, marker, (marker) =>
+      @whenCaretInMarker editor, marker, (marker) =>
         @removeMarker(marker)
 
     @editorEvents.add editor.onDidChangeSelectionRange =>
@@ -41,9 +42,8 @@ class QuickInfoView
 
   # Helpers
 
-  withValidMarker: (editor, marker, callback) =>
+  whenCaretInMarker: (editor, marker, callback) =>
     return unless marker.getProperties().isDartMarker
-    return unless marker.isValid()
 
     selectedBufferRange = editor.getSelectedBufferRange()
     markerRange = marker.getBufferRange()
