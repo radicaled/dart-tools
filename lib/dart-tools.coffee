@@ -30,6 +30,8 @@ module.exports =
         isDartMarker: true
       marker.destroy() for marker in markers
 
+    # Status updates for analysis server
+
     AnalysisComponent = require './analysis_component'
     Formatter = require './formatter'
     PubComponent = require './pub/pub_component'
@@ -42,11 +44,12 @@ module.exports =
     ProblemView = require './info/problem_view'
 
     @analysisComponent = new AnalysisComponent()
+    @analysisApi = @analysisComponent.analysisAPI
 
-    @errorRepository = new ErrorRepository(@analysisComponent.analysisAPI)
+    @errorRepository = new ErrorRepository(@analysisApi)
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
     @pubComponent = new PubComponent(atom.project.getPaths()[0])
-    @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
+    # @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
     @sdkInfo = new SdkInfo()
     @analysisDecorator = new AnalysisDecorator(@errorRepository)
     @quickInfoView = new QuickInfoView()
@@ -54,8 +57,23 @@ module.exports =
     ProblemView.register(@errorRepository)
 
     @analysisComponent.enable()
-    AutoCompletePlusProvider.analysisApi = @analysisComponent.analysisAPI
+    AutoCompletePlusProvider.analysisApi = @analysisApi
     # @dartExplorerComponent.enable()
+
+
+
+    # Status updates for analysis server
+    @analysisApi.on 'server.connected', =>
+      success = '[dart-tools] The analysis server is now running.'
+      atom.notifications.addSuccess success
+    @analysisApi.on 'server.error', =>
+      warning = '
+        [dart-tools] The analysis server has experienced an error.
+        Please restart Atom and hope that fixes it.
+      '
+      atom.notifications.addWarning warning
+
+    # Commands
 
     atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>
       Utils.whenEditor (editor) ->
