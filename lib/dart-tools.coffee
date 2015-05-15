@@ -26,8 +26,9 @@ module.exports =
 
   # TODO: becoming massive, refactor.
   activate: (state) ->
-    return unless Utils.isDartProject()
     @subscriptions = new CompositeDisposable()
+    return unless Utils.isDartProject()
+
     # HACK: for some reason Atom is saving every dart-tools marker
     # This code flushes all pre-existing markers...
     atom.workspace.observeTextEditors (editor) =>
