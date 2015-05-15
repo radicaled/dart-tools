@@ -6,7 +6,7 @@ module.exports =
 
   # Wizardry
   config:
-    automaticPubGet:
+    pubGetOnSave:
       type: 'boolean'
       default: true
     # automaticFormat:
