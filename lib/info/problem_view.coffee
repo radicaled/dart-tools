@@ -5,9 +5,18 @@ Template = require '../templates/template'
 class ProblemView
   @uri: 'dart-tools://problem-view'
 
+  @isRegistered: (tagName) =>
+    document.createElement(tagName).constructor != HTMLElement
+
   @register: (@errors) =>
-    pve = document.registerElement 'dart-tools-problem-view',
-      prototype: ProblemViewElement.prototype
+    # Github issue #26: somehow module is being reloaded,
+    # but document isn't, so the dart-tools-problem-view element is already
+    # registered. User might be toggling dart-tools on/off via settings panel?
+    pve = if @isRegistered('dart-tools-problem-view')
+      document.createElement('dart-tools-problem-view').constructor
+    else
+      document.registerElement 'dart-tools-problem-view',
+        prototype: ProblemViewElement.prototype
 
     atom.views.addViewProvider ProblemView, pve
 
