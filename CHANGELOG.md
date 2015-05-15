@@ -1,3 +1,7 @@
+## 0.9.2
+
+Release for Atom 0.198
+
 ## 0.9.1
 
 Updating the most important part of the project: the README.md
