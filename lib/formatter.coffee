@@ -42,9 +42,9 @@ class Formatter
       editor.setSelectedBufferRange([start, end])
 
   signalError: (error) =>
-    return if response.error.code == 'SERVER_ERROR'
+    return if error.code == 'SERVER_ERROR'
     # please when don't you have an error son
-    detail = response.error.message
+    detail = error.message
     atom.notifications.addWarning "Failed to autoformat current document!",
       detail: detail
     return
@@ -52,7 +52,7 @@ class Formatter
   formatEditor: (editor) =>
     descriptors = editor.getRootScopeDescriptor()
     # We only support pure Dart files for now
-    return unless Utils.isCompatible(editor)
+    return new Promise() unless Utils.isCompatible(editor)
     path = editor.getPath()
     bufferRange = editor.getSelectedBufferRange()
     offset = editor.buffer.characterIndexForPosition(bufferRange.start)
@@ -60,7 +60,8 @@ class Formatter
     # length = offset - editor.buffer.characterIndexForPosition(bufferRange.end)
 
     promise = @analysisApi.edit.format(path, offset, length)
-    promise.then (response) =>
+    return promise.then (response) =>
+      console.log '???'
       result = response.result
 
       if response.error
@@ -73,8 +74,13 @@ class Formatter
   # Event Handlers
 
   formatOnSave: (editor) =>
+    formatting = false;
     @editorSubscriptions.add editor.onDidSave =>
-      @formatEditor(editor)
+      return if formatting;
+      formatting = true;
+      @formatEditor(editor).then () =>
+        editor.save();
+        formatting = false;
 
 
   # Broken(ish).

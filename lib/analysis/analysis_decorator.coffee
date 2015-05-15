@@ -21,7 +21,7 @@ class AnalysisDecorator
         problem = m.getProperties().problem
         _.any(problems, (p) => _.isEqual(p, problem))
       ).value()
-    # console.log "destroying #{ms.length} markers for #{problems.length} problems"
+
     _.invoke ms, 'destroy'
 
   decorateEditor: (editor, problems) =>
