@@ -9,9 +9,7 @@ class ProblemView
     pve = document.registerElement 'dart-tools-problem-view',
       prototype: ProblemViewElement.prototype
 
-    atom.views.addViewProvider
-      modelConstructor: ProblemView
-      viewConstructor: pve
+    atom.views.addViewProvider ProblemView, pve
 
     atom.workspace.addOpener (uri) =>
       try
