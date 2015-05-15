@@ -73,6 +73,11 @@ module.exports =
       '
       atom.notifications.addWarning warning
 
+    unless atom.config.get 'dart-tools.dartSdkLocation'
+      info = '[dart-tools] Dart SDK not specified, analysis_server not running.'
+      atom.notifications.addInfo info,
+        detail: 'Go to Settings > Packages > Dart Tools to specify Dart SDK'
+
     # Commands
 
     atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>
