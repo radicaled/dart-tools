@@ -1,3 +1,12 @@
+## 0.9.0
+
+Everything old is new again.
+
+dart-tools now uses the analysis_server packaged with the Dart SDK to perform
+its code analysis (linting, autocomplete, etc).
+
+Dart 1.10+ required
+
 ## 0.8.9
 
 dart-tools no longer crashes when opening a blank Atom window
