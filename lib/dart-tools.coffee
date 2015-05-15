@@ -9,10 +9,15 @@ module.exports =
     automaticPubGet:
       type: 'boolean'
       default: true
+    # automaticFormat:
+    #   type: 'boolean'
+    #   default: false
+    formatOnSave:
+        type: 'boolean'
+        default: true
     dartSdkLocation:
       type: 'string'
       default: ''
-
 
   # Provider for `autocomplete-plus`
   provideAutocompleter: ->
@@ -53,7 +58,7 @@ module.exports =
     @sdkInfo = new SdkInfo()
     @analysisDecorator = new AnalysisDecorator(@errorRepository)
     @quickInfoView = new QuickInfoView()
-
+    @formatter = new Formatter(@analysisApi)
     ProblemView.register(@errorRepository)
 
     @analysisComponent.enable()
@@ -83,7 +88,7 @@ module.exports =
     atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>
       Utils.whenEditor (editor) ->
         editor.save()
-        Formatter.formatCode(editor.getPath())
+        @formatter.formatEditor(editor)
 
     atom.commands.add 'atom-workspace', 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
