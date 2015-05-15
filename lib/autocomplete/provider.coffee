@@ -12,6 +12,18 @@ AutoCompletePlusProvider =
   # Our analysis API service object
   analysisApi: null
 
+  typeMap:
+    class_type_alias: 'class'
+    setter: 'property'
+    getter: 'property'
+    local_variable: 'variable'
+    function_type_alias: 'function'
+    enum: 'constant'
+    enum_constant: 'constant'
+    # The following don't map well, I think
+    # top_level_variable:
+
+
   # Required: Return a promise, an array of suggestions, or null.
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
     new Promise (resolve) =>
@@ -22,7 +34,7 @@ AutoCompletePlusProvider =
 
         @analysisApi.updateFile path, editor.getText()
         @analysisApi.completion.getSuggestions(path, offset)
-          .then (autocompleteInfo) ->
+          .then (autocompleteInfo) =>
             items = []
             results = autocompleteInfo.params.results
             sortedResults = _.chain(results)
@@ -37,11 +49,16 @@ AutoCompletePlusProvider =
 
             for result in sortedResults
               items.push
-                text: result.completion,
-                rightLabel: result.element?.kind
+                text: result.completion
+                leftLabel: result.returnType
+                rightLabel: result.element?.kind || result.kind
+                type: @mapType(result)
 
             resolve(items)
 
+  mapType: (result) ->
+    kind = (result.element?.kind || result.kind || '').toLowerCase()
+    @typeMap[kind] || kind
 
   # (optional): called _after_ the suggestion `replacementPrefix` is replaced
   # by the suggestion `text` in the buffer

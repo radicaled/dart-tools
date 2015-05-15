@@ -2,6 +2,8 @@
 
 Updating the most important part of the project: the README.md
 
+Also, use new autocomplete+ type icons when possible
+
 ## 0.9.0
 
 Everything old is new again.
