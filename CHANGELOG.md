@@ -1,3 +1,7 @@
+## 0.9.3
+
+Bugfixes: don't try to reregister custom elements (Github Issue #26)
+
 ## 0.9.2
 
 Release for Atom 0.198
