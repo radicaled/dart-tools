@@ -1,3 +1,7 @@
+## 0.9.5
+
+Bugfixes: auto formatting does not raise exception on non-Dart files
+
 ## 0.9.3
 
 Bugfixes: don't try to reregister custom elements (Github Issue #26)

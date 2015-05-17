@@ -52,7 +52,7 @@ class Formatter
   formatEditor: (editor) =>
     descriptors = editor.getRootScopeDescriptor()
     # We only support pure Dart files for now
-    return new Promise() unless Utils.isCompatible(editor)
+    return Promise.resolve() unless Utils.isCompatible(editor)
     path = editor.getPath()
     bufferRange = editor.getSelectedBufferRange()
     offset = editor.buffer.characterIndexForPosition(bufferRange.start)
