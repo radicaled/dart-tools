@@ -98,7 +98,7 @@ module.exports =
     atom.commands.add 'atom-workspace', 'dart-tools:toggle-analysis-view'
 
   deactivate: ->
-    @subscriptions.dispose()
-    @analysisComponent.disable()
-    @analysisDecorator.dispose()
-    @quickInfoView.dispose()
+    @subscriptions?.dispose()
+    @analysisComponent?.disable()
+    @analysisDecorator?.dispose()
+    @quickInfoView?.dispose()
