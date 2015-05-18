@@ -11,7 +11,7 @@
       rv-data-col="problem.location.startColumn"
       rv-on-click="it.navigateToProblem">
 
-      { problem.location.file } : { problem.message }
+      { problem.location.file | relativePath } : { problem.message }
     </a>
 
   </div>

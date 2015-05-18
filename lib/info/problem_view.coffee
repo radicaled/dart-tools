@@ -50,6 +50,9 @@ class ProblemViewElement extends HTMLElement
 
   createdCallback: ->
     rivets.formatters.lowerCase = (s) -> if s then s.toLowerCase() else s
+    rivets.formatters.relativePath = (s) ->
+      "/" + atom.project.relativizePath(s)[1]
+
     element = Template.get('info/problem_view.html')
     @view = rivets.bind(element, {it: this})
     @appendChild element
