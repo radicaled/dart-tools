@@ -61,7 +61,6 @@ class Formatter
 
     promise = @analysisApi.edit.format(path, offset, length)
     return promise.then (response) =>
-      console.log '???'
       result = response.result
 
       if response.error
