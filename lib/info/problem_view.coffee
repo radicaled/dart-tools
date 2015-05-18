@@ -18,7 +18,7 @@ class ProblemView
       document.registerElement 'dart-tools-problem-view',
         prototype: ProblemViewElement.prototype
 
-    atom.views.addViewProvider ProblemView, pve
+    atom.views.addViewProvider ProblemView, -> new pve()
 
     atom.workspace.addOpener (uri) =>
       try
@@ -68,4 +68,8 @@ class ProblemViewElement extends HTMLElement
       initialLine: line
       initialColumn: col
 
+  copy: =>
+    view = atom.views.getView new ProblemView
+    view.initialize(@errors)
+    view
 module.exports = ProblemView
