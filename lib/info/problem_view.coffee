@@ -1,5 +1,6 @@
 url = require 'url'
 rivets = require 'rivets'
+_ = require 'lodash'
 Template = require '../templates/template'
 
 class ProblemView
@@ -45,7 +46,7 @@ class ProblemViewElement extends HTMLElement
       for k,v of @errors.repository
         @problemList = @problemList.concat(v)
     updateErrors()
-    @errors.onChange updateErrors
+    @errors.onChange _.debounce(updateErrors, 250, maxWait: 1000)
 
 
   createdCallback: ->
