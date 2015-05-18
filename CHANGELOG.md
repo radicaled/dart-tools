@@ -1,3 +1,7 @@
+## 0.9.6
+
+Problem View: clean up view styling / formatting.
+
 ## 0.9.5
 
 Bugfixes: auto formatting does not raise exception on non-Dart files
