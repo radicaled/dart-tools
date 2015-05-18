@@ -95,4 +95,16 @@ atom-text-editor::shadow {
 dart-tools-problem-view {
   color: @text-color;
   overflow: scroll;
+
+  a[data-dart-analysis] {
+    display: table-row;
+    span {
+      display: table-cell;
+      // display: inline-block;
+    }
+
+    .line, .column {
+      width: 80px;
+    }
+  }
 }

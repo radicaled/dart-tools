@@ -1,18 +1,29 @@
+<div class="panel-heading">
+  <span rv-text="it.problemCount < problemList"></span> problems
+</div>
+
 <div class="padded">
   <h1>
     Problems <span class="badge" rv-text="it.problemCount < problemList"></span>
   </h1>
 
-  <div rv-each-problem="it.problemList">
-    <a rv-class="problem.severity | lowerCase"
-      data-dart-analysis
-      rv-data-file="problem.location.file"
-      rv-data-line="problem.location.startLine"
-      rv-data-col="problem.location.startColumn"
-      rv-on-click="it.navigateToProblem">
-
-      { problem.location.file | relativePath } : { problem.message }
-    </a>
-
+  <div rv-each-entry="it.problemList">
+    <h3>
+      <span class="icon icon-file-text"></span>
+      <span class="filename">{ entry.file | relativePath }</span>
+      <span class="">({ entry.count })</span>
+    </h3>
+    <div rv-each-problem="entry.problems">
+      <a rv-class="problem.severity | lowerCase"
+        data-dart-analysis
+        rv-data-file="problem.location.file"
+        rv-data-line="problem.location.startLine"
+        rv-data-col="problem.location.startColumn"
+        rv-on-click="it.navigateToProblem">
+        <span class="line">line { problem.location.startLine },</span>
+        <span class="column">column { problem.location.startColumn },</span>
+        <span class="message">{ problem.message }</span>
+      </a>
+    </div>
   </div>
 </div>

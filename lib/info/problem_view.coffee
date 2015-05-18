@@ -44,19 +44,26 @@ class ProblemViewElement extends HTMLElement
     updateErrors = =>
       @problemList = []
       for k,v of @errors.repository
-        @problemList = @problemList.concat(v)
+        if v.length > 0
+          @problemList = @problemList.concat
+            file: k
+            count: v.length
+            problems: v
+
     updateErrors()
     @errors.onChange _.debounce(updateErrors, 250, maxWait: 1000)
 
 
   createdCallback: ->
     rivets.formatters.lowerCase = (s) -> if s then s.toLowerCase() else s
-    rivets.formatters.relativePath = (s) ->
-      "/" + atom.project.relativizePath(s)[1]
+    rivets.formatters.relativePath = (s) -> atom.project.relativizePath(s)[1]
 
-    element = Template.get('info/problem_view.html')
-    @view = rivets.bind(element, {it: this})
-    @appendChild element
+    this.innerHTML = Template.getText('info/problem_view.html')
+    @view = rivets.bind(this, {it: this})
+
+    # element = Template.get('info/problem_view.html')
+    # @view = rivets.bind(element, {it: this})
+    # @appendChild element
 
 
   getTitle: ->
