@@ -3,6 +3,16 @@ path  = require 'path'
 
 module.exports =
 class Utils
+  @windowsCmdMap =
+    pub: 'pub.bat'
+    dart: 'dart.exe'
+
+  @getExecutable: (cmd) =>
+    isWin = /^win/.test(process.platform);
+    return cmd unless isWin
+    windowsCmd = @windowsCmdMap[cmd]
+    return windowsCmd || cmd
+
   @whenEditor: (fxn) =>
     editor = atom.workspace.getActiveEditor()
     fxn(editor) if editor

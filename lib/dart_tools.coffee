@@ -1,6 +1,7 @@
 {Emitter} = require 'event-kit'
 spawn = require('child_process').spawn
 path  = require 'path'
+Utils = require './utils'
 
 class DartTools
   constructor: (@workingDir) ->
@@ -8,7 +9,7 @@ class DartTools
 
   runPubCommand: (cmd, args) =>
     @withSdk (sdkPath) =>
-      cmd  = path.join(sdkPath, 'bin', 'pub')
+      cmd  = path.join(sdkPath, 'bin', Utils.getExecutable('pub'))
       args = Array(args)
       process = spawn cmd, args,
         cwd: @workingDir
