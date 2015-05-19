@@ -1,3 +1,7 @@
+## 0.9.7
+
+dart-tools works under Windows again
+
 ## 0.9.6
 
 Problem View: clean up view styling / formatting.
