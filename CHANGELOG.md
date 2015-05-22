@@ -1,3 +1,7 @@
+## 0.9.8
+
+Bugfixes: work on how paths are composed for better Windows support.
+
 ## 0.9.7
 
 dart-tools works under Windows again
