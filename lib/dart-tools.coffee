@@ -87,7 +87,7 @@ module.exports =
     # Commands
 
     atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>
-      Utils.whenEditor (editor) ->
+      Utils.whenEditor (editor) =>
         editor.save()
         @formatter.formatEditor(editor)
 
