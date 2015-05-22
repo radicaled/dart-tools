@@ -1,3 +1,7 @@
+## 0.9.9
+
+Bugfixes: manually invoking the formatter no longer raises an error.
+
 ## 0.9.8
 
 Bugfixes: work on how paths are composed for better Windows support.
