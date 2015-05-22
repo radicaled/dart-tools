@@ -20,6 +20,7 @@ Available Commands
 ==================
 
 * Pub Get
+* Pub Upgrade
 * Sdk Info
 * Format Code
 
