@@ -18,7 +18,7 @@ class AnalysisServer
   constructor: ->
     @emitter = new Emitter()
 
-  start: (packageRoot) =>
+  start: (analysisRoots) =>
     promiseMap = {}
     sdkPath = Utils.dartSdkPath()
     atomConfigRoot = atom.getConfigDirPath()
@@ -50,11 +50,7 @@ class AnalysisServer
           atom.notifications.addError("[dart-tools] The analysis server failed to start after several tries.", detail: detail)
 
       # Set analysis root.
-      @sendMessage
-        method: "analysis.setAnalysisRoots"
-        params:
-          included: [packageRoot]
-          excluded: []
+      @setAnalysisRoots analysisRoots
 
   stop: =>
     @process?.close()
@@ -108,3 +104,10 @@ class AnalysisServer
   forEachEvent: (callback) =>
     @emitter.on 'new-event', (obj) =>
       callback(obj.event, obj)
+
+  setAnalysisRoots: (paths) =>
+    @sendMessage
+      method: "analysis.setAnalysisRoots"
+      params:
+        included: paths
+        excluded: []

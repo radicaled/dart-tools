@@ -1,3 +1,13 @@
+# 0.9.11
+
+Features:
+  * Better Pub output styling by @devoncarew
+  * Now supports multiple Dart projects in a single Atom workspace
+
+Bugfixes:
+  * node-pathwatcher has a bug: it sometimes produces 2 events! We work
+    around that bug for now
+
 # 0.9.10
 
 Features:

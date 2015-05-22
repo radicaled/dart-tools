@@ -1,3 +1,4 @@
+_ = require 'lodash'
 spawn = require('child_process').spawn
 path  = require 'path'
 
@@ -52,14 +53,16 @@ class Utils
     fxn() if @isDartProject()
 
   @isDartProject: =>
-    @getDartProjectPath() != null
+    @getDartProjectPaths() != null
 
-  @getDartProjectPath: =>
-    for dir in atom.project.getDirectories()
-      pubspecFile = dir.getFile('pubspec.yaml')
-      packagesFile = dir.getFile('.packages')
-      if pubspecFile.existsSync() || packagesFile.existsSync()
-        return dir.path
+  @getDartProjectPaths: =>
+    _(atom.project.getDirectories())
+      .where (dir) ->
+        pubspecFile = dir.getFile('pubspec.yaml')
+        packagesFile = dir.getFile('.packages')
+        pubspecFile.existsSync() || packagesFile.existsSync()
+      .map (dir) -> dir.path
+      .value()
 
   @isDartFile: (filename = '') =>
     path.extname(filename) == '.dart'

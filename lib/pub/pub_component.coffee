@@ -1,6 +1,6 @@
 {Emitter} = require 'event-kit'
-DartTools = require '../dart_tools'
 
+_ = require 'lodash'
 path  = require 'path'
 spawn = require('child_process').spawn
 PathWatcher = require('pathwatcher')
@@ -8,11 +8,22 @@ Utils = require '../utils'
 PubStatusView = require './pub_status_view'
 
 class PubComponent
-  constructor: (@rootPath) ->
+  constructor: () ->
     @emitter = new Emitter
-    @dartTools = new DartTools(@rootPath)
     @pubStatusView = new PubStatusView(this)
-    @observePubspec()
+    @watchers = []
+    @runningProcesses = {}
+
+    watchProjectPaths = =>
+      _.each Utils.getDartProjectPaths(), (pp) =>
+        @watchers.push @observePubspec(pp)
+
+    atom.project.onDidChangePaths =>
+      _.invoke @watchers, 'close'
+      @watchers = []
+      watchProjectPaths()
+
+    watchProjectPaths()
 
     atom.commands.add 'atom-workspace', 'dart-tools:pub-get', =>
       @get()
@@ -20,33 +31,71 @@ class PubComponent
       @upgrade()
 
   run: (args) =>
-    process = @dartTools.runPubCommand('pub', args)
-    process.stdout.on 'data', (data) =>
-      @emitter.emit 'pub-update',
-        output: data.toString()
-    process.stderr.on 'data', (data) =>
-      @emitter.emit 'pub-error',
-        output: data.toString()
-    process.on 'exit', =>
-      @emitter.emit 'pub-finished'
+    # TODO / HACK: need to operate on multiple valid projects
+    pubspecRoot = Utils.getDartProjectPaths()[0]
+    pubspecPath = path.join pubspecRoot, 'pubspec.yaml'
+    return unless pubspecRoot
+
+    if @isRunning(pubspecPath)
+      @pubRunningNotification pubspecPath
+      return
+
+    Utils.dartSdkInfo (sdkInfo) =>
+      cmd  = Utils.getExecPath 'pub'
+      args = Array(args)
+
+      @markAsRunning pubspecPath
+
+      process = spawn cmd, args,
+        cwd: pubspecRoot
+      process.stdout.on 'data', (data) =>
+        @emitter.emit 'pub-update',
+          output: data.toString()
+      process.stderr.on 'data', (data) =>
+        @emitter.emit 'pub-error',
+          output: data.toString()
+      process.on 'exit', =>
+        @markAsStopped pubspecPath
+        @emitter.emit 'pub-finished'
 
   get: =>
-    @dartTools.withSdk =>
+    Utils.dartSdkInfo =>
       @emitter.emit 'pub-start',
         title: 'Pub Get'
       @run 'get'
 
   upgrade: =>
-    @dartTools.withSdk =>
+    Utils.dartSdkInfo =>
       @emitter.emit 'pub-start',
         title: 'Pub Upgrade'
       @run 'upgrade'
 
-  observePubspec: =>
-    return unless Utils.isDartProject()
-    @watcher = PathWatcher.watch path.join(@rootPath, 'pubspec.yaml'), =>
+  observePubspec: (pubspecRoot) =>
+    pubspecPath = path.join pubspecRoot, 'pubspec.yaml'
+    runPubGet = =>
+      if @isRunning(pubspecPath)
+        @pubRunningNotification pubspecPath
+        return
       if atom.config.get 'dart-tools.pubGetOnSave'
         @get()
+    # See https://github.com/atom/node-pathwatcher/issues/50
+    # We'll debounce to drop the duplicate event
+    PathWatcher.watch pubspecPath, _.debounce runPubGet, 200,
+      maxWait: 400
+
+  pubRunningNotification: (pubspecPath) =>
+    atom.notifications.addInfo 'Pub is already running, wait a second!'
+
+  # Code to prevent multiple pub processes on the same file
+
+  isRunning: (pubspecPath) =>
+    @runningProcesses[pubspecPath] == true
+
+  markAsRunning: (pubspecPath) =>
+    @runningProcesses[pubspecPath] = true
+
+  markAsStopped: (pubspecPath) =>
+    delete @runningProcesses[pubspecPath]
 
   # Events
 
@@ -64,5 +113,7 @@ class PubComponent
 
   destroy: ->
     @emitter.dispose()
+    _.invoke @watchers, 'close'
+    @watchers = []
 
 module.exports = PubComponent

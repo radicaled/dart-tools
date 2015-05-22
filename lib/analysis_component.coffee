@@ -19,9 +19,14 @@ class AnalysisComponent
     @emitter = new Emitter()
 
   enable: =>
-    @subscriptions.push atom.project.onDidChangePaths @watchDartProject
-    @watchDartProject()
-    # @createAnalysisView()
+    return unless Utils.isDartProject()
+
+    dartProjectPaths = Utils.getDartProjectPaths()
+    @analysisServer = new AnalysisServer()
+    @analysisAPI.analysisServer = @analysisServer
+    @analysisServer.start dartProjectPaths
+
+    @subscriptions.push atom.project.onDidChangePaths @handleProjectPaths
 
     atom.workspace.observeTextEditors (editor) =>
       buc = new BufferUpdateComponent(editor, @analysisAPI)
@@ -30,15 +35,6 @@ class AnalysisComponent
   disable: =>
     @cleanup()
 
-  watchDartProject: =>
-    @cleanup()
-    return unless Utils.isDartProject()
-
-    dartProjectPath = Utils.getDartProjectPath()
-    @analysisServer = new AnalysisServer(dartProjectPath)
-    @analysisAPI.analysisServer = @analysisServer
-    @analysisServer.start dartProjectPath
-
   checkFile: (fullPath) =>
     if extname(fullPath) == '.dart'
       @analysisServer.check(fullPath)
@@ -46,13 +42,20 @@ class AnalysisComponent
   cleanup: =>
     subscription.dispose() for subscription in @subscriptions
     @subscriptions = []
-    @watcher?.close()
     @analysisServer?.stop()
 
   createAnalysisView: =>
     atom.packages.once 'activated', =>
       @analysisView = new AnalysisView()
       @analysisView.attach()
+
+  # Event handlers
+
+  handleProjectPaths: (paths) =>
+    dartProjectPaths = Utils.getDartProjectPaths()
+    # Naively assuming that analysis_server will ensure that the project paths
+    # have changed before invalidating everything...
+    @analysisServer.setAnalysisRoots dartProjectPaths
 
   showProblems: =>
     console.log 'showing problems'
