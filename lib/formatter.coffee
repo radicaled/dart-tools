@@ -65,7 +65,7 @@ class Formatter
 
       if response.error
         @signalError(response.error)
-        return;
+        return
 
       @applyEdits(editor, result.edits)
       @updateCaretPosition(editor, result.selectionOffset, result.selectionLength)
@@ -73,13 +73,13 @@ class Formatter
   # Event Handlers
 
   formatOnSave: (editor) =>
-    formatting = false;
+    formatting = false
     @editorSubscriptions.add editor.onDidSave =>
-      return if formatting;
-      formatting = true;
+      return if formatting
+      formatting = true
       @formatEditor(editor).then () =>
-        editor.save();
-        formatting = false;
+        editor.save()
+        formatting = false
 
 
   # Broken(ish).

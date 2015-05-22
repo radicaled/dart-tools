@@ -59,8 +59,8 @@ class AnalysisResultRow extends View
         @text @analysisText(analysisResult)
 
   @analysisText: (analysisResult) ->
-     loc = analysisResult.location
-     "#{loc.file}:#{loc.startLine}: #{analysisResult.message}"
+    loc = analysisResult.location
+    "#{loc.file}:#{loc.startLine}: #{analysisResult.message}"
 
   gotoAnalysis: =>
     loc = @analysisResult.location

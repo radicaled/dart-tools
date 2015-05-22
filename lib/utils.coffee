@@ -8,7 +8,7 @@ class Utils
     dart: 'dart.exe'
 
   @getExecutable: (cmd) =>
-    isWin = /^win/.test(process.platform);
+    isWin = /^win/.test(process.platform)
     return cmd unless isWin
     windowsCmd = @windowsCmdMap[cmd]
     return windowsCmd || cmd
@@ -43,7 +43,7 @@ class Utils
     execPath = @getExecPath 'dart'
     @whenDartSdkFound =>
       process = spawn execPath, ['--version']
-      exitCode = -1;
+      exitCode = -1
 
       process.stderr.on 'data', (data) => buffer += data.toString()
       process.stderr.on 'end', => fxn(buffer)
