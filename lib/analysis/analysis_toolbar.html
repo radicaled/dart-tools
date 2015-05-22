@@ -1,16 +1,13 @@
 <atom-panel id='analysis-toolbar' class='from-bottom' rv-if="it.shouldShow">
-  <div class="container">
+  <div class="container" style="padding-left: 12.5px; padding-right: 12.5px">
     <h6>Dart Tools</h6>
     <div class='status'>
       <span rv-unless="it.hasProblems < errorCount warningCount">
         <i class="icon-check"></i> Everything is A OK!
       </span>
       <span rv-if="it.hasProblems < errorCount warningCount">
-        <a class="text-error" rv-on-click="it.showProblems">
-          <span rv-text="it.errorCount"
-            class="">
-          </span>
-          errors
+        <a class="text-warning" rv-on-click="it.showProblems">
+          <span rv-text="it.errorCount" class=""> </span> issues
         </a>
       </span>
     </div>
