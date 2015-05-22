@@ -10,7 +10,7 @@
     'name': 'meta.preprocessor.script.dart'
   }
   {
-    'begin': '\\b(library|import|part of|part)\\b'
+    'begin': '\\b(library|import|part of|part|export)\\b'
     'beginCaptures':
       '0':
         'name': 'keyword.other.import.dart'
@@ -117,7 +117,7 @@
         'name': 'keyword.cast.dart'
       }
       {
-        'match': '\\b(try|catch|finally|throw)\\b'
+        'match': '\\b(try|catch|finally|throw|rethrow)\\b'
         'name': 'keyword.control.catch-exception.dart'
       }
       {
