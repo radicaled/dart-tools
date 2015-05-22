@@ -54,7 +54,7 @@ module.exports =
 
     @errorRepository = new ErrorRepository(@analysisApi)
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
-    @pubComponent = new PubComponent(atom.project.getPaths()[0])
+    @pubComponent = new PubComponent(Utils.getDartProjectPath())
     # @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
     @sdkInfo = new SdkInfo()
     @analysisDecorator = new AnalysisDecorator(@errorRepository)

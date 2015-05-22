@@ -52,10 +52,14 @@ class Utils
     fxn() if @isDartProject()
 
   @isDartProject: =>
-    rootDirectory = atom.project.getDirectories()[0]
-    return false unless rootDirectory
-    pubspec = rootDirectory.getFile('pubspec.yaml')
-    pubspec.existsSync()
+    @getDartProjectPath() != null
+
+  @getDartProjectPath: =>
+    for dir in atom.project.getDirectories()
+      pubspecFile = dir.getFile('pubspec.yaml')
+      packagesFile = dir.getFile('.packages')
+      if pubspecFile.existsSync() || packagesFile.existsSync()
+        return dir.path
 
   @isDartFile: (filename = '') =>
     path.extname(filename) == '.dart'
