@@ -7,7 +7,7 @@ class PubStatusView
   @shouldShow   = false
 
   constructor: (@pubComponent) ->
-    element = Template.get('pub/status_view.html')
+    element = Template.get('pub/pub_status_view.html')
     atom.workspace.addBottomPanel(item: element)
     atom.commands.add 'atom-workspace', 'core:cancel', =>
       @shouldShow = false
@@ -20,7 +20,7 @@ class PubStatusView
 
     asHtml = (input, textClass) =>
       textClass = '' unless textClass
-      formatted = input.replace '\n', "<br />"
+      formatted = input.replace new RegExp('\n', 'g'), "<br>"
       "<span class=\"#{textClass}\">#{formatted}</span>"
 
     @pubComponent.onPubStart (data) =>

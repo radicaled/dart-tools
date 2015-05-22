@@ -32,14 +32,12 @@ class AnalysisComponent
 
   watchDartProject: =>
     @cleanup()
-
     return unless Utils.isDartProject()
 
-    rootPath = atom.project.getPaths()[0]
-    @analysisServer = new AnalysisServer(rootPath)
+    dartProjectPath = Utils.getDartProjectPath()
+    @analysisServer = new AnalysisServer(dartProjectPath)
     @analysisAPI.analysisServer = @analysisServer
-
-    @analysisServer.start rootPath
+    @analysisServer.start dartProjectPath
 
   checkFile: (fullPath) =>
     if extname(fullPath) == '.dart'
