@@ -28,7 +28,7 @@ class AnalysisServer
         "snapshots",
         "analysis_server.dart.snapshot")
     ]
-    cmd = path.join(sdkPath, "bin", Utils.getExecutable("dart"))
+    cmd = Utils.getExecPath 'dart'
     Utils.whenDartSdkFound =>
       @process = spawn cmd, args
       @writable = true

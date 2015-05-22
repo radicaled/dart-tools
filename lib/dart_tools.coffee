@@ -9,7 +9,7 @@ class DartTools
 
   runPubCommand: (cmd, args) =>
     @withSdk (sdkPath) =>
-      cmd  = path.join(sdkPath, 'bin', Utils.getExecutable('pub'))
+      cmd  = Utils.getExecPath 'pub'
       args = Array(args)
       process = spawn cmd, args,
         cwd: @workingDir

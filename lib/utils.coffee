@@ -13,6 +13,11 @@ class Utils
     windowsCmd = @windowsCmdMap[cmd]
     return windowsCmd || cmd
 
+  @getExecPath: (cmd) =>
+    sdkPath = @dartSdkPath()
+    dartCmd = @getExecutable cmd
+    execPath = if sdkPath then path.join(sdkPath, 'bin', dartCmd) else dartCmd
+
   @whenEditor: (fxn) =>
     editor = atom.workspace.getActiveEditor()
     fxn(editor) if editor
@@ -35,8 +40,7 @@ class Utils
 
   @dartVersion: (fxn) =>
     buffer = ''
-    sdkPath = @dartSdkPath()
-    execPath = if sdkPath then path.join(sdkPath, 'bin', 'dart') else 'dart'
+    execPath = @getExecPath 'dart'
     @whenDartSdkFound =>
       process = spawn execPath, ['--version']
       exitCode = -1;
@@ -64,16 +68,9 @@ class Utils
     # Why is process null??
     process = window.process unless process
     if process
-      sdkPath = @dartSdkPath()
-      whereCmd = if process.platform == 'win32' then 'where' else 'which'
-      if sdkPath
-        execPath = path.join(sdkPath, 'bin', 'dart')
-        process = spawn whereCmd, [execPath]
+      execPath = @getExecPath 'dart'
+      process = spawn execPath, ['--version']
 
-        process.on 'exit', (code) =>
-          if code == 0
-            fxn()
-          else
-            atom.workspace.emit 'dart-tools:cannot-find-sdk', @dartSdkInfo()
-      else
-        atom.workspace.emit 'dart-tools:cannot-find-sdk', @dartSdkInfo()
+      process.on 'exit', (code) =>
+        if code == 0
+          fxn()
