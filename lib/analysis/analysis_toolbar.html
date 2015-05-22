@@ -2,12 +2,12 @@
   <div class="container" style="padding-left: 12.5px; padding-right: 12.5px">
     <h6>Dart Tools</h6>
     <div class='status'>
-      <span rv-unless="it.hasProblems < errorCount warningCount">
+      <span rv-unless="it.problemCount">
         <i class="icon-check"></i> Everything is A OK!
       </span>
-      <span rv-if="it.hasProblems < errorCount warningCount">
+      <span rv-if="it.problemCount">
         <a class="text-warning" rv-on-click="it.showProblems">
-          <span rv-text="it.errorCount" class=""> </span> issues
+          <span rv-text="it.problemCount" class=""> </span> issues
         </a>
       </span>
     </div>

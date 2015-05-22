@@ -23,7 +23,7 @@
     "envify": "~1.2.1",
     "event-kit": "^1.1.0",
     "fuzzaldrin": "^2.1.0",
-    "lodash": "~2.4.1",
+    "lodash": "~3.9.0",
     "pathwatcher": "4.4.0",
     "q": "^1.0.1",
     "react-atom-fork": "~0.10.0",
