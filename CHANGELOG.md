@@ -2,6 +2,7 @@
 
 Features:
   * Better Pub output styling by @devoncarew
+  * Pub Upgrade support by @devoncarew
   * Now supports multiple Dart projects in a single Atom workspace
 
 Bugfixes:
