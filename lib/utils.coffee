@@ -56,13 +56,9 @@ class Utils
     @getDartProjectPaths() != null
 
   @getDartProjectPaths: =>
-    _(atom.project.getDirectories())
-      .where (dir) ->
-        pubspecFile = dir.getFile('pubspec.yaml')
-        packagesFile = dir.getFile('.packages')
-        pubspecFile.existsSync() || packagesFile.existsSync()
-      .map (dir) -> dir.path
-      .value()
+    filter = (dir) ->
+      dir.getFile('pubspec.yaml').existsSync() || dir.getFile('.packages').existsSync()
+    (dir for dir in atom.project.getDirectories() when filter(dir)).map((d) => d.path)
 
   @isDartFile: (filename = '') =>
     path.extname(filename) == '.dart'
