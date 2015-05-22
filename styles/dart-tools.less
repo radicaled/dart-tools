@@ -30,7 +30,11 @@
   &.dart-analysis-error {
     color: @text-color-error
   }
+}
 
+.pub-status .panel-body {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 html /deep/ * {
@@ -69,7 +73,6 @@ html /deep/ #analysis-toolbar {
       }
     }
 }
-
 
 atom-text-editor::shadow {
   .dart-analysis-info {
