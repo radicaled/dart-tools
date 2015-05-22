@@ -1,8 +1,10 @@
 # 0.9.10
 
-Features
+Features:
+  Added "pub upgrade" thanks to @devoncarew
 
-Added "pub upgrade" thanks to @devoncarew
+Bugfixes:
+  Problem View: clicking on a line item now takes you to that location again
 
 Errata:
 
