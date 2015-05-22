@@ -16,6 +16,8 @@ class PubComponent
 
     atom.commands.add 'atom-workspace', 'dart-tools:pub-get', =>
       @get()
+    atom.commands.add 'atom-workspace', 'dart-tools:pub-upgrade', =>
+      @upgrade()
 
   run: (args) =>
     process = @dartTools.runPubCommand('pub', args)
@@ -33,6 +35,12 @@ class PubComponent
       @emitter.emit 'pub-start',
         title: 'Pub Get'
       @run 'get'
+
+  upgrade: =>
+    @dartTools.withSdk =>
+      @emitter.emit 'pub-start',
+        title: 'Pub Upgrade'
+      @run 'upgrade'
 
   observePubspec: =>
     return unless Utils.isDartProject()
