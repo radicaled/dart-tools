@@ -1,3 +1,16 @@
+# 0.9.10
+
+Features
+
+Added "pub upgrade" thanks to @devoncarew
+
+Errata:
+
+Some awesome styling changes thanks to @devoncarew
+  The toolbar now has a cleaner look
+  The SDK info dialog now has a cleaner look
+  The Pub dialog how has a cleaner look
+
 ## 0.9.9
 
 Bugfixes: manually invoking the formatter no longer raises an error.
