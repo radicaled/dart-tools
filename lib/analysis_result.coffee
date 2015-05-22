@@ -15,4 +15,4 @@ class AnalysisResult
     result.column   = parseInt segments[5]
     result.length   = parseInt segments[6]
     result.desc     = segments[7]
-    return result    
+    return result

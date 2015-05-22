@@ -13,8 +13,8 @@ module.exports =
     #   type: 'boolean'
     #   default: false
     formatOnSave:
-        type: 'boolean'
-        default: true
+      type: 'boolean'
+      default: true
     dartSdkLocation:
       type: 'string'
       default: ''

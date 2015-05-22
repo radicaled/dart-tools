@@ -70,7 +70,7 @@ class ProblemViewElement extends HTMLElement
     "Dart: Problems"
 
   navigateToProblem: (event) =>
-    target = event.currentTarget;
+    target = event.currentTarget
     file = target.getAttribute('data-file')
     line = target.getAttribute('data-line') - 1
     col  = target.getAttribute('data-col') - 1
