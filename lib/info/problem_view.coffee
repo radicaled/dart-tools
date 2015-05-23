@@ -7,7 +7,7 @@ class ProblemView
   @uri: 'dart-tools://problem-view'
 
   @isRegistered: (tagName) =>
-    document.createElement(tagName).constructor != HTMLElement
+    document.createElement(tagName).constructor isnt HTMLElement
 
   @register: (@errors) =>
     # Github issue #26: somehow module is being reloaded,
@@ -28,7 +28,7 @@ class ProblemView
         return
 
       return unless protocol is 'dart-tools:'
-      return unless host == 'problem-view'
+      return unless host is 'problem-view'
 
       view = new pve()
       view.initialize(@errors)

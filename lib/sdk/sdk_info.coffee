@@ -6,8 +6,8 @@ class SdkInfo
     @view = new View()
 
   showInfo: (sdkInfo) =>
-    @view.sdkPath = sdkInfo.sdkPath || '(null)'
-    @view.sdkVersion = sdkInfo.version || '(null)'
+    @view.sdkPath = sdkInfo.sdkPath or '(null)'
+    @view.sdkVersion = sdkInfo.version or '(null)'
     @view.show()
 
 class View
