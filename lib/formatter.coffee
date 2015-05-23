@@ -17,7 +17,7 @@ class Formatter
     #     @editorSubscriptions.dispose()
 
     @subscriptions.add atom.config.observe 'dart-tools.formatOnSave', (newValue) =>
-      if newValue == true
+      if newValue is true
         @editorSubscriptions.add atom.workspace.observeTextEditors @formatOnSave
       else
         @editorSubscriptions.dispose()
@@ -32,17 +32,17 @@ class Formatter
       editor.setTextInBufferRange([start, end], edit.replacement)
 
   updateCaretPosition: (editor, offset, length) =>
-    return unless atom.workspace.getActiveTextEditor().id == editor.id
+    return unless atom.workspace.getActiveTextEditor().id is editor.id
 
     # HACK: analysis server is returning null for offset, length
-    unless offset && length
+    unless offset and length
       start = editor.buffer.positionForCharacterIndex(offset)
       end   = editor.buffer.positionForCharacterIndex(offset + length)
 
       editor.setSelectedBufferRange([start, end])
 
   signalError: (error) =>
-    return if error.code == 'SERVER_ERROR'
+    return if error.code is 'SERVER_ERROR'
     # please when don't you have an error son
     detail = error.message
     atom.notifications.addWarning "Failed to autoformat current document!",

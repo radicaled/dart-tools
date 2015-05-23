@@ -12,7 +12,7 @@ class Utils
     isWin = /^win/.test(process.platform)
     return cmd unless isWin
     windowsCmd = @windowsCmdMap[cmd]
-    return windowsCmd || cmd
+    return windowsCmd or cmd
 
   @getExecPath: (cmd) =>
     sdkPath = @dartSdkPath()
@@ -24,8 +24,8 @@ class Utils
     fxn(editor) if editor
 
   @dartSdkPath: =>
-    atom.config.get 'dart-tools.dartSdkLocation' ||
-      process.env.DART_SDK ||
+    atom.config.get 'dart-tools.dartSdkLocation' or
+      process.env.DART_SDK or
       ''
 
   @dartSdkInfo: (fxn) =>
@@ -53,15 +53,15 @@ class Utils
     fxn() if @isDartProject()
 
   @isDartProject: =>
-    @getDartProjectPaths() != null
+    @getDartProjectPaths() isnt null
 
   @getDartProjectPaths: =>
     filter = (dir) ->
-      dir.getFile('pubspec.yaml').existsSync() || dir.getFile('.packages').existsSync()
+      dir.getFile('pubspec.yaml').existsSync() or dir.getFile('.packages').existsSync()
     (dir for dir in atom.project.getDirectories() when filter(dir)).map((d) => d.path)
 
   @isDartFile: (filename = '') =>
-    path.extname(filename) == '.dart'
+    path.extname(filename) is '.dart'
 
   @isCompatible: (editor) =>
     # We only support pure Dart files for now
@@ -75,5 +75,5 @@ class Utils
       process = spawn execPath, ['--version']
 
       process.on 'exit', (code) =>
-        if code == 0
+        if code is 0
           fxn()

@@ -44,21 +44,21 @@ AutoCompletePlusProvider =
             # Side-step the analzyer's sad, sad relevance scores.
             # Both "XmlDocument" and "XmlName" have the same relevance score
             # for the fragment "XmlDocumen"
-            if prefix != "."
+            if prefix isnt "."
               sortedResults = filter(results, prefix, {key: 'completion'})
 
             for result in sortedResults
               items.push
                 text: result.completion
                 leftLabel: result.returnType
-                rightLabel: result.element?.kind || result.kind
+                rightLabel: result.element?.kind or result.kind
                 type: @mapType(result)
 
             resolve(items)
 
   mapType: (result) ->
-    kind = (result.element?.kind || result.kind || '').toLowerCase()
-    @typeMap[kind] || kind
+    kind = (result.element?.kind or result.kind or '').toLowerCase()
+    @typeMap[kind] or kind
 
   # (optional): called _after_ the suggestion `replacementPrefix` is replaced
   # by the suggestion `text` in the buffer
