@@ -29,7 +29,7 @@
     "level": "error"
   },
   "no_unnecessary_fat_arrows": {
-    "comment": "Changed from the Atom standard coffeelint file",
+    "comment": "Changed from the Atom standard coffeelint file (was error)",
     "level": "ignore"
   }
 }
