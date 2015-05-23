@@ -13,8 +13,8 @@ class DartExplorerComponent
       catch error
         return
 
-      return unless protocol == 'dart-tools:'
-      return unless host == 'dart_explorer'
+      return unless protocol is 'dart-tools:'
+      return unless host is 'dart_explorer'
 
       DartExplorerView = require './dart_explorer_view'
       new DartExplorerView(atom.project, @analysisComponent.analysisAPI)

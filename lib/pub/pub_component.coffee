@@ -89,7 +89,7 @@ class PubComponent
   # Code to prevent multiple pub processes on the same file
 
   isRunning: (pubspecPath) =>
-    @runningProcesses[pubspecPath] == true
+    @runningProcesses[pubspecPath] is true
 
   markAsRunning: (pubspecPath) =>
     @runningProcesses[pubspecPath] = true

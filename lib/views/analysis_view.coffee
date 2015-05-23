@@ -25,7 +25,7 @@ class AnalysisView extends View
       @updateState()
 
     atom.commands.add 'atom-workspace', 'dart-tools:refresh', (fullPath) =>
-      _.remove @items, (item) => item.location.file == fullPath
+      _.remove @items, (item) => item.location.file is fullPath
       @updateState()
     this
 
@@ -37,7 +37,7 @@ class AnalysisView extends View
   updateState: ->
     panel = @find('.dart-tools-analysis-tool-panel')
     panel.html('')
-    if @items.length == 0
+    if @items.length is 0
       panel.append(new LennyRow())
     else
       panel.append(new AnalysisResultRow(analysisResult: item)) for item in @items
