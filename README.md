@@ -1,5 +1,7 @@
 # dart-tools package
 
+[![Build Status](https://travis-ci.org/radicaled/dart-tools.svg?branch=master)][travis]
+
 Various tools for Dart support in Atom.
 
 **NOTE**: somewhat alpha quality
@@ -29,15 +31,18 @@ Notes
 
 Formatting will save the current editor buffer first.
 
-**Linting requires you to set your dart-sdk location.** You can do from
-Settings View: Open -> Filter Packages -> Dart Tools.
+**Linting requires you to set your dart-sdk location.** You can do that from
+`Settings View: Open` -> `Filter Packages` -> `Dart Tools`.
 
 Linting will not be performed until you have run `pub get` at least once.
 
-Performance: `dart-tools` doesn't handle a large number of errors very well -- around 300 errors starts slowing things down. Take care with your refactoring until this is resolved!
-
+Performance: `dart-tools` doesn't handle a large number of errors very well -
+around 300 errors starts slowing things down. Take care with your refactoring
+until this is resolved!
 
 Credits
 =======
 
 dart.cson taken from https://github.com/Daegalus/atom-language-dart (dead?) and modified.
+
+[travis]: https://travis-ci.org/radicaled/dart-tools
