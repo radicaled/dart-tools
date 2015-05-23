@@ -47,7 +47,9 @@ class AnalysisServer
             After #{@FAILURE_HARD_STOP} tries within #{@FAILURE_HARD_STOP_TIMEOUT * 1000} seconds,
             the analysis server failed to start.
           "
-          atom.notifications.addError("[dart-tools] The analysis server failed to start after several tries.", detail: detail)
+          atom.notifications.addError(
+            "[dart-tools] The analysis server failed to start after several tries.",
+            detail: detail)
 
       # Set analysis root.
       @setAnalysisRoots analysisRoots
