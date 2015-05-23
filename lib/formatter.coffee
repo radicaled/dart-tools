@@ -77,7 +77,7 @@ class Formatter
     @editorSubscriptions.add editor.onDidSave =>
       return if formatting
       formatting = true
-      @formatEditor(editor).then () =>
+      @formatEditor(editor).then =>
         editor.save()
         formatting = false
 

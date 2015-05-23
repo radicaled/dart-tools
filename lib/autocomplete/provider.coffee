@@ -45,7 +45,7 @@ AutoCompletePlusProvider =
             # Both "XmlDocument" and "XmlName" have the same relevance score
             # for the fragment "XmlDocumen"
             if prefix != "."
-              sortedResults = filter(results, prefix, { key: 'completion'})
+              sortedResults = filter(results, prefix, {key: 'completion'})
 
             for result in sortedResults
               items.push

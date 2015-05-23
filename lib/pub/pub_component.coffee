@@ -8,7 +8,7 @@ Utils = require '../utils'
 PubStatusView = require './pub_status_view'
 
 class PubComponent
-  constructor: () ->
+  constructor: ->
     @emitter = new Emitter
     @pubStatusView = new PubStatusView(this)
     @watchers = []
