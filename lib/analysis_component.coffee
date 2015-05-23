@@ -36,7 +36,7 @@ class AnalysisComponent
     @cleanup()
 
   checkFile: (fullPath) =>
-    if extname(fullPath) == '.dart'
+    if extname(fullPath) is '.dart'
       @analysisServer.check(fullPath)
 
   cleanup: =>

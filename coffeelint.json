@@ -14,9 +14,6 @@
   "no_debugger": {
     "level": "error"
   },
-  "prefer_english_operator": {
-    "level": "error"
-  },
   "colon_assignment_spacing": {
     "spacing": {
       "left": 0,
@@ -28,8 +25,14 @@
     "spaces": 0,
     "level": "error"
   },
+
+
   "no_unnecessary_fat_arrows": {
     "comment": "Changed from the Atom standard coffeelint file (was error)",
     "level": "ignore"
+  },
+  "prefer_english_operator": {
+    "comment": "Changed from the Atom standard coffeelint file (was error)",
+    "level": "warn"
   }
 }

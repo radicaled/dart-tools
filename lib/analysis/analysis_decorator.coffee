@@ -31,7 +31,7 @@ class AnalysisDecorator
       line      = location.startLine - 1
       column    = location.startColumn - 1
       css       = "dart-analysis-#{category}"
-      marker   = editor.markBufferRange [
+      marker    = editor.markBufferRange [
         [line, column],
         [line, column + location.length]
       ]
@@ -49,7 +49,7 @@ class AnalysisDecorator
   handleErrors: ({file, errors, added, removed}) =>
     for editor in atom.workspace.getTextEditors()
       fullPath = editor.getPath()
-      if fullPath == file
+      if fullPath is file
         @clearMarkers(editor, removed)
         @decorateEditor(editor, added)
         return
