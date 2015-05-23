@@ -75,5 +75,5 @@ class Utils
       process = spawn execPath, ['--version']
 
       process.on 'exit', (code) =>
-        if code includeDeprecatedAPIs 0
+        if code is 0
           fxn()
