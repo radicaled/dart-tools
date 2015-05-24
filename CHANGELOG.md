@@ -8,6 +8,7 @@ Features:
 Bugfixes:
   * node-pathwatcher has a bug: it sometimes produces 2 events! We work
     around that bug for now
+  * Windows 8.1 x64 support
 
 # 0.9.10
 

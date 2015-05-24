@@ -3,7 +3,7 @@
 _ = require 'lodash'
 path  = require 'path'
 spawn = require('child_process').spawn
-PathWatcher = require('pathwatcher')
+fs = require('fs')
 Utils = require '../utils'
 PubStatusView = require './pub_status_view'
 
@@ -78,10 +78,9 @@ class PubComponent
         return
       if atom.config.get 'dart-tools.pubGetOnSave'
         @get()
-    # See https://github.com/atom/node-pathwatcher/issues/50
-    # We'll debounce to drop the duplicate event
-    PathWatcher.watch pubspecPath, _.debounce runPubGet, 200,
-      maxWait: 400
+    # We'll debounce to drop any duplicate events
+    # Unfortunately fs.watch has the same problem as pathwatcher.
+    fs.watch pubspecPath, _.debounce(runPubGet, 3000, leading: true, trailing: false)
 
   pubRunningNotification: (pubspecPath) =>
     atom.notifications.addInfo 'Pub is already running, wait a second!'
