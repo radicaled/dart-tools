@@ -52,6 +52,3 @@ class AnalysisComponent
     # Naively assuming that analysis_server will ensure that the project paths
     # have changed before invalidating everything...
     @analysisServer.setAnalysisRoots dartProjectPaths
-
-  showProblems: =>
-    console.log 'showing problems'
