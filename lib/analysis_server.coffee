@@ -8,11 +8,8 @@ Q = require 'q'
 
 module.exports =
 class AnalysisServer
-  FAILURE_HARD_STOP: 3
-  FAILURE_HARD_STOP_TIMEOUT: 30
   id: 1
   promiseMap = {}
-  serverFailureCount: 0
   writable: false
 
   constructor: ->
@@ -35,21 +32,6 @@ class AnalysisServer
       @process.stdout.pipe(StreamSplitter("\n")).on 'token', @processMessage
       @process.on 'exit', =>
         @writable = false
-        @serverFailureCount += 1
-
-        setTimeout (=> @serverFailureCount = 0), @FAILURE_HARD_STOP_TIMEOUT * 1000
-
-
-        if @serverFailureCount < @FAILURE_HARD_STOP
-          @start()
-        else
-          detail = "
-            After #{@FAILURE_HARD_STOP} tries within #{@FAILURE_HARD_STOP_TIMEOUT * 1000} seconds,
-            the analysis server failed to start.
-          "
-          atom.notifications.addError(
-            "[dart-tools] The analysis server failed to start after several tries.",
-            detail: detail)
 
       # Set analysis root.
       @setAnalysisRoots analysisRoots
