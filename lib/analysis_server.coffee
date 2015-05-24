@@ -8,12 +8,10 @@ Q = require 'q'
 
 module.exports =
 class AnalysisServer
-  FAILURE_HARD_STOP: 3
-  FAILURE_HARD_STOP_TIMEOUT: 30
   id: 1
   promiseMap = {}
-  serverFailureCount: 0
-  writable: false
+  isRunning: false
+  currentAnalysisRoots: new Set()
 
   constructor: ->
     @emitter = new Emitter()
@@ -31,25 +29,10 @@ class AnalysisServer
     cmd = Utils.getExecPath 'dart'
     Utils.whenDartSdkFound =>
       @process = spawn cmd, args
-      @writable = true
+      @isRunning = true
       @process.stdout.pipe(StreamSplitter("\n")).on 'token', @processMessage
       @process.on 'exit', =>
-        @writable = false
-        @serverFailureCount += 1
-
-        setTimeout (=> @serverFailureCount = 0), @FAILURE_HARD_STOP_TIMEOUT * 1000
-
-
-        if @serverFailureCount < @FAILURE_HARD_STOP
-          @start()
-        else
-          detail = "
-            After #{@FAILURE_HARD_STOP} tries within #{@FAILURE_HARD_STOP_TIMEOUT * 1000} seconds,
-            the analysis server failed to start.
-          "
-          atom.notifications.addError(
-            "[dart-tools] The analysis server failed to start after several tries.",
-            detail: detail)
+        @isRunning = false
 
       # Set analysis root.
       @setAnalysisRoots analysisRoots
@@ -57,21 +40,11 @@ class AnalysisServer
   stop: =>
     @process?.close()
 
-  # Not sure this method is needed, but adding for
-  # compatibility
-  check: (fullPath) =>
-    @emit 'refresh', fullPath
-    @sendMessage
-      method: "analysis.reanalyze"
-      params:
-        file: fullPath
-
-
   sendMessage: (obj) =>
+    return unless @isRunning
     obj.id ||= "dart-tools-#{(@id++)}"
     msg = JSON.stringify(obj)
-    if @writable
-      @process?.stdin?.write(msg + "\n")
+    @process.stdin.write(msg + "\n")
 
     deferred = Q.defer()
     promiseMap[obj.id] = deferred
@@ -108,6 +81,7 @@ class AnalysisServer
       callback(obj.event, obj)
 
   setAnalysisRoots: (paths) =>
+    @currentAnalysisRoots = new Set(paths)
     @sendMessage
       method: "analysis.setAnalysisRoots"
       params:

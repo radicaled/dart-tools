@@ -1,33 +1,53 @@
 {CompositeDisposable} = require 'atom'
 Utils = require './utils'
 AutoCompletePlusProvider = require './autocomplete/provider'
+_ = require 'lodash'
 
-module.exports =
+class DartTools
+  subscriptions: new CompositeDisposable()
+  hasBooted: false
 
-  # Wizardry
-  config:
-    pubGetOnSave:
-      type: 'boolean'
-      default: true
-    # automaticFormat:
-    #   type: 'boolean'
-    #   default: false
-    formatOnSave:
-      type: 'boolean'
-      default: true
-    dartSdkLocation:
-      type: 'string'
-      default: ''
+  constructor: ->
+    AnalysisComponent = require './analysis_component'
+    @analysisComponent = new AnalysisComponent()
+    @analysisApi = @analysisComponent.analysisAPI
 
-  # Provider for `autocomplete-plus`
-  provideAutocompleter: ->
-    AutoCompletePlusProvider
+  waitForDartSources: =>
+    analysisServer = @analysisComponent.analysisServer
+    # Trigger analysis server if we're in a plain-jane Dart project
+    @subscriptions.add atom.workspace.observeTextEditors (editor) =>
+      enableAnalyzer = (editor) =>
+        return unless Utils.canAnalyze(editor)
 
+        projectPath = Utils.findProjectRootInAtom(editor.getPath())
+        roots = @analysisComponent.analysisServer.currentAnalysisRoots
+
+        array = []
+        perform = =>
+          analysisServer.setAnalysisRoots array
+
+        return if roots.has(projectPath)
+
+        roots.add(projectPath)
+        roots.forEach (e) => array.push(e)
+
+        if analysisServer.isRunning
+          perform()
+        else
+          sub = @analysisApi.on 'server.connected', =>
+            perform()
+            sub.dispose()
+        @boot()
+
+      editor.onDidChangePath (path) =>
+        enableAnalyzer(editor)
+
+      enableAnalyzer(editor)
 
   # TODO: becoming massive, refactor.
-  activate: (state) ->
-    @subscriptions = new CompositeDisposable()
-    return unless Utils.isDartProject()
+  boot: =>
+    return if @hasBooted
+    @hasBooted = true
 
     # HACK: for some reason Atom is saving every dart-tools marker
     # This code flushes all pre-existing markers...
@@ -36,9 +56,6 @@ module.exports =
         isDartMarker: true
       marker.destroy() for marker in markers
 
-    # Status updates for analysis server
-
-    AnalysisComponent = require './analysis_component'
     Formatter = require './formatter'
     PubComponent = require './pub/pub_component'
     DartExplorerComponent = require './dart_explorer/dart_explorer_component'
@@ -48,9 +65,6 @@ module.exports =
     AnalysisDecorator = require './analysis/analysis_decorator'
     QuickInfoView = require './info/quick_info_view'
     ProblemView = require './info/problem_view'
-
-    @analysisComponent = new AnalysisComponent()
-    @analysisApi = @analysisComponent.analysisAPI
 
     @errorRepository = new ErrorRepository(@analysisApi)
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
@@ -97,8 +111,40 @@ module.exports =
 
     atom.commands.add 'atom-workspace', 'dart-tools:toggle-analysis-view'
 
-  deactivate: ->
+  dispose: =>
     @subscriptions?.dispose()
     @analysisComponent?.disable()
     @analysisDecorator?.dispose()
     @quickInfoView?.dispose()
+
+# TODO: move this out into "init.coffee" or "main.coffee"
+module.exports =
+
+  # Wizardry
+  config:
+    pubGetOnSave:
+      type: 'boolean'
+      default: true
+    # automaticFormat:
+    #   type: 'boolean'
+    #   default: false
+    formatOnSave:
+      type: 'boolean'
+      default: true
+    dartSdkLocation:
+      type: 'string'
+      default: ''
+
+  # Provider for `autocomplete-plus`
+  provideAutocompleter: ->
+    AutoCompletePlusProvider
+
+  activate: (state) ->
+    @dartTools = new DartTools()
+    @dartTools.waitForDartSources()
+
+    return unless Utils.isDartProject()
+    @dartTools.boot()
+
+  deactivate: ->
+    @dartTools.dispose()
