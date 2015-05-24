@@ -117,6 +117,7 @@ class DartTools
     @analysisDecorator?.dispose()
     @quickInfoView?.dispose()
 
+# TODO: move this out into "init.coffee" or "main.coffee"
 module.exports =
 
   # Wizardry
