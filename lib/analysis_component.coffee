@@ -35,10 +35,6 @@ class AnalysisComponent
   disable: =>
     @cleanup()
 
-  checkFile: (fullPath) =>
-    if extname(fullPath) is '.dart'
-      @analysisServer.check(fullPath)
-
   cleanup: =>
     subscription.dispose() for subscription in @subscriptions
     @subscriptions = []

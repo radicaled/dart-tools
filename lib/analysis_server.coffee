@@ -39,16 +39,6 @@ class AnalysisServer
   stop: =>
     @process?.close()
 
-  # Not sure this method is needed, but adding for
-  # compatibility
-  check: (fullPath) =>
-    @emit 'refresh', fullPath
-    @sendMessage
-      method: "analysis.reanalyze"
-      params:
-        file: fullPath
-
-
   sendMessage: (obj) =>
     obj.id ||= "dart-tools-#{(@id++)}"
     msg = JSON.stringify(obj)
