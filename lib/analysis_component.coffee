@@ -17,18 +17,17 @@ class AnalysisComponent
 
   constructor: ->
     @emitter = new Emitter()
-
-  enable: =>
-    return unless Utils.isDartProject()
-
-    dartProjectPaths = Utils.getDartProjectPaths()
     @analysisServer = new AnalysisServer()
     @analysisAPI.analysisServer = @analysisServer
+
+  enable: =>
+    dartProjectPaths = Utils.getDartProjectPaths()
+
     @analysisServer.start dartProjectPaths
 
     @subscriptions.push atom.project.onDidChangePaths @handleProjectPaths
 
-    atom.workspace.observeTextEditors (editor) =>
+    @subscriptions.push atom.workspace.observeTextEditors (editor) =>
       buc = new BufferUpdateComponent(editor, @analysisAPI)
       editor.onDidDestroy => buc.destroy()
 

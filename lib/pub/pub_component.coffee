@@ -60,15 +60,17 @@ class PubComponent
 
   get: =>
     Utils.dartSdkInfo =>
-      @emitter.emit 'pub-start',
-        title: 'Pub Get'
-      @run 'get'
+      @whenPubspecPresent =>
+        @emitter.emit 'pub-start',
+          title: 'Pub Get'
+        @run 'get'
 
   upgrade: =>
     Utils.dartSdkInfo =>
-      @emitter.emit 'pub-start',
-        title: 'Pub Upgrade'
-      @run 'upgrade'
+      @whenPubspecPresent =>
+        @emitter.emit 'pub-start',
+          title: 'Pub Upgrade'
+        @run 'upgrade'
 
   observePubspec: (pubspecRoot) =>
     pubspecPath = path.join pubspecRoot, 'pubspec.yaml'
@@ -95,6 +97,15 @@ class PubComponent
 
   markAsStopped: (pubspecPath) =>
     delete @runningProcesses[pubspecPath]
+
+  # Helpers
+
+  whenPubspecPresent: (callback) =>
+    return unless Utils.getDartProjectPaths().length > 0
+    pubspecRoot = Utils.getDartProjectPaths()[0]
+    pubspecPath = path.join pubspecRoot, 'pubspec.yaml'
+    return unless fs.existsSync(pubspecPath)
+    callback()
 
   # Events
 

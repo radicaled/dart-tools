@@ -11,6 +11,7 @@ class AnalysisServer
   id: 1
   promiseMap = {}
   isRunning: false
+  currentAnalysisRoots: new Set()
 
   constructor: ->
     @emitter = new Emitter()
@@ -80,6 +81,7 @@ class AnalysisServer
       callback(obj.event, obj)
 
   setAnalysisRoots: (paths) =>
+    @currentAnalysisRoots = new Set(paths)
     @sendMessage
       method: "analysis.setAnalysisRoots"
       params:

@@ -53,7 +53,7 @@ class Utils
     fxn() if @isDartProject()
 
   @isDartProject: =>
-    @getDartProjectPaths() isnt null
+    @getDartProjectPaths().length > 0
 
   @getDartProjectPaths: =>
     filter = (dir) ->
@@ -66,6 +66,17 @@ class Utils
   @isCompatible: (editor) =>
     # We only support pure Dart files for now
     @isDartFile editor.getPath()
+
+  @findProjectRootInAtom: (path) =>
+    directories = atom.project.getDirectories()
+    dir = _.find(directories, (d) => d.contains(path))
+    dir?.getPath()
+
+  @canAnalyze: (editor) =>
+    filename = editor.getPath()
+    projectPath = @findProjectRootInAtom(filename)
+
+    @isCompatible(editor) && projectPath
 
   @whenDartSdkFound: (fxn) =>
     # Why is process null??
