@@ -1,3 +1,8 @@
+# 0.9.12
+
+Features:
+  * Now supports analyzing plain jane Dart files when possible.
+
 # 0.9.11
 
 Features:
