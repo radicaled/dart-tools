@@ -1,7 +1,7 @@
 {
   "name": "dart-tools",
   "main": "./lib/dart-tools",
-  "version": "0.9.10",
+  "version": "0.9.11",
   "description": "Dart Tooling for Atom",
   "repository": "https://github.com/radicaled/dart-tools",
   "license": "MIT",
