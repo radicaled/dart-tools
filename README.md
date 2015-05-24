@@ -34,7 +34,9 @@ Formatting will save the current editor buffer first.
 **Linting requires you to set your dart-sdk location.** You can do that from
 `Settings View: Open` -> `Filter Packages` -> `Dart Tools`.
 
-Linting will not be performed until you have run `pub get` at least once.
+If you have a `pubspec.yaml` file or `.packages` path in your project, linting
+will begin immediately. If not, linting will begin once you open a Dart file
+that exists within your current project scope.
 
 Performance: `dart-tools` doesn't handle a large number of errors very well -
 around 300 errors starts slowing things down. Take care with your refactoring
