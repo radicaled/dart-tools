@@ -7,6 +7,7 @@ notifications:
 
 script:
   - npm install coffeelint
+  - export PATH=$PATH:./node_modules/.bin
   - coffeelint .
   - 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
 
