@@ -10,7 +10,7 @@ module.exports =
 class AnalysisServer
   id: 1
   promiseMap = {}
-  writable: false
+  isRunning: false
 
   constructor: ->
     @emitter = new Emitter()
@@ -28,10 +28,10 @@ class AnalysisServer
     cmd = Utils.getExecPath 'dart'
     Utils.whenDartSdkFound =>
       @process = spawn cmd, args
-      @writable = true
+      @isRunning = true
       @process.stdout.pipe(StreamSplitter("\n")).on 'token', @processMessage
       @process.on 'exit', =>
-        @writable = false
+        @isRunning = false
 
       # Set analysis root.
       @setAnalysisRoots analysisRoots
@@ -42,7 +42,7 @@ class AnalysisServer
   sendMessage: (obj) =>
     obj.id ||= "dart-tools-#{(@id++)}"
     msg = JSON.stringify(obj)
-    if @writable
+    if @isRunning
       @process?.stdin?.write(msg + "\n")
 
     deferred = Q.defer()
