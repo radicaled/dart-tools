@@ -49,10 +49,13 @@ class Formatter
       detail: detail
     return
 
+  # Returns a Promise that resolves to true or false.
+  # true: editor was formatted
+  # false: editor was not formatted
   formatEditor: (editor) =>
     descriptors = editor.getRootScopeDescriptor()
     # We only support pure Dart files for now
-    return Promise.resolve() unless Utils.isCompatible(editor)
+    return Promise.resolve(false) unless Utils.isCompatible(editor)
     path = editor.getPath()
     bufferRange = editor.getSelectedBufferRange()
     offset = editor.buffer.characterIndexForPosition(bufferRange.start)
@@ -69,6 +72,7 @@ class Formatter
 
       @applyEdits(editor, result.edits)
       @updateCaretPosition(editor, result.selectionOffset, result.selectionLength)
+      true
 
   # Event Handlers
 
@@ -77,8 +81,8 @@ class Formatter
     @editorSubscriptions.add editor.onDidSave =>
       return if formatting
       formatting = true
-      @formatEditor(editor).then =>
-        editor.save()
+      @formatEditor(editor).then (didFormat) =>
+        editor.save() if didFormat
         formatting = false
 
 
