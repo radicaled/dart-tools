@@ -44,9 +44,6 @@ class DartTools
 
       enableAnalyzer(editor)
 
-    return unless Utils.isDartProject()
-    @boot()
-
   # TODO: becoming massive, refactor.
   boot: =>
     return if @hasBooted
