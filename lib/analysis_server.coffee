@@ -40,10 +40,10 @@ class AnalysisServer
     @process?.close()
 
   sendMessage: (obj) =>
+    return unless @isRunning
     obj.id ||= "dart-tools-#{(@id++)}"
     msg = JSON.stringify(obj)
-    if @isRunning
-      @process?.stdin?.write(msg + "\n")
+    @process.stdin.write(msg + "\n")
 
     deferred = Q.defer()
     promiseMap[obj.id] = deferred
