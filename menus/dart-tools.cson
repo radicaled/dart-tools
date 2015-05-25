@@ -4,8 +4,7 @@
   'submenu': [
     'label': 'Dart Tools'
     'submenu': [
-      'label': 'Analyze File'
-      'command': 'dart-tools:analyze-file'
+      {'label': 'SDK Info', 'command': 'dart-tools:sdk-info'}
     ]
   ]
 ]

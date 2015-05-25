@@ -1,6 +1,7 @@
 {CompositeDisposable} = require 'atom'
 _ = require 'lodash'
 
+# Class to add underline decorations and gutter bullets for analysis errors.
 class AnalysisDecorator
   constructor: (@errors) ->
     @subscriptions = new CompositeDisposable()

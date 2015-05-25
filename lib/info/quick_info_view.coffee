@@ -3,6 +3,8 @@ rivets = require 'rivets'
 Template = require '../templates/template'
 _ = require 'lodash'
 
+# Display one (or a few) problems in a panel at the botto of the screen. This is
+# used to show the problems for the currently selected line in the editor.
 class QuickInfoView
   constructor: ->
     @subscriptions = new CompositeDisposable()

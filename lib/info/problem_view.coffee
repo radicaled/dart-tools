@@ -3,6 +3,7 @@ rivets = require 'rivets'
 _ = require 'lodash'
 Template = require '../templates/template'
 
+# Display all the issues for the workspace in a new editor ("Dart: Problems").
 class ProblemView
   @uri: 'dart-tools://problem-view'
 

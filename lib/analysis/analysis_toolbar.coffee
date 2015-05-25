@@ -2,6 +2,8 @@ _ = require 'lodash'
 rivets = require 'rivets'
 Template = require '../templates/template'
 
+# A class to display the errors summary for the workspace
+# ("Dart Tools 91 issues"). Shown above the status line.
 class AnalysisToolbar
   @infoTypes = [
     'HINT',

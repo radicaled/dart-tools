@@ -80,8 +80,6 @@ class DartTools
     AutoCompletePlusProvider.analysisApi = @analysisApi
     # @dartExplorerComponent.enable()
 
-
-
     # Status updates for analysis server
     @analysisApi.on 'server.connected', =>
       success = '[dart-tools] The analysis server is now running.'
@@ -99,7 +97,6 @@ class DartTools
         detail: 'Go to Settings > Packages > Dart Tools to specify Dart SDK'
 
     # Commands
-
     atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>
       Utils.whenEditor (editor) =>
         editor.save()
