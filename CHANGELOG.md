@@ -3,6 +3,12 @@
 Features:
   * Now supports analyzing plain jane Dart files when possible.
 
+General overhaul of the errors display:
+  * add a gutter bullet decoration for dart infos, warnings, and errors
+  * show the quick error view for any markers on the line (not just the selection)
+  * change the look of the quick info view of a dart issue
+  * change the highlight decorator to better call out errors (2px underline instead of 1px dotted)
+
 # 0.9.11
 
 Features:

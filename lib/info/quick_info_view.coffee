@@ -28,8 +28,8 @@ class QuickInfoView
         @removeMarker(marker)
 
     @editorEvents.add editor.onDidChangeSelectionRange =>
-      selectedBufferRange = editor.getSelectedBufferRange()
-      markers = @findMarkersInRange(editor, selectedBufferRange)
+      range = editor.getSelectedBufferRange()
+      markers = @findMarkersOnRow(editor, range.start.row)
 
       @view.reset()
       @addMarker(marker) for marker in markers
@@ -50,9 +50,9 @@ class QuickInfoView
     if markerRange.containsRange(selectedBufferRange)
       callback(marker)
 
-  findMarkersInRange: (editor, range) =>
+  findMarkersOnRow: (editor, row) =>
     attrs =
-      containsBufferRange: range
+      startBufferRow: row
       isDartMarker: true
     markers = editor.findMarkers(attrs)
     _.where markers, (m) -> m.isValid()
@@ -78,7 +78,9 @@ class View
     atom.workspace.addBottomPanel(item: element)
     @view = rivets.bind(element, {it: this})
 
-    rivets.formatters.formattedProblem = @formattedProblem
+    rivets.binders.badge = @badge
+    rivets.formatters.formatProblemType = @formatProblemType
+    rivets.formatters.formatLocation = @formatLocation
     rivets.formatters.lowerCase = (s) -> if s then s.toLowerCase() else s
 
   addProblem: (problem) =>
@@ -91,7 +93,16 @@ class View
   reset: =>
     @problems = []
 
-  formattedProblem: (problem) ->
-    problem.message
+  formatProblemType: (str) ->
+    (str.replace new RegExp('_', 'g'), " ").toLowerCase()
+
+  formatLocation: (location) ->
+    "line #{location.startLine}, column #{location.startColumn}"
+
+  badge: (element, problem) ->
+    element.classList.remove("badge-info")
+    element.classList.remove("badge-warning")
+    element.classList.remove("badge-error")
+    element.classList.add("badge-#{problem.severity.toLowerCase()}")
 
 module.exports = QuickInfoView

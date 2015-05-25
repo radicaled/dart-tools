@@ -44,6 +44,9 @@ class AnalysisDecorator
       editor.decorateMarker marker,
         type: 'highlight',
         class: css
+      editor.decorateMarker marker,
+        type: 'line-number',
+        class: "dart-#{category}"
 
   # Event handlers
   handleErrors: ({file, errors, added, removed}) =>

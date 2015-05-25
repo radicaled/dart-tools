@@ -1,9 +1,8 @@
-// The ui-variables file is provided by base themes provided by Atom.
-//
-// See https://github.com/atom/atom-dark-ui/blob/master/stylesheets/ui-variables.less
+// The ui-variables file is provided by base themes provided by Atom. See
+// https://github.com/atom/atom-dark-ui/blob/master/stylesheets/ui-variables.less
 // for a full listing of what's available.
-@import "ui-variables";
-
+@import 'ui-variables';
+@import 'octicon-utf-codes';
 
 .dart-explorer {
   overflow: scroll;
@@ -49,48 +48,43 @@ html /deep/ * {
   }
 }
 
-
 ul.dart-tools-quick-issue-view {
   margin-bottom: 0;
 }
 
-html /deep/ #quick-info-view {
-  [data-dart-analysis] {
-    margin-bottom: 2px;
-  }
-  [data-dart-analysis] > span.badge {
-    margin-right: 10px;
-  }
+#quick-info-view .badge {
+  font-weight: normal;
+  text-shadow: none;
+  padding: 2px 6px;
 }
 
 html /deep/ #analysis-toolbar {
-    & > .container {
-      display: flex;
-      align-items: baseline;
+  & > .container {
+    display: flex;
+    align-items: baseline;
 
-      & > * {
-        margin-right: 15px;
-      }
+    & > * {
+      margin-right: 15px;
     }
+  }
 }
 
 atom-text-editor::shadow {
   .dart-analysis-info {
     .region {
-      border-bottom: 1px dotted fadeout(@text-color-info, 30%);
+      border-bottom: 2px solid @text-color-info;
     }
 
   }
   .dart-analysis-warning {
     .region {
-      border-bottom: 1px dotted fadeout(@text-color-warning, 30%);
+      border-bottom: 2px solid @text-color-warning;
     }
   }
 
-
   .dart-analysis-error {
     .region {
-      border-bottom: 1px dotted fadeout(@text-color-error, 30%);
+      border-bottom: 2px solid @text-color-error;
     }
   }
 }
@@ -108,6 +102,37 @@ dart-tools-problem-view {
 
     .line, .column {
       width: 80px;
+    }
+  }
+}
+
+// Gutter marker decorations.
+
+atom-text-editor::shadow .gutter .line-number {
+  &.dart-info .icon-right {
+    visibility: visible;
+    &:before {
+      color: @text-color-info;
+      content: @primitive-dot;
+      font-size: 1.1em;
+    }
+  }
+
+  &.dart-warning .icon-right {
+    visibility: visible;
+    &:before {
+      color: @text-color-warning;
+      content: @primitive-dot;
+      font-size: 1.1em;
+    }
+  }
+
+  &.dart-error .icon-right {
+    visibility: visible;
+    &:before {
+      color: @text-color-error;
+      content: @primitive-dot;
+      font-size: 1.1em;
     }
   }
 }
