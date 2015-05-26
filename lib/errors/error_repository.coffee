@@ -17,19 +17,19 @@ class ErrorRepository
       callback(k, v) if v.length > 0
 
   findAddedErrors: (oldErrors, newErrors) =>
-    return newErrors if oldErrors.length == 0
+    return newErrors if oldErrors.length is 0
     _.where newErrors, (ne) =>
-      !_.any oldErrors, (oe) => _.isEqual(ne, oe)
+      not _.any oldErrors, (oe) => _.isEqual(ne, oe)
 
   findRemovedErrors: (oldErrors, newErrors) =>
-    return oldErrors if newErrors.length == 0
+    return oldErrors if newErrors.length is 0
     _.where oldErrors, (oe) =>
-      !_.any newErrors, (ne) => _.isEqual(ne, oe)
+      not _.any newErrors, (ne) => _.isEqual(ne, oe)
 
   handleErrors: (data) =>
     file = data.params.file
     errors = data.params.errors
-    oldErrors = @repository[file] || []
+    oldErrors = @repository[file] or []
     @repository[file] = errors
 
     addedErrors = @findAddedErrors(oldErrors, errors)

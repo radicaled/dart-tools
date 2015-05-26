@@ -10,6 +10,7 @@ General overhaul of the errors display:
   * change the highlight decorator to better call out errors (2px underline instead of 1px dotted)
 
 Other:
+  * Remove a no longer used `dart-tools:toggle-analysis-view` command
   * Change the SDK and Pub dialogs to model dialogs
 
 # 0.9.11

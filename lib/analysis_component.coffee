@@ -1,5 +1,4 @@
 AnalysisServer = require './analysis_server'
-AnalysisView = require './views/analysis_view'
 AnalysisAPI = require './analysis_api'
 BufferUpdateComponent = require './buffer_update_component'
 Utils = require './utils'
@@ -11,7 +10,6 @@ extname = require('path').extname
 module.exports =
 class AnalysisComponent
   subscriptions: []
-  analysisView: null
   analysisServer: null
   analysisAPI: new AnalysisAPI()
 
@@ -38,11 +36,6 @@ class AnalysisComponent
     subscription.dispose() for subscription in @subscriptions
     @subscriptions = []
     @analysisServer?.stop()
-
-  createAnalysisView: =>
-    atom.packages.once 'activated', =>
-      @analysisView = new AnalysisView()
-      @analysisView.attach()
 
   # Event handlers
 
