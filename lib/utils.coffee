@@ -20,7 +20,7 @@ class Utils
     execPath = if sdkPath then path.join(sdkPath, 'bin', dartCmd) else dartCmd
 
   @whenEditor: (fxn) =>
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     fxn(editor) if editor
 
   @dartSdkPath: =>
@@ -76,7 +76,7 @@ class Utils
     filename = editor.getPath()
     projectPath = @findProjectRootInAtom(filename)
 
-    @isCompatible(editor) && projectPath
+    @isCompatible(editor) and projectPath
 
   @whenDartSdkFound: (fxn) =>
     # Why is process null??

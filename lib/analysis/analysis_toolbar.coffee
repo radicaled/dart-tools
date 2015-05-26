@@ -33,16 +33,15 @@ class AnalysisToolbar
       totalProblems += errors.length
 
       totalInfo     += _.sum errors, (p) =>
-        if AnalysisToolbar.infoTypes.indexOf(p.type) != -1 then 1 else 0
+        if AnalysisToolbar.infoTypes.indexOf(p.type) isnt -1 then 1 else 0
 
       totalWarnings += _.sum errors, (p) =>
-        if AnalysisToolbar.warningTypes.indexOf(p.type) != -1 then 1 else 0
+        if AnalysisToolbar.warningTypes.indexOf(p.type) isnt -1 then 1 else 0
 
       totalErrors   += _.sum errors, (p) =>
-        isInfo    = AnalysisToolbar.infoTypes.indexOf(p.type) != -1
-        isWarning = AnalysisToolbar.warningTypes.indexOf(p.type) != -1
-
-        if !isInfo && !isWarning then 1 else 0
+        isInfo    = AnalysisToolbar.infoTypes.indexOf(p.type) isnt -1
+        isWarning = AnalysisToolbar.warningTypes.indexOf(p.type) isnt -1
+        if not isInfo and not isWarning then 1 else 0
 
     @view.problemCount  = totalProblems
     @view.infoCount     = totalInfo

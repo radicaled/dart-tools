@@ -106,8 +106,6 @@ class DartTools
       Utils.dartSdkInfo (sdkInfo) =>
         @sdkInfo.showInfo(sdkInfo)
 
-    atom.commands.add 'atom-workspace', 'dart-tools:toggle-analysis-view'
-
   dispose: =>
     @subscriptions?.dispose()
     @analysisComponent?.disable()
