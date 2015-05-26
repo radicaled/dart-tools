@@ -1,20 +1,14 @@
-<atom-panel class='overlay from-bottom' rv-if="it.shouldShow">
-  <div class="padded">
-    <div class="inset-panel">
-      <div class="panel-heading">
-        <div class='pull-right'>
-          <a href='#' class='icon icon-x' rel='dismiss' rv-on-click="it.hide"></a>
-        </div>
-        <h2>Dart SDK Information</h2>
+<atom-panel class='model'>
+  <div class="inset-panel">
+    <div class="panel-heading">
+      <div class='pull-right'>
+        <a href='#' class='icon icon-x' rel='dismiss' rv-on-click="it.hide"></a>
       </div>
-      <div class="panel-body padded">
-        <h3>SDK path</h3>
-        <p>{ it.sdkPath }</p>
-
-        <h3>SDK version</h3>
-        <p>{ it.sdkVersion }</p>
-      </div>
+      <div class="inline-block">Dart SDK Information</div>
     </div>
-  </div>
+    <div class="panel-body padded">
+      <p><strong>SDK path:</strong> {it.sdkPath}</p>
+      <p><strong>SDK version:</strong> {it.sdkVersion}</p>
+    </div>
   </div>
 </atom-panel>

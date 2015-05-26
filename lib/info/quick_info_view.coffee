@@ -32,9 +32,9 @@ class QuickInfoView
     @editorEvents.add editor.onDidChangeSelectionRange =>
       range = editor.getSelectedBufferRange()
       markers = @findMarkersOnRow(editor, range.start.row)
-
       @view.reset()
       @addMarker(marker) for marker in markers
+      @view.syncState()
 
   addMarker: (marker) =>
     @view.addProblem(marker.getProperties().problem)
@@ -62,8 +62,8 @@ class QuickInfoView
   # Events
 
   handleActivePane: (item) =>
-    # There's no way to tell if the item is a text editor or not
-    # so just see if there's an active text editor or not
+    # There's no way to tell if the item is a text editor or not so just see if
+    # there's an active text editor or not.
     editor = atom.workspace.getActiveTextEditor()
     @observeEditor(editor) if editor
 
@@ -72,12 +72,11 @@ class QuickInfoView
     @editorEvents.dispose()
 
 class View
-  shouldShow: => @problems.length > 0
   problems: []
 
   constructor: ->
     element = Template.get('info/quick_info_view.html')
-    atom.workspace.addBottomPanel(item: element)
+    @panel = atom.workspace.addBottomPanel(item: element, visible: false)
     @view = rivets.bind(element, {it: this})
 
     rivets.binders.badge = @badge
@@ -88,12 +87,20 @@ class View
   addProblem: (problem) =>
     return if _.any(@problems, (p) => _.isEqual(p, problem))
     @problems.push problem
+    @syncState()
 
   removeProblem: (problem) =>
     @problems = _.where(@problems, (p) => not _.isEqual(p, problem))
+    @syncState()
 
   reset: =>
     @problems = []
+
+  syncState: =>
+    if @problems.length is 0 and @panel.isVisible()
+      @panel.hide()
+    else if @problems.length > 0 and not @panel.isVisible()
+      @panel.show()
 
   formatProblemType: (str) ->
     (str.replace new RegExp('_', 'g'), " ").toLowerCase()

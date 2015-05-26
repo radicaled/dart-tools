@@ -4,20 +4,16 @@ Template = require '../templates/template'
 class PubStatusView
   @title        = ''
   @output       = ''
-  @shouldShow   = false
 
   constructor: (@pubComponent) ->
     element = Template.get('pub/pub_status_view.html')
-    atom.workspace.addBottomPanel(item: element)
+    @panel = atom.workspace.addModalPanel(item: element, visible: false)
     atom.commands.add 'atom-workspace', 'core:cancel', =>
-      @shouldShow = false
-
+      @panel.hide()
     @view = rivets.bind(element, {it: this})
-
     @listen()
 
   listen: =>
-
     asHtml = (input, textClass) =>
       textClass = '' unless textClass
       formatted = input.replace new RegExp('\n', 'g'), "<br>"
@@ -26,7 +22,7 @@ class PubStatusView
     @pubComponent.onPubStart (data) =>
       @title = data.title
       @output = ''
-      @shouldShow = true
+      @panel.show()
 
     @pubComponent.onPubUpdate (data) =>
       @output = @output + asHtml(data.output)
@@ -38,6 +34,6 @@ class PubStatusView
       @title = @title + ' (Finished)'
 
   hide: =>
-    @shouldShow = false
+    @panel.hide()
 
 module.exports = PubStatusView
