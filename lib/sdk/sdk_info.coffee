@@ -11,25 +11,23 @@ class SdkInfo
     @view.show()
 
 class View
-  shouldShow: false
   sdkPath: null
   sdkVersion: null
 
   constructor: ->
     element = Template.get('sdk/sdk_info.html')
-    atom.workspace.addBottomPanel(item: element)
-
+    @panel = atom.workspace.addModalPanel(item: element, visible: false)
     @view = rivets.bind(element, {it: this})
-
     @listen()
 
   listen: =>
     atom.commands.add 'atom-text-editor', 'core:cancel', =>
-      @shouldShow = false
+      @panel.hide()
 
   hide: =>
-    @shouldShow = false
+    @panel.hide()
+
   show: =>
-    @shouldShow = true
+    @panel.show()
 
 module.exports = SdkInfo

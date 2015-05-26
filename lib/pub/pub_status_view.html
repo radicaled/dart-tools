@@ -1,14 +1,11 @@
-<atom-panel class='overlay from-bottom pub-status' rv-if="it.shouldShow">
-  <div class="padded">
-    <div class="inset-panel">
-      <div class="panel-heading">
-        <div class='pull-right'>
-          <a href='#' class='icon icon-x' rel='dismiss' rv-on-click="it.hide"></a>
-        </div>
-        <h2 rv-text="it.title"></h2>
+<atom-panel class='model pub-status'>
+  <div class="inset-panel">
+    <div class="panel-heading">
+      <div class='pull-right'>
+        <a href='#' class='icon icon-x' rel='dismiss' rv-on-click="it.hide"></a>
       </div>
-      <div class="panel-body padded" rv-html="it.output">
+      <div rv-text="it.title" class="inline-block"></div>
     </div>
-  </div>
+    <div class="panel-body padded" rv-html="it.output"></div>
   </div>
 </atom-panel>
