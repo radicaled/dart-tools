@@ -25,7 +25,8 @@ class SdkService
 
   @getCommandPath: (command) =>
     sdkPath = @getActiveSdkPath()
-    throw "No valid Dart SDK found; cannot execute #{command}" unless sdkPath
+    unless sdkPath
+      throw new Error("No valid Dart SDK found; cannot execute #{command}")
     dartCmd = PlatformService.getExecutable command
     execPath = path.join(sdkPath, 'bin', dartCmd)
 
