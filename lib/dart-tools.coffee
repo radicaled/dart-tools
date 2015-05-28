@@ -2,6 +2,7 @@
 Utils = require './utils'
 AutoCompletePlusProvider = require './autocomplete/provider'
 _ = require 'lodash'
+SdkService = require './sdk/sdk_service'
 
 class DartTools
   subscriptions: new CompositeDisposable()
@@ -91,7 +92,7 @@ class DartTools
       '
       atom.notifications.addWarning warning
 
-    unless atom.config.get 'dart-tools.dartSdkLocation'
+    unless SdkService.getActiveSdkPath()
       info = '[dart-tools] Dart SDK not specified, analysis_server not running.'
       atom.notifications.addInfo info,
         detail: 'Go to Settings > Packages > Dart Tools to specify Dart SDK'

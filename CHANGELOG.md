@@ -2,6 +2,8 @@
 
 Features:
   * Now supports analyzing plain jane Dart files when possible.
+  * When launched from command shell, will try to locate Dart SDK on demand if
+    no Dart SDK has been explicitly configured.
 
 General overhaul of the errors display:
   * add a gutter bullet decoration for dart infos, warnings, and errors

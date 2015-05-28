@@ -1,36 +1,26 @@
 _ = require 'lodash'
 spawn = require('child_process').spawn
 path  = require 'path'
+SdkService        = require './sdk/sdk_service'
+PlatformService   = require './platform/platform_service'
 
 module.exports =
 class Utils
-  @windowsCmdMap =
-    pub: 'pub.bat'
-    dart: 'dart.exe'
-
+  # TODO: find and replace all instances with PlatformService.getExecutable
   @getExecutable: (cmd) =>
-    isWin = /^win/.test(process.platform)
-    return cmd unless isWin
-    windowsCmd = @windowsCmdMap[cmd]
-    return windowsCmd or cmd
+    PlatformService.getExecutable(cmd)
 
+  # TODO: find and replace all instances with SdkService.getActiveSdkPath
   @getExecPath: (cmd) =>
-    sdkPath = @dartSdkPath()
-    dartCmd = @getExecutable cmd
-    execPath = if sdkPath then path.join(sdkPath, 'bin', dartCmd) else dartCmd
+    SdkService.getCommandPath(cmd)
 
   @whenEditor: (fxn) =>
     editor = atom.workspace.getActiveTextEditor()
     fxn(editor) if editor
 
-  @dartSdkPath: =>
-    atom.config.get 'dart-tools.dartSdkLocation' or
-      process.env.DART_SDK or
-      ''
-
   @dartSdkInfo: (fxn) =>
     sdkInfo =
-      sdkPath: atom.config.get 'dart-tools.dartSdkLocation'
+      sdkPath: SdkService.getActiveSdkPath()
       envPath: process.env.DART_SDK
     if fxn
       @dartVersion (dartVersion) =>
@@ -83,6 +73,7 @@ class Utils
     process = window.process unless process
     if process
       execPath = @getExecPath 'dart'
+      return false unless execPath
       process = spawn execPath, ['--version']
 
       process.on 'exit', (code) =>
