@@ -1,0 +1,7 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  '.tree-view.full-menu li[is="tree-view-file"] span[data-name="pubspec.yaml"]': [
+    {'label': 'Pub Get', 'command': 'dart-tools:pub-get' }
+    {'label': 'Pub Upgrade', 'command': 'dart-tools:pub-upgrade' }
+    {'type': 'separator'}
+  ]
