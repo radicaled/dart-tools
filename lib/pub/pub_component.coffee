@@ -6,7 +6,7 @@ spawn = require('child_process').spawn
 fs = require('fs')
 Utils = require '../utils'
 PubStatusView = require './pub_status_view'
-ProjectPicker = require '../project/project_picker'
+Picker = require '../project/project_picker'
 
 class PubComponent
   constructor: ->
@@ -99,8 +99,10 @@ class PubComponent
     if Utils.getDartProjectPaths().length is 1
       return Promise.resolve(Utils.getDartProjectPaths()[0])
 
-    picker = new ProjectPicker()
-    return picker.selectProject()
+    picker = new Picker()
+    projects = (project for project in Utils.getDartProjectPaths()).map (p) ->
+      { item: p, displayName: path.basename(p) }
+    return picker.selectFrom(projects)
 
   # Code to prevent multiple pub processes on the same file
 

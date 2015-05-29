@@ -3,23 +3,27 @@ _ = require 'lodash'
 {match} = require 'fuzzaldrin'
 Utils = require '../utils'
 path = require 'path'
-# Let the user select a project for project-scoped commands (Pub, etc)
+
+# Let the user select an item from a list of items
 # Most code borrowed from https://github.com/atom/command-palette/blob/master/lib/command-palette-view.coffee
-class ProjectPicker
-  selectProject: =>
+# Items in the form of {item: 'item', displayName: 'Cool Item #1'}
+class Picker
+  selectFrom: (items) =>
     new Promise (resolve, reject) =>
-      view = new ProjectPickerView resolve, reject
+      view = new PickerView items, resolve, reject
       view.show()
 
-class ProjectPickerView extends SelectListView
-  initialize: (@resolve, @reject) ->
+class PickerView extends SelectListView
+  initialize: (@selectableItems, @resolve, @reject) ->
     super
 
-    @addClass('project-picker')
+    @addClass('picker')
+
+  getFilterKey: -> 'displayName'
 
   cancelled: ->
     @hide()
-    @reject('User cancelled project selection')
+    @reject('User cancelled selection')
 
   toggle: ->
     if @panel?.isVisible()
@@ -39,48 +43,45 @@ class ProjectPickerView extends SelectListView
       @eventElement = atom.views.getView(atom.workspace)
     @keyBindings = atom.keymaps.findKeyBindings(target: @eventElement)
 
-    projects = (project for project in Utils.getDartProjectPaths()).map (p) -> p
-    @setItems(projects)
+    @setItems(@selectableItems)
 
     @focusFilterEditor()
 
   hide: ->
     @panel?.hide()
 
-  viewForItem: (project) ->
-    displayName = path.basename(project)
+  viewForItem: ({item, displayName}) ->
     # Style matched characters in search results
     filterQuery = @getFilterQuery()
     matches = match(displayName, filterQuery)
-    # friendlyName = path.basename(project)
 
     $$ ->
-      highlighter = (project, matches, offsetIndex) =>
+      highlighter = (item, matches, offsetIndex) =>
         lastIndex = 0
         matchedChars = [] # Build up a set of matched chars to be more semantic
 
         for matchIndex in matches
           matchIndex -= offsetIndex
           continue if matchIndex < 0 # If marking up the basename, omit command matches
-          unmatched = project.substring(lastIndex, matchIndex)
+          unmatched = item.substring(lastIndex, matchIndex)
           if unmatched
             @span matchedChars.join(''), class: 'character-match' if matchedChars.length
             matchedChars = []
             @text unmatched
-          matchedChars.push(project[matchIndex])
+          matchedChars.push(item[matchIndex])
           lastIndex = matchIndex + 1
 
         @span matchedChars.join(''), class: 'character-match' if matchedChars.length
 
         # Remaining characters are plain text
-        @text project.substring(lastIndex)
+        @text item.substring(lastIndex)
 
-      @li class: 'event', 'data-event-name': project, =>
+      @li class: 'event', 'data-event-name': item, =>
         @div class: 'pull-right', =>
         @span title: displayName, -> highlighter(displayName, matches, 0)
 
-  confirmed: (projectPath) ->
+  confirmed: (item) ->
     @hide()
-    @resolve(projectPath)
+    @resolve(item.item)
 
-module.exports = ProjectPicker
+module.exports = Picker
