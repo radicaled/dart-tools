@@ -133,6 +133,10 @@
         'name': 'keyword.control.dart'
       }
       {
+        'match': '\\bassert\\b'
+        'name': 'keyword.control.dart'
+      }
+      {
         'match': '\\b(new)\\b'
         'name': 'keyword.control.new.dart'
       }
