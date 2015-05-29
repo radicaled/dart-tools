@@ -6,6 +6,7 @@ spawn = require('child_process').spawn
 fs = require('fs')
 Utils = require '../utils'
 PubStatusView = require './pub_status_view'
+ProjectPicker = require '../project/project_picker'
 
 class PubComponent
   constructor: ->
@@ -30,11 +31,8 @@ class PubComponent
     atom.commands.add 'atom-workspace', 'dart-tools:pub-upgrade', =>
       @upgrade()
 
-  run: (args) =>
-    # TODO / HACK: need to operate on multiple valid projects
-    pubspecRoot = Utils.getDartProjectPaths()[0]
+  run: (pubspecRoot, args) =>
     pubspecPath = path.join pubspecRoot, 'pubspec.yaml'
-    return unless pubspecRoot
 
     if @isRunning(pubspecPath)
       @pubRunningNotification pubspecPath
@@ -59,18 +57,23 @@ class PubComponent
         @emitter.emit 'pub-finished'
 
   get: =>
-    Utils.dartSdkInfo =>
-      @whenPubspecPresent =>
-        @emitter.emit 'pub-start',
-          title: 'Pub Get'
-        @run 'get'
-
+    @whenPubspecPresent =>
+      @getPubspecRoot().then(
+        (pubspecRoot) =>
+          @emitter.emit 'pub-start',
+            title: 'Pub Get'
+          @run pubspecRoot, 'get'
+        () => 1
+      )
   upgrade: =>
-    Utils.dartSdkInfo =>
-      @whenPubspecPresent =>
-        @emitter.emit 'pub-start',
-          title: 'Pub Upgrade'
-        @run 'upgrade'
+    @whenPubspecPresent =>
+      @getPubspecRoot().then(
+        (pubspecRoot) =>
+          @emitter.emit 'pub-start',
+            title: 'Pub Upgrade'
+          @run pubspecRoot, 'upgrade'
+        () => 1
+      )
 
   observePubspec: (pubspecRoot) =>
     pubspecPath = path.join pubspecRoot, 'pubspec.yaml'
@@ -86,6 +89,18 @@ class PubComponent
 
   pubRunningNotification: (pubspecPath) =>
     atom.notifications.addInfo 'Pub is already running, wait a second!'
+
+  # Select a pubspecRoot to operate on
+  # Returns Promise.
+  getPubspecRoot: =>
+    if Utils.getDartProjectPaths().length == 0
+      return Promise.reject('No valid Dart project paths')
+
+    if Utils.getDartProjectPaths().length == 1
+      return Promise.resolve(Utils.getDartProjectPaths()[0])
+
+    picker = new ProjectPicker()
+    return picker.selectProject()
 
   # Code to prevent multiple pub processes on the same file
 

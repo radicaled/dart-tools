@@ -107,11 +107,6 @@ class DartTools
       Utils.dartSdkInfo (sdkInfo) =>
         @sdkInfo.showInfo(sdkInfo)
 
-    atom.commands.add 'atom-workspace', 'dart-tools:show-picker', =>
-      ProjectPicker = require './project/project_picker'
-      p = new ProjectPicker()
-      p.launch()
-
   dispose: =>
     @subscriptions?.dispose()
     @analysisComponent?.disable()
