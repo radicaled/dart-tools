@@ -63,7 +63,7 @@ class PubComponent
           @emitter.emit 'pub-start',
             title: 'Pub Get'
           @run pubspecRoot, 'get'
-        () => 1
+        => 1
       )
   upgrade: =>
     @whenPubspecPresent =>
@@ -72,7 +72,7 @@ class PubComponent
           @emitter.emit 'pub-start',
             title: 'Pub Upgrade'
           @run pubspecRoot, 'upgrade'
-        () => 1
+        => 1
       )
 
   observePubspec: (pubspecRoot) =>
@@ -93,10 +93,10 @@ class PubComponent
   # Select a pubspecRoot to operate on
   # Returns Promise.
   getPubspecRoot: =>
-    if Utils.getDartProjectPaths().length == 0
+    if Utils.getDartProjectPaths().length is 0
       return Promise.reject('No valid Dart project paths')
 
-    if Utils.getDartProjectPaths().length == 1
+    if Utils.getDartProjectPaths().length is 1
       return Promise.resolve(Utils.getDartProjectPaths()[0])
 
     picker = new ProjectPicker()
