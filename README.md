@@ -34,6 +34,10 @@ Formatting will save the current editor buffer first.
 **Linting requires you to set your dart-sdk location.** You can do that from
 `Settings View: Open` -> `Filter Packages` -> `Dart Tools`.
 
+**Did you install Dart SDK via homebrew?** Use `HOMEBREW_INSTALL/opt/dart/libexec`
+as the SDK directory (replace `HOMEBREW_INSTALL` with the location
+where homebrew installs software, which is often `/usr/local`).
+
 If you have a `pubspec.yaml` file or `.packages` path in your project, linting
 will begin immediately. If not, linting will begin once you open a Dart file
 that exists within your current project scope.
