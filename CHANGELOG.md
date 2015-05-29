@@ -12,6 +12,7 @@ General overhaul of the errors display:
 Other:
   * Remove a no longer used `dart-tools:toggle-analysis-view` command
   * Change the SDK and Pub dialogs to model dialogs
+  * Added context menu items for running pub and the formatter
 
 # 0.9.11
 
@@ -36,9 +37,9 @@ Bugfixes:
 Errata:
 
 Some awesome styling changes thanks to @devoncarew
-  The toolbar now has a cleaner look
-  The SDK info dialog now has a cleaner look
-  The Pub dialog how has a cleaner look
+  * The toolbar now has a cleaner look
+  * The SDK info dialog now has a cleaner look
+  * The Pub dialog how has a cleaner look
 
 ## 0.9.9
 

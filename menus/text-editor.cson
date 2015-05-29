@@ -1,0 +1,11 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  'atom-text-editor[data-grammar~="dart"]': [
+    {label: 'Format', command: 'dart-tools:format-code'}
+    {'type': 'separator'}
+  ],
+  'atom-pane[data-active-item-path$="pubspec.yaml"] atom-text-editor[data-grammar~="yaml"]': [
+    {'label': 'Pub Get', 'command': 'dart-tools:pub-get'}
+    {'label': 'Pub Upgrade', 'command': 'dart-tools:pub-upgrade'}
+    {'type': 'separator'}
+  ]
