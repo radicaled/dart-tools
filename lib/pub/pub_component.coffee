@@ -101,7 +101,7 @@ class PubComponent
 
     picker = new Picker()
     projects = (project for project in Utils.getDartProjectPaths()).map (p) ->
-      { item: p, displayName: path.basename(p) }
+      {item: p, displayName: path.basename(p)}
     return picker.selectFrom(projects)
 
   # Code to prevent multiple pub processes on the same file
