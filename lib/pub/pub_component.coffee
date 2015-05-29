@@ -6,7 +6,7 @@ spawn = require('child_process').spawn
 fs = require('fs')
 Utils = require '../utils'
 PubStatusView = require './pub_status_view'
-Picker = require '../project/project_picker'
+Picker = require '../ui/picker'
 
 class PubComponent
   constructor: ->
