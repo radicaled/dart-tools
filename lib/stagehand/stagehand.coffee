@@ -15,7 +15,7 @@ class Stagehand
       process.stderr.on 'data', (data) =>
         errors = errors + data.toString()
       process.on 'exit', (code) =>
-        if code == 0
+        if code is 0
           resolve()
         else
           reject(errors)
@@ -33,7 +33,7 @@ class Stagehand
       process.stderr.on 'data', (data) =>
         errors = errors + data.toString()
       process.on 'exit', (code) =>
-        if code == 0
+        if code is 0
           resolve(JSON.parse(json))
         else
           reject(errors)
@@ -64,11 +64,11 @@ class Stagehand
       process.stderr.on 'data', (data) =>
         errors = errors + data.toString()
       process.on 'exit', (code) =>
-        if code == 0
+        if code is 0
           atom.notifications.addInfo "[dart-tools] Generated #{projectTemplate.label}!"
         else
           atom.notifications.addError "[dart-tools] Failed to generate #{projectTemplate.label}!",
-            detail: errors || output
+            detail: errors or output
 
     if projectPaths.length is 0
       atom.notifications.addError "[dart-tools] Cannot run Stagehand without a project directory open."
@@ -79,7 +79,7 @@ class Stagehand
         {item: p, displayName: path.basename(p)}
       picker.selectFrom(items).then(
         (selectedProjectPath) => generateProject(selectedProjectPath)
-        () => 1
+        => 1
       )
 
 
