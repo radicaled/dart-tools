@@ -66,6 +66,7 @@ class DartTools
     AnalysisDecorator = require './analysis/analysis_decorator'
     QuickInfoView = require './info/quick_info_view'
     ProblemView = require './info/problem_view'
+    Stagehand = require './stagehand/stagehand'
 
     @errorRepository = new ErrorRepository(@analysisApi)
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
@@ -106,6 +107,9 @@ class DartTools
     atom.commands.add 'atom-workspace', 'dart-tools:sdk-info', =>
       Utils.dartSdkInfo (sdkInfo) =>
         @sdkInfo.showInfo(sdkInfo)
+
+    atom.commands.add 'atom-workspace', 'dart-tools:stagehand', =>
+      Stagehand.activate().then => Stagehand.showProjectTemplates()
 
   dispose: =>
     @subscriptions?.dispose()
