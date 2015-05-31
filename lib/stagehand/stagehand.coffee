@@ -41,7 +41,7 @@ class Stagehand
     picker = new Picker
     @getProjectTemplates().then (projectTemplates) =>
       items = projectTemplates.map (pt) =>
-        {item: pt, displayName: pt.label}
+        {item: pt, displayName: pt.label, description: pt.description}
 
       promise = picker.selectFrom(items).then(
         (selectedItem) =>

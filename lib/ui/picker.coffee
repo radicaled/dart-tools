@@ -50,7 +50,7 @@ class PickerView extends SelectListView
   hide: ->
     @panel?.hide()
 
-  viewForItem: ({item, displayName}) ->
+  viewForItem: ({item, displayName, description}) ->
     # Style matched characters in search results
     filterQuery = @getFilterQuery()
     matches = match(displayName, filterQuery)
@@ -76,9 +76,15 @@ class PickerView extends SelectListView
         # Remaining characters are plain text
         @text item.substring(lastIndex)
 
-      @li class: 'event', 'data-event-name': item, =>
-        @div class: 'pull-right', =>
-        @span title: displayName, -> highlighter(displayName, matches, 0)
+      if description
+        @li class: 'two-lines event', 'data-event-name': item, =>
+          @div class: 'primary-line', =>
+            @span title: displayName, -> highlighter(displayName, matches, 0)
+          @div class: 'secondary-line', => @text(description)
+      else
+        @li class: 'event', 'data-event-name': item, =>
+          @div class: 'pull-right', =>
+          @span title: displayName, -> highlighter(displayName, matches, 0)
 
   confirmed: (item) ->
     @hide()
