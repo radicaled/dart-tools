@@ -66,7 +66,7 @@ class DartTools
     AnalysisDecorator = require './analysis/analysis_decorator'
     QuickInfoView = require './info/quick_info_view'
     ProblemView = require './info/problem_view'
-    Stagehand = require './stagehand/stagehand'
+
 
     @errorRepository = new ErrorRepository(@analysisApi)
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
@@ -108,7 +108,14 @@ class DartTools
       Utils.dartSdkInfo (sdkInfo) =>
         @sdkInfo.showInfo(sdkInfo)
 
+  registerGlobalCommands: =>
+    Stagehand = require './stagehand/stagehand'
     atom.commands.add 'atom-workspace', 'dart-tools:stagehand', =>
+      if atom.project.getPaths().length is 0
+        atom.notifications.addInfo(
+          "[dart-tools] There is no open project to run Stagehand against."
+        )
+        return
       atom.notifications.addInfo 'Activating Stagehand...'
       Stagehand.activate().then => Stagehand.showProjectTemplates()
 
@@ -143,6 +150,7 @@ module.exports =
   activate: (state) ->
     @dartTools = new DartTools()
     @dartTools.waitForDartSources()
+    @dartTools.registerGlobalCommands()
 
     return unless Utils.isDartProject()
     @dartTools.boot()
