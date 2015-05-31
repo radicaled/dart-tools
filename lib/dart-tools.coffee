@@ -116,8 +116,10 @@ class DartTools
           "[dart-tools] There is no open project to run Stagehand against."
         )
         return
-      atom.notifications.addInfo 'Activating Stagehand...'
-      Stagehand.activate().then => Stagehand.showProjectTemplates()
+      atom.notifications.addInfo '[dart-tools] Activating Stagehand...'
+      Stagehand.activate().then =>
+        Stagehand.showProjectTemplates().then (projectTemplate) =>
+          Stagehand.generate(projectTemplate)
 
   dispose: =>
     @subscriptions?.dispose()
