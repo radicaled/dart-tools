@@ -111,15 +111,16 @@ class DartTools
   registerGlobalCommands: =>
     Stagehand = require './stagehand/stagehand'
     atom.commands.add 'atom-workspace', 'dart-tools:stagehand', =>
-      if atom.project.getPaths().length is 0
-        atom.notifications.addInfo(
-          "[dart-tools] There is no open project to run Stagehand against."
-        )
-        return
-      atom.notifications.addInfo '[dart-tools] Activating Stagehand...'
-      Stagehand.activate().then =>
-        Stagehand.showProjectTemplates().then (projectTemplate) =>
-          Stagehand.generate(projectTemplate)
+      Utils.whenDartSdkFound =>
+        if atom.project.getPaths().length is 0
+          atom.notifications.addInfo(
+            "[dart-tools] There is no open project to run Stagehand against."
+          )
+          return
+        atom.notifications.addInfo '[dart-tools] Activating Stagehand...'
+        Stagehand.activate().then =>
+          Stagehand.showProjectTemplates().then (projectTemplate) =>
+            Stagehand.generate(projectTemplate)
 
   dispose: =>
     @subscriptions?.dispose()
