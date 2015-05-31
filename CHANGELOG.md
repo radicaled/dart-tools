@@ -16,6 +16,10 @@ Other:
   * Change the SDK and Pub dialogs to model dialogs
   * Added context menu items for running pub and the formatter
 
+Bugfixes:
+  * Resolved issue with Dart analyzer sometimes starting up on unsupported
+    projects.
+
 # 0.9.11
 
 Features:

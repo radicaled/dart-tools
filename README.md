@@ -11,7 +11,8 @@ Features
 
 * Updated grammar file (no need for the `language-dart` package; remove it if you have it)
 * Lints the Dart project when a pubspec.yaml file exists
-at project root. (see note section)
+at project root (see note section) or when you open a Dart file in the current
+project.
 * Formats the current Dart file via command palette
 * Can perform "pub get" when pubspec.yaml is saved.
 * Can format Dart files on save.
