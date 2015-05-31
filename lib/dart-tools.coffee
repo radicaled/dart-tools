@@ -109,6 +109,7 @@ class DartTools
         @sdkInfo.showInfo(sdkInfo)
 
     atom.commands.add 'atom-workspace', 'dart-tools:stagehand', =>
+      atom.notifications.addInfo 'Activating Stagehand...'
       Stagehand.activate().then => Stagehand.showProjectTemplates()
 
   dispose: =>
