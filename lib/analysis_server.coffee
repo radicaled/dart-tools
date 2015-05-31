@@ -5,6 +5,7 @@ spawn = require('child_process').spawn
 path  = require 'path'
 StreamSplitter = require 'stream-splitter'
 Q = require 'q'
+SdkService = require './sdk/sdk_service'
 
 module.exports =
 class AnalysisServer
@@ -18,7 +19,7 @@ class AnalysisServer
 
   start: (analysisRoots) =>
     promiseMap = {}
-    sdkPath = Utils.dartSdkPath()
+    sdkPath = SdkService.getActiveSdkPath()
     atomConfigRoot = atom.getConfigDirPath()
     args = [
       path.join(sdkPath,
