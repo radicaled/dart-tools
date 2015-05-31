@@ -18,6 +18,7 @@ project.
 * Can format Dart files on save.
 * Putting the caret within an analysis error quickly shows the problem text
 * Basic autocomplete, via the `autocomplete-plus` package.
+* Generate new Dart projects using Stagehand
 
 Available Commands
 ==================

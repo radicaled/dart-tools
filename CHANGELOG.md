@@ -1,3 +1,8 @@
+# 0.9.13
+
+Features:
+  * Generate a new Dart project using Stagehand
+
 # 0.9.12
 
 Features:
