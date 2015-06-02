@@ -8,7 +8,7 @@
   "engines": {
     "atom": ">=0.198.0"
   },
-  "constributors": [
+  "contributors": [
     "Arron Washington <arron@theradicaledwards.com>"
   ],
   "providedServices": {
