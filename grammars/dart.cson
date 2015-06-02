@@ -56,12 +56,35 @@
         'name': 'comment.block.empty.dart'
       }
       {
+        'include': '#comments-doc'
+      }
+      {
         'include': 'text.html.javadoc'
       }
       {
         'include': '#comments-inline'
       }
     ]
+  'comments-doc':
+    'patterns': [
+      {
+        'match': '(///)\\s*(.*?)$'
+        'captures':
+          '1':
+            'name': 'comment.triple-slash.dart'
+          '2':
+            'name': 'source.gfm.comment.dartdoc.dart'
+            'patterns': [
+              {
+                'include': 'source.gfm'
+              }
+            ]
+
+            # 'scopeName': 'trala'
+            # 'include': 'source.gfm'
+      }
+    ]
+
   'comments-inline':
     'patterns': [
       {
