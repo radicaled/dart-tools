@@ -46,6 +46,15 @@
   }
 ]
 'repository':
+  # Parsing the interior of a dartdoc comment: ///{DART_DOC_INTERIOR}
+  # Not a top-level component
+  'dartdoc':
+    'patterns': [
+      'match': '\\[(.*?)\\]'
+      'captures':
+        '1':
+          'name': 'dartdoc.reference.dart'
+    ]
   'comments':
     'patterns': [
       {
@@ -56,6 +65,9 @@
         'name': 'comment.block.empty.dart'
       }
       {
+        'include': '#comments-doc-oldschool'
+      }
+      {
         'include': '#comments-doc'
       }
       {
@@ -63,6 +75,22 @@
       }
       {
         'include': '#comments-inline'
+      }
+    ]
+  'comments-doc-oldschool':
+    'patterns': [
+      {
+        'begin': '/\\*\\*'
+        'end': '\\*\\*/'
+        'name': 'comment.block-dartdoc.dart'
+        'patterns': [
+          {
+            'include': 'source.gfm'
+          }
+          {
+            'include': '#dartdoc'
+          }
+        ]
       }
     ]
   'comments-doc':
@@ -78,10 +106,10 @@
               {
                 'include': 'source.gfm'
               }
+              {
+                'include': '#dartdoc'
+              }
             ]
-
-            # 'scopeName': 'trala'
-            # 'include': 'source.gfm'
       }
     ]
 
