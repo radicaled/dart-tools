@@ -50,10 +50,12 @@
   # Not a top-level component
   'dartdoc':
     'patterns': [
-      'match': '\\[(.*?)\\]'
-      'captures':
-        '1':
-          'name': 'dartdoc.reference.dart'
+      {
+        'match': '\\[(.*?)\\]'
+        'captures':
+          '1':
+            'name': 'dartdoc.reference.dart'
+      }
     ]
   'comments':
     'patterns': [
