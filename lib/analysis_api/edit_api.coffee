@@ -8,3 +8,4 @@ class EditAPI
       file: file
       selectionOffset: offset
       selectionLength: length
+      lineLength: atom.config.get('editor.preferredLineLength')
