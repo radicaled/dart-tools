@@ -151,16 +151,16 @@
         'name': 'constant.numeric.dart'
       }
       {
-        'match': '\\b[A-Z][a-zA-Z]+\\b'
+        'match': '\\b_?[A-Z_0-9]+\\b'
+        'name': 'support.constant.dart'
+      }
+      {
+        'match': '\\b_?[A-Z][a-zA-Z]+\\b'
         'name': 'support.class.dart'
       }
       {
         'match': '(_?[a-z][a-zA-Z]+)(?=\\\(\\\[)'
         'name': 'entity.name.function.dart'
-      }
-      {
-        'match': '\\b[A-Z_0-9]+\\b'
-        'name': 'support.constant.dart'
       }
     ]
   'keywords':
@@ -210,7 +210,7 @@
         'name': 'keyword.operator.assignment.bitwise.dart'
       }
       {
-        'match': '(===?|!==?|<=?|>=?)'
+        'match': '(==|!=|<=?|>=?)'
         'name': 'keyword.operator.comparison.dart'
       }
       {
@@ -242,7 +242,7 @@
         'name': 'storage.modifier.dart'
       }
       {
-        'match': '\\b(?:void|bool|num|int|double|Dynamic|var|String)\\b'
+        'match': '\\b(?:void|bool|num|int|double|dynamic|var)\\b'
         'name': 'storage.type.primitive.dart'
       }
     ]
