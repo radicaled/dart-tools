@@ -35,9 +35,9 @@ module.exports =
         type: 'change'
         edits: [
           offset: 0
-          length: contents?.length || 0
+          length: contents?.length or 0
           replacement: contents
-        ]        
+        ]
 
       @perform 'analysis.updateContent',
         {files}
