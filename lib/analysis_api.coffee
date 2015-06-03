@@ -32,12 +32,8 @@ module.exports =
     updateFile: (path, contents) =>
       files = {}
       files[path] =
-        type: 'change'
-        edits: [
-          offset: 0
-          length: contents?.length or 0
-          replacement: contents
-        ]
+        type: 'add'
+        content: contents
 
       @perform 'analysis.updateContent',
         {files}
