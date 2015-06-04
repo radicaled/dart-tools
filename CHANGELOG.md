@@ -3,6 +3,9 @@
 Features:
   * Generate a new Dart project using Stagehand
 
+Bugfixes:
+  * Resolved issue with Dart analyzer sometimes not reporting all errors in file
+
 # 0.9.12
 
 Features:
