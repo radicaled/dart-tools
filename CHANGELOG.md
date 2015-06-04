@@ -1,3 +1,8 @@
+# 0.9.14
+
+Bugfixes:
+  * Resolved issue with some package UI not being removed on deactivation
+
 # 0.9.13
 
 Features:
