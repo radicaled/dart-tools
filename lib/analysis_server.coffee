@@ -38,8 +38,8 @@ class AnalysisServer
       # Set analysis root.
       @setAnalysisRoots analysisRoots
 
-  stop: =>
-    @process?.close()
+  stop: =>    
+    @process?.kill()
 
   sendMessage: (obj) =>
     return unless @isRunning
