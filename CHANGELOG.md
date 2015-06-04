@@ -1,3 +1,7 @@
+# 0.9.16
+
+Rogue publish due to issues with `apm publish` and/or Atom API(?)
+
 # 0.9.15
 
 Bugfixes:
