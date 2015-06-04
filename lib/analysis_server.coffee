@@ -38,7 +38,7 @@ class AnalysisServer
       # Set analysis root.
       @setAnalysisRoots analysisRoots
 
-  stop: =>    
+  stop: =>
     @process?.kill()
 
   sendMessage: (obj) =>
@@ -47,6 +47,7 @@ class AnalysisServer
     msg = JSON.stringify(obj)
     @process.stdin.write(msg + "\n")
 
+    console.log "SENT", msg
     deferred = Q.defer()
     promiseMap[obj.id] = deferred
     return deferred.promise
@@ -54,6 +55,8 @@ class AnalysisServer
   processMessage: (message) =>
     obj = JSON.parse(message.toString())
     promise = promiseMap[obj.id]
+
+    console.log "RECV", message.toString()
 
     if obj.event
       @emitter.emit 'new-event', obj

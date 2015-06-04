@@ -1,3 +1,8 @@
+# 0.9.15
+
+Bugfixes:
+  * Resolved an issue in our interaction with analysis_server
+
 # 0.9.14
 
 Bugfixes:
