@@ -33,7 +33,7 @@ class BufferUpdateComponent
 
     @events.add @editor.onDidSave =>
       # https://github.com/dart-lang/sdk/issues/23579
-      @removeOverlay(@editor) if Utils.isCompatible(editor)
+      @removeOverlay(@editor) if Utils.isCompatible(@editor)
 
     # onDidStopChanging fires 300ms after the user stops typing.
     # Therefore, we'll update the file buffer if no new events are received
@@ -83,4 +83,4 @@ class BufferUpdateComponent
   destroy: =>
     @events.dispose()
     # https://github.com/dart-lang/sdk/issues/23579
-    @removeOverlay(@editor) if Utils.isCompatible(editor)
+    @removeOverlay(@editor) if Utils.isCompatible(@editor)
