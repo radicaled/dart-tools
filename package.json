@@ -1,6 +1,6 @@
 {
   "name": "dart-tools",
-  "main": "./lib/dart-tools",
+  "main": "./lib/main",
   "version": "0.9.12",
   "description": "Dart Tooling for Atom",
   "repository": "https://github.com/radicaled/dart-tools",
