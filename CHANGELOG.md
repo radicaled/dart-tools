@@ -1,3 +1,8 @@
+# 0.9.17
+
+Bugfixes:
+  * Doesn't generate error message when closing an editor window.
+
 # 0.9.16
 
 Rogue publish due to issues with `apm publish` and/or Atom API(?)
