@@ -29,6 +29,11 @@ module.exports =
         method: methodName
         params: params
 
+
+    updateContent: (files) =>
+      @perform 'analysis.updateContent',
+        {files}
+
     updateFile: (path, contents) =>
       files = {}
       files[path] =
