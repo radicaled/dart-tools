@@ -69,7 +69,9 @@ class AnalysisServer
       else
         delete promiseMap[id]
         promise?.resolve(obj)
-
+    else if obj.error?
+      delete promiseMap[obj.id]
+      promise?.reject(obj.error)
     else if obj.result?.id # An ID for an incoming event stream
       delete promiseMap[obj.id]
       promiseMap[obj.result.id] = promise
