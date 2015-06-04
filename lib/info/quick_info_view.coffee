@@ -70,6 +70,7 @@ class QuickInfoView
   dispose: =>
     @subscriptions.dispose()
     @editorEvents.dispose()
+    @view.dispose()
 
 class View
   problems: []
@@ -113,5 +114,8 @@ class View
     element.classList.remove("badge-warning")
     element.classList.remove("badge-error")
     element.classList.add("badge-#{problem.severity.toLowerCase()}")
+
+  dispose: =>
+    @panel.destroy()
 
 module.exports = QuickInfoView

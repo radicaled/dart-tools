@@ -127,5 +127,6 @@ class DartTools
     @analysisComponent?.disable()
     @analysisDecorator?.dispose()
     @quickInfoView?.dispose()
+    @analysisToolbar?.dispose()
 
 module.exports = DartTools

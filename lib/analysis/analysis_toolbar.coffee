@@ -48,6 +48,8 @@ class AnalysisToolbar
     @view.warningCount  = totalWarnings
     @view.errorCount    = totalErrors
 
+  dispose: =>
+    @view.dispose()
 
 class ToolbarView
   shouldShow: true
@@ -58,10 +60,13 @@ class ToolbarView
 
   constructor: ->
     element = Template.get('analysis/analysis_toolbar.html')
-    atom.workspace.addBottomPanel(item: element)
+    @panel = atom.workspace.addBottomPanel(item: element)
     @view = rivets.bind(element, it: this)
 
   showProblems: ->
     atom.workspace.open('dart-tools://problem-view')
+
+  dispose: =>
+    @panel.destroy()
 
 module.exports = AnalysisToolbar
