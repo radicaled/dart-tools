@@ -79,3 +79,17 @@ class Utils
       process.on 'exit', (code) =>
         if code is 0
           fxn()
+
+  @deferred: =>
+    console.log 'Who???'
+    resolve = null
+    reject = null
+    promise = new Promise =>
+      resolve = arguments[0]
+      reject = arguments[1]
+
+    return {
+      resolve: resolve
+      reject: reject
+      promise: promise
+    }

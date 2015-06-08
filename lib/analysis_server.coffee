@@ -4,7 +4,6 @@ Utils = require './utils'
 spawn = require('child_process').spawn
 path  = require 'path'
 StreamSplitter = require 'stream-splitter'
-Q = require 'q'
 SdkService = require './sdk/sdk_service'
 
 module.exports =
@@ -48,7 +47,7 @@ class AnalysisServer
     @process.stdin.write(msg + "\n")
 
     console.log "SENT", msg
-    deferred = Q.defer()
+    deferred = Utils.deferred()
     promiseMap[obj.id] = deferred
     return deferred.promise
 
