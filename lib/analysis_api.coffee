@@ -1,6 +1,7 @@
 SearchAPI = require './analysis_api/search_api'
 CompletionAPI = require './analysis_api/completion_api'
 EditApi = require './analysis_api/edit_api'
+AlsoAnalysisApi = require './analysis_api/analysis_api'
 {Emitter} = require 'event-kit'
 
 module.exports =
@@ -17,6 +18,7 @@ module.exports =
       @search ||= new SearchAPI(this)
       @completion ||= new CompletionAPI(this)
       @edit ||= new EditApi(this)
+      @analysis ||= new AlsoAnalysisApi(this)
 
       # TODO: bit of a hack here
       @_analysisServer.forEachEvent (name, e) =>

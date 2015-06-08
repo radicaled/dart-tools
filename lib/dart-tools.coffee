@@ -66,7 +66,7 @@ class DartTools
     AnalysisDecorator = require './analysis/analysis_decorator'
     QuickInfoView = require './info/quick_info_view'
     ProblemView = require './info/problem_view'
-
+    ContextView = require './info/context_view'
 
     @errorRepository = new ErrorRepository(@analysisApi)
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
@@ -77,6 +77,7 @@ class DartTools
     @quickInfoView = new QuickInfoView()
     @formatter = new Formatter(@analysisApi)
     ProblemView.register(@errorRepository)
+    @contextView = new ContextView(@analysisApi)
 
     @analysisComponent.enable()
     AutoCompletePlusProvider.analysisApi = @analysisApi
@@ -128,5 +129,6 @@ class DartTools
     @analysisDecorator?.dispose()
     @quickInfoView?.dispose()
     @analysisToolbar?.dispose()
+    @contextView?.dispose()
 
 module.exports = DartTools
