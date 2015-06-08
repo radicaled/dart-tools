@@ -80,8 +80,7 @@ class Utils
         if code is 0
           fxn()
 
-  @deferred: =>
-    console.log 'Who???'
+  @deferred: =>    
     resolve = null
     reject = null
     promise = new Promise =>
