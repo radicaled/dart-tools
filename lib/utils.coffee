@@ -80,7 +80,7 @@ class Utils
         if code is 0
           fxn()
 
-  @deferred: =>    
+  @deferred: =>
     resolve = null
     reject = null
     promise = new Promise =>

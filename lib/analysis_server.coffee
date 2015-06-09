@@ -91,4 +91,4 @@ class AnalysisServer
       method: "analysis.setAnalysisRoots"
       params:
         included: paths
-        excluded: []
+        excluded: paths.map (p) -> path.join(p, '.pub')
