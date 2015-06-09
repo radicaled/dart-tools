@@ -67,7 +67,7 @@ class AnalysisServer
           delete promiseMap[id]
           promise?.resolve(obj)
         else
-          promise?.notify(obj)
+          # promise?.notify(obj)
       else
         delete promiseMap[id]
         promise?.resolve(obj)
