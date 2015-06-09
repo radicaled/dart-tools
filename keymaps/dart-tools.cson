@@ -11,4 +11,4 @@
   "ctrl-shift-space": "dart-tools:autocomplete"
 
 "atom-text-editor":
-  "ctrl-alt-u": "dart-tools:show-information"
+  "ctrl-i": "dart-tools:show-information"
