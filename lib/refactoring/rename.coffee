@@ -96,7 +96,12 @@ class View
   show: =>
     @panel.show()
     @editor.focus()
-  hide: => @panel.hide()
+
+  hide: =>
+    @panel.hide()
+    codeEditor = atom.workspace.getActiveTextEditor()
+    if codeEditor
+      atom.views.getView(codeEditor).focus()
 
   confirm: =>
     @resolve(@model.getText())
