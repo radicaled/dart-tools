@@ -67,6 +67,7 @@ class DartTools
     QuickInfoView = require './info/quick_info_view'
     ProblemView = require './info/problem_view'
     ContextView = require './info/context_view'
+    RefactoringComponent = require './refactoring/refactoring_component'
 
     @errorRepository = new ErrorRepository(@analysisApi)
     @analysisToolbar = new AnalysisToolbar(@errorRepository)
@@ -78,8 +79,10 @@ class DartTools
     @formatter = new Formatter(@analysisApi)
     ProblemView.register(@errorRepository)
     @contextView = new ContextView(@analysisApi)
+    @refactoringComponent = new RefactoringComponent(@analysisApi)
 
     @analysisComponent.enable()
+    @refactoringComponent.enable()
     AutoCompletePlusProvider.analysisApi = @analysisApi
     # @dartExplorerComponent.enable()
 
@@ -130,5 +133,6 @@ class DartTools
     @quickInfoView?.dispose()
     @analysisToolbar?.dispose()
     @contextView?.dispose()
+    @refactoringComponent?.disable()
 
 module.exports = DartTools
