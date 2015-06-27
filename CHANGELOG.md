@@ -1,3 +1,11 @@
+# 0.9.18
+
+Features:
+  * Now using the `linter` package to provide error details. Install it today!
+  * Press CTRL-I to get basic dart documentation for element at cursor
+  * Basic "rename" refactor available via command palette (Dart Tools: Rename)
+  * Some updates to Dart grammar
+
 # 0.9.17
 
 Bugfixes:

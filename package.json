@@ -18,8 +18,15 @@
       }
     }
   },
+  "consumedServices": {
+    "linter-plus-self": {
+      "versions": {
+        "0.1.0": "consumeLinter"
+      }
+    }
+  },
   "dependencies": {
-    "atom-space-pen-views": "^2.0.3",    
+    "atom-space-pen-views": "^2.0.3",
     "envify": "~1.2.1",
     "event-kit": "^1.1.0",
     "fuzzaldrin": "^2.1.0",
