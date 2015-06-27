@@ -48,23 +48,4 @@ linterConfig =
   # lint: ->
   # The linting, it does nothing!
 
-
-# // Error/Warning
-# {
-#   type: string, // "Error" or "Warning"
-#   text?: string,
-#   html?: string,
-#   filePath?: string,
-#   range?: Range,
-#   trace?: Array<Trace>
-# }
-
-
-# @emitter.emit 'change',
-#   file: file
-#   errors: errors
-#   added: addedErrors
-#   removed: removedErrors
-
-
 module.exports = LinterComponent
