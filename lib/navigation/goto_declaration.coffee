@@ -23,6 +23,6 @@ class GotoDeclaration
       #       validFiles.push(file) if atom.project.contains(file)
       #       # validFiles.push(file)
 
-      @analysisApi.analysis.setSubscriptions { 'NAVIGATION': validFiles }
+      @analysisApi.analysis.setSubscriptions {'NAVIGATION': validFiles}
 
 module.exports = GotoDeclaration
