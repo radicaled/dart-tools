@@ -37,7 +37,6 @@ class LinterComponent
 
       @linter.deleteProjectMessages(linterConfig)
       @linter.setProjectMessages linterConfig, messages
-      @linter.views.render()
 
     @errorRepository.onChange _.debounce(updateErrors, 250, maxWait: 1000)
 
