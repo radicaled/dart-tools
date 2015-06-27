@@ -5,6 +5,9 @@ Features:
   * Press CTRL-I to get basic dart documentation for element at cursor
   * Basic "rename" refactor available via command palette (Dart Tools: Rename)
   * Some updates to Dart grammar
+  * Autocomplete will show dartdoc summary if available, which is never, because
+    the analysis_server doesn't ever return a dartdoc summary. But it might in
+    the future.
 
 # 0.9.17
 
