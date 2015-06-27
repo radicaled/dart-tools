@@ -22,6 +22,9 @@ module.exports =
   provideAutocompleter: ->
     AutoCompletePlusProvider
 
+  consumeLinter: (linter) ->
+    @dartTools?.consumeLinter(linter)
+
   activate: (state) ->
     @dartTools = new DartTools()
     @dartTools.waitForDartSources()

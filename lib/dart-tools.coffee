@@ -45,6 +45,10 @@ class DartTools
 
       enableAnalyzer(editor)
 
+  consumeLinter: (@linter) =>
+    LinterComponent = require './linter/linter_component'
+    @linterComponent = new LinterComponent(@linter, @errorRepository)
+
   # TODO: becoming massive, refactor.
   boot: =>
     return if @hasBooted
@@ -60,26 +64,28 @@ class DartTools
     Formatter = require './formatter'
     PubComponent = require './pub/pub_component'
     DartExplorerComponent = require './dart_explorer/dart_explorer_component'
-    AnalysisToolbar = require './analysis/analysis_toolbar'
+    # AnalysisToolbar = require './analysis/analysis_toolbar'
     ErrorRepository = require './errors/error_repository'
     SdkInfo = require './sdk/sdk_info'
-    AnalysisDecorator = require './analysis/analysis_decorator'
+    # AnalysisDecorator = require './analysis/analysis_decorator'
     QuickInfoView = require './info/quick_info_view'
-    ProblemView = require './info/problem_view'
+    # ProblemView = require './info/problem_view'
     ContextView = require './info/context_view'
     RefactoringComponent = require './refactoring/refactoring_component'
+    # NavigationComponent = require './navigation/navigation_component'
 
     @errorRepository = new ErrorRepository(@analysisApi)
-    @analysisToolbar = new AnalysisToolbar(@errorRepository)
+    # @analysisToolbar = new AnalysisToolbar(@errorRepository)
     @pubComponent = new PubComponent()
     # @dartExplorerComponent = new DartExplorerComponent(@analysisComponent)
     @sdkInfo = new SdkInfo()
-    @analysisDecorator = new AnalysisDecorator(@errorRepository)
+    # @analysisDecorator = new AnalysisDecorator(@errorRepository)
     @quickInfoView = new QuickInfoView()
     @formatter = new Formatter(@analysisApi)
-    ProblemView.register(@errorRepository)
+    # ProblemView.register(@errorRepository)
     @contextView = new ContextView(@analysisApi)
     @refactoringComponent = new RefactoringComponent(@analysisApi)
+    # @navigationComponent = new NavigationComponent(@analysisApi)
 
     @analysisComponent.enable()
     @refactoringComponent.enable()
@@ -101,6 +107,11 @@ class DartTools
       info = '[dart-tools] Dart SDK not specified, analysis_server not running.'
       atom.notifications.addInfo info,
         detail: 'Go to Settings > Packages > Dart Tools to specify Dart SDK'
+
+    setTimeout(
+      => @linterComponent.check(),
+      4000)
+
 
     # Commands
     atom.commands.add 'atom-workspace', 'dart-tools:format-code', =>
@@ -134,5 +145,6 @@ class DartTools
     @analysisToolbar?.dispose()
     @contextView?.dispose()
     @refactoringComponent?.disable()
+    @navigationComponent?.disable()
 
 module.exports = DartTools

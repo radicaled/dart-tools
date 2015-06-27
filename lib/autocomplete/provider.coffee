@@ -53,6 +53,7 @@ AutoCompletePlusProvider =
                 leftLabel: result.returnType
                 rightLabel: result.element?.kind or result.kind
                 type: @mapType(result)
+                description: result.docSummary
 
             resolve(items)
 

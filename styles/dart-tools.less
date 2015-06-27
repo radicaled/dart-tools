@@ -71,7 +71,19 @@ html /deep/ #analysis-toolbar {
   }
 }
 
+// AtomLinter/Linter custom styles
+atom-text-editor::shadow .linter-highlight.info:not(.line-number),
+.linter-highlight.info:not(.line-number) {
+  color: white;
+  background-color: @text-color-info;
+
+  .region {
+    border-bottom: 1px dashed @text-color-info;
+  }
+}
+
 atom-text-editor::shadow {
+  // Old linter styles
   .dart-analysis-info {
     .region {
       border-bottom: 2px solid @text-color-info;
@@ -111,6 +123,14 @@ dart-tools-problem-view {
 // Gutter marker decorations.
 
 atom-text-editor::shadow .gutter .line-number {
+  // AtomLinter/Linter styles
+  &.linter-highlight.info .icon-right {
+    &:before {
+      color: @text-color-info;
+    }
+  }
+
+  // Old linter styles
   &.dart-info .icon-right {
     visibility: visible;
     &:before {
