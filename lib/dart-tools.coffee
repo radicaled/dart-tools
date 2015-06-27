@@ -72,7 +72,7 @@ class DartTools
     # ProblemView = require './info/problem_view'
     ContextView = require './info/context_view'
     RefactoringComponent = require './refactoring/refactoring_component'
-    NavigationComponent = require './navigation/navigation_component'
+    # NavigationComponent = require './navigation/navigation_component'
 
     @errorRepository = new ErrorRepository(@analysisApi)
     # @analysisToolbar = new AnalysisToolbar(@errorRepository)
@@ -85,7 +85,7 @@ class DartTools
     # ProblemView.register(@errorRepository)
     @contextView = new ContextView(@analysisApi)
     @refactoringComponent = new RefactoringComponent(@analysisApi)
-    @navigationComponent = new NavigationComponent(@analysisApi)
+    # @navigationComponent = new NavigationComponent(@analysisApi)
 
     @analysisComponent.enable()
     @refactoringComponent.enable()
