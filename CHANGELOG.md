@@ -1,3 +1,8 @@
+# 0.9.19
+
+Bugfixes:
+  * Fix issue with method call order related to `linter` integration (20f760)  
+
 # 0.9.18
 
 Features:
