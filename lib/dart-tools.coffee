@@ -54,7 +54,7 @@ class DartTools
     if @hasBooted
       setupLinter()
     else
-      onBoot => setupLinter()
+      @onBoot => setupLinter()
 
   # TODO: becoming massive, refactor.
   boot: =>
