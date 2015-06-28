@@ -1,4 +1,5 @@
 {CompositeDisposable} = require 'atom'
+{Emitter} = require 'event-kit'
 Utils = require './utils'
 AutoCompletePlusProvider = require './autocomplete/provider'
 _ = require 'lodash'
@@ -12,6 +13,7 @@ class DartTools
     AnalysisComponent = require './analysis_component'
     @analysisComponent = new AnalysisComponent()
     @analysisApi = @analysisComponent.analysisAPI
+    @emitter = new Emitter()
 
   waitForDartSources: =>
     analysisServer = @analysisComponent.analysisServer
@@ -47,12 +49,16 @@ class DartTools
 
   consumeLinter: (@linter) =>
     LinterComponent = require './linter/linter_component'
-    @linterComponent = new LinterComponent(@linter, @errorRepository)
+    setupLinter = =>
+      @linterComponent = new LinterComponent(@linter, @errorRepository)
+    if @hasBooted
+      setupLinter()
+    else
+      onBoot => setupLinter()
 
   # TODO: becoming massive, refactor.
   boot: =>
     return if @hasBooted
-    @hasBooted = true
 
     # HACK: for some reason Atom is saving every dart-tools marker
     # This code flushes all pre-existing markers...
@@ -123,6 +129,10 @@ class DartTools
       Utils.dartSdkInfo (sdkInfo) =>
         @sdkInfo.showInfo(sdkInfo)
 
+    # Notify listeners that dart-tools has booted
+    @hasBooted = true
+    @emitter.emit 'boot'
+
   registerGlobalCommands: =>
     Stagehand = require './stagehand/stagehand'
     atom.commands.add 'atom-workspace', 'dart-tools:stagehand', =>
@@ -136,6 +146,9 @@ class DartTools
         Stagehand.activate().then =>
           Stagehand.showProjectTemplates().then (projectTemplate) =>
             Stagehand.generate(projectTemplate)
+
+  onBoot: (callback) =>
+    @emitter.on 'boot', callback
 
   dispose: =>
     @subscriptions?.dispose()
