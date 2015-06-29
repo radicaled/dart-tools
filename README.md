@@ -19,7 +19,7 @@ project.
 * Putting the caret within an analysis error quickly shows the problem text
 * Basic autocomplete, via the `autocomplete-plus` package.
 * Generate new Dart projects using Stagehand
-
+*
 Available Commands
 ==================
 
@@ -35,6 +35,8 @@ Formatting will save the current editor buffer first.
 
 **Linting requires you to set your dart-sdk location.** You can do that from
 `Settings View: Open` -> `Filter Packages` -> `Dart Tools`.
+
+**Linting requires the `linter` package.**
 
 **Did you install Dart SDK via homebrew?** Use `HOMEBREW_INSTALL/opt/dart/libexec`
 as the SDK directory (replace `HOMEBREW_INSTALL` with the location

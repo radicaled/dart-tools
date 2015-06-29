@@ -1,3 +1,8 @@
+# 0.9.21
+
+Bugfixes:
+  * Fix bug in `linter` detection code.
+
 # 0.9.19
 
 Bugfixes:

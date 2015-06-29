@@ -56,6 +56,11 @@ class DartTools
     else
       @onBoot => setupLinter()
 
+  detectLinterStatus: =>
+    unless @linterComponent?.linter
+      LinterComponent = require './linter/linter_component'
+      LinterComponent.warn()
+
   # TODO: becoming massive, refactor.
   boot: =>
     return if @hasBooted
@@ -115,7 +120,7 @@ class DartTools
         detail: 'Go to Settings > Packages > Dart Tools to specify Dart SDK'
 
     setTimeout(
-      => @linterComponent.check(),
+      => @detectLinterStatus(),
       4000)
 
 

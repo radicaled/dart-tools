@@ -3,14 +3,13 @@ _ = require 'lodash'
 
 class LinterComponent
   constructor: (@linter, @errorRepository) ->
-    LinterComponent.warn(@linter)
+    LinterComponent.warn() unless @linter
     @setup() if @linter
 
-  @warn: (linter) ->
-    unless linter
-      msg = '[dart-tools] The linter package is required to provide details
-      about errors and warnings.'
-      atom.notifications.addWarning msg
+  @warn: ->
+    msg = '[dart-tools] The linter package is required to provide details
+    about errors and warnings.'
+    atom.notifications.addWarning msg
 
   check: => LinterComponent.warn(@linter)
   setup: =>
