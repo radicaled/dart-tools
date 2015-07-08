@@ -34,8 +34,8 @@ class LinterComponent
             filePath: file
             range: range
 
-      @linter.deleteProjectMessages(linterConfig)
-      @linter.setProjectMessages linterConfig, messages
+      @linter.deleteMessages(linterConfig)
+      @linter.setMessages linterConfig, messages
 
     @errorRepository.onChange _.debounce(updateErrors, 250, maxWait: 1000)
 

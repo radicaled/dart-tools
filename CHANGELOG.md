@@ -1,3 +1,8 @@
+# 0.9.22
+
+Bugfixes:
+  * Quickly upgrade our use of `linter`, since 1.2.0 broke the interface
+
 # 0.9.21
 
 Bugfixes:
