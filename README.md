@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/radicaled/dart-tools.svg?branch=master)][travis]
 
+**NOTE**: currently unmaintained. You should use the [dartlang package](https://atom.io/packages/dartlang) instead.
+
 Various tools for Dart support in Atom.
 
 **NOTE**: somewhat alpha quality
